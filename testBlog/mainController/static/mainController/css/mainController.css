@@ -1,0 +1,365 @@
+body {
+  margin: 0 auto;
+  padding: 0;
+}
+
+.container {
+  display: flex;
+  height: 100vh; /* Занимает всю высоту экрана */
+}
+
+.sidebar {
+  position: fixed; /* Фиксируем навигационную панель */
+  top: 0;
+  left: 0;
+  width: 18%;
+  height: 100%;
+  background-color: #1f1e1eba;
+  padding: 20px;
+  list-style: none;
+  margin: 0, auto;
+}
+
+.sidebar h2 {
+  margin-bottom: 20px;
+}
+
+.sidebar ul {
+      list-style: none;
+      margin-left: 10%;
+
+}
+
+.sidebar li {
+  margin-bottom: 10px;
+  font-size: 20px;
+  FONT-FAMILY: cursive;
+  transition: transform .6s ease;
+}
+
+.sidebar a {
+  text-decoration: none;
+  color: white;
+
+}
+
+.sidebar p{
+  font-size: 30px;
+  padding-top: 8%;
+  margin-left: 8%;
+  FONT-FAMILY: fantasy;
+}
+
+.sidebar a:hover {
+  text-decoration: none;
+  color: red;
+}
+.sidebar li:hover {
+  text-decoration: none;
+  transform: scale(1.05);
+}
+
+
+
+.logotype .img{
+   width: 80px;
+   margin-left: 70px;
+}
+
+
+.main-content {
+  flex: 1;
+  padding: 50px;
+
+  text-align: center;
+
+
+}
+
+.main-content h1{
+  FONT-FAMILY: fangsong;
+
+}
+.icon-link{
+    text-decoration: none;
+}
+
+FONT-FAMILY: fantasy;
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+
+      .b-example-divider {
+        width: 100%;
+        height: 3rem;
+        background-color: rgba(0, 0, 0, .1);
+        border: solid rgba(0, 0, 0, .15);
+        border-width: 1px 0;
+        box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+      }
+
+      .b-example-vr {
+        flex-shrink: 0;
+        width: 1.5rem;
+        height: 100vh;
+      }
+
+      .bi {
+        vertical-align: -.125em;
+        fill: currentColor;
+      }
+
+      .nav-scroller {
+        position: relative;
+        z-index: 2;
+        height: 2.75rem;
+        overflow-y: hidden;
+      }
+
+      .nav-scroller .nav {
+        display: flex;
+        flex-wrap: nowrap;
+        padding-bottom: 1rem;
+        margin-top: -1px;
+        overflow-x: auto;
+        text-align: center;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .btn-bd-primary {
+        --bd-violet-bg: #712cf9;
+        --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
+
+        --bs-btn-font-weight: 600;
+        --bs-btn-color: var(--bs-white);
+        --bs-btn-bg: var(--bd-violet-bg);
+        --bs-btn-border-color: var(--bd-violet-bg);
+        --bs-btn-hover-color: var(--bs-white);
+        --bs-btn-hover-bg: #6528e0;
+        --bs-btn-hover-border-color: #6528e0;
+        --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
+        --bs-btn-active-color: var(--bs-btn-hover-color);
+        --bs-btn-active-bg: #5a23c8;
+        --bs-btn-active-border-color: #5a23c8;
+      }
+
+      .bd-mode-toggle {
+        z-index: 1500;
+      }
+      .bd-mode-toggle .dropdown-menu .active .bi {
+        display: block !important;
+      }
+
+#carousel-inner {
+  max-width: 550px; /* Устанавливаем максимальную ширину карусели */
+  margin: 0 auto; /* Центрируем карусель */
+}
+
+.carousel-inner img {
+  height: 400px; /* Устанавливаем высоту изображений */
+  object-fit: cover;
+}
+
+.carousel-item h3, h2{
+    FONT-FAMILY: fangsong;
+}
+
+
+.time-slot-button {
+    background-color: #ccc; /* Default color */
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.time-slot-button.active {
+    background-color: #007bff; /* Active color */
+    color: #fff;
+}
+
+.login{
+    padding-top: 10%;
+    margin: 0 auto;
+    width: 25%;
+}
+.login h1{
+    text-align: center;
+}
+.text-center{
+    padding-top: 10px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+::after,
+::before {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+}
+
+li {
+    list-style: none;
+}
+
+h1 {
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+.wrapper {
+    display: flex;
+}
+.appoint{
+    margin: 0 auto;
+    width:60%;
+}
+.carousel{
+    margin: 0 auto;
+    width: 80%;
+}
+.main {
+    min-height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    transition: all 0.35s ease-in-out;
+    background-color: #fafbfe;
+}
+
+#sidebar {
+    width: 70px;
+    min-width: 70px;
+    z-index: 1000;
+    transition: all .25s ease-in-out;
+    background-color: #0e2238;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+#sidebar.expand {
+    width: 260px;
+    min-width: 260px;
+    height: 100vh;
+}
+
+.toggle-btn {
+    background-color: transparent;
+    cursor: pointer;
+    border: 0;
+    padding: 1rem 1.5rem;
+}
+
+.toggle-btn i {
+    font-size: 1.5rem;
+    color: #FFF;
+}
+
+.sidebar-logo {
+    margin: auto 0;
+}
+
+.sidebar-logo a {
+    color: #FFF;
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+#sidebar:not(.expand) .sidebar-logo,
+#sidebar:not(.expand) a.sidebar-link span {
+    display: none;
+}
+
+.sidebar-nav {
+    padding: 2rem 0;
+    flex: 1 1 auto;
+}
+
+a.sidebar-link {
+    padding: .625rem 1.625rem;
+    color: #FFF;
+    display: block;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    border-left: 3px solid transparent;
+}
+
+.sidebar-link i {
+    font-size: 1.1rem;
+    margin-right: .75rem;
+}
+
+a.sidebar-link:hover {
+    background-color: rgba(255, 255, 255, .075);
+    border-left: 3px solid #3b7ddd;
+}
+
+.sidebar-item {
+    position: relative;
+}
+
+#sidebar:not(.expand) .sidebar-item .sidebar-dropdown {
+    position: absolute;
+    top: 0;
+    left: 70px;
+    background-color: #0e2238;
+    padding: 0;
+    min-width: 15rem;
+    display: none;
+}
+
+#sidebar:not(.expand) .sidebar-item:hover .has-dropdown+.sidebar-dropdown {
+    display: block;
+    max-height: 15em;
+    width: 100%;
+    opacity: 1;
+}
+
+#sidebar.expand .sidebar-link[data-bs-toggle="collapse"]::after {
+    border: solid;
+    border-width: 0 .075rem .075rem 0;
+    content: "";
+    display: inline-block;
+    padding: 2px;
+    position: absolute;
+    right: 1.5rem;
+    top: 1.4rem;
+    transform: rotate(-135deg);
+    transition: all .2s ease-out;
+}
+
+#sidebar.expand .sidebar-link[data-bs-toggle="collapse"].collapsed::after {
+    transform: rotate(45deg);
+    transition: all .2s ease-out;
+}
