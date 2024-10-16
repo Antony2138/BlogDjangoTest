@@ -52,10 +52,10 @@ class AppointmentForm(forms.ModelForm):
 
 
 class ServiceForm(forms.ModelForm):
-    # def __init__(self, *args, **kwargs):
-    #     super(ServiceForm, self).__init__(*args, **kwargs)
-    #     if self.instance and self.instance.pk:
-    #         self.fields['background_color'].widget.attrs['value'] = self.instance.background_color
+    def __init__(self, *args, **kwargs):
+        super(ServiceForm, self).__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields['background_color'].widget.attrs['value'] = self.instance.background_color
 
     class Meta:
         model = Service

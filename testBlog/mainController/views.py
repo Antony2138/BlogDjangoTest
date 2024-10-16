@@ -81,6 +81,5 @@ def promo(request):
 #     return render(request, 'appointment.html', context)
 
 
-
 def calendar(request):
     return render(request, 'mainController/calendar.html')

@@ -19,6 +19,9 @@ def add_or_update_service(request):
     return render(request, 'administration/manage_service.html', data)
 
 
+def show_abilities(request):
+    return render(request, 'administration/manege_all.html')
+
     # extra_context = {
     #     "btn_text": "Save",
     #     "page_title": "Add Service",

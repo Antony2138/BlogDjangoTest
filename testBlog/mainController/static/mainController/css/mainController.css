@@ -70,7 +70,7 @@ body {
 .main-content {
   flex: 1;
   padding: 50px;
-
+  margin: 0 auto;
   text-align: center;
 
 
@@ -362,4 +362,67 @@ a.sidebar-link:hover {
 #sidebar.expand .sidebar-link[data-bs-toggle="collapse"].collapsed::after {
     transform: rotate(45deg);
     transition: all .2s ease-out;
+}
+
+.Modal {
+    position: fixed;
+    display: none;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 0;
+    background: rgba(0,0,0,0.7);
+    pointer-events: none;
+}
+
+.Modal:target {
+    display: flex;
+    pointer-events: auto;
+}
+
+.Modal_Body {
+    position: relative;
+    z-index: 2;
+    display: block;
+    margin: auto;
+    padding: 15px;
+    background: #FFF;
+}
+
+.ModalFull {
+    position: absolute;
+    display: none;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    text-align: center;
+    padding-top: 20%;
+}
+
+.CloseBtn {
+    display: block;
+    margin-top: 10px;
+    text-decoration: none;
+    color: #333;
+}
+
+.ConfirmBtn,
+.CancelBtn {
+    display: block;
+    margin-top: 10px;
+    text-decoration: none;
+    color: #333;
+}
+
+.ConfirmBtn {
+    margin-top: 20px;
+}
+.out{
+    margin-left:7%;
+    margin-bottom:5%;
+    border-radius: 5px;
+    background: #e94848bf;
+    color: white;
 }

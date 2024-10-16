@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import UserRegisterForm
-
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 
@@ -20,3 +20,8 @@ def registration(request):
     else:
         form = UserRegisterForm()
         return render(request, 'mainUser/registration.html', {'form': form})
+
+
+@login_required
+def profile(request):
+    return render(request, 'mainUser/profile.html')
