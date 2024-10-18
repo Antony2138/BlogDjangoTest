@@ -1,3 +1,5 @@
+from importlib.resources._common import _
+
 from django import forms
 
 from .models import (
@@ -5,7 +7,6 @@ from .models import (
 )
 
 from .utils.validators import not_in_the_past
-
 
 class AppointmentRequestForm(forms.ModelForm):
     class Meta:
@@ -50,29 +51,33 @@ class AppointmentForm(forms.ModelForm):
 
 
 class ServiceForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(ServiceForm, self).__init__(*args, **kwargs)
-        if self.instance and self.instance.pk:
-            self.fields['background_color'].widget.attrs['value'] = self.instance.background_color
 
     class Meta:
         model = Service
         fields = ['name', 'description', 'duration', 'price']
+        labels = {
+            'name': 'Название',
+            'description': 'Описание',
+            'duration': 'Продолжительность',
+            'price': 'Цена',
+        }
         widgets = {
             'name': forms.TextInput(attrs={
+                'label': 'Название',
                 'class': 'form-control',
-                'placeholder': 'Example: First Consultation'
+                'placeholder': 'Пример: Наращивание'
             }),
             'description': forms.Textarea(attrs={
+                'label': 'Название',
                 'class': 'form-control',
-                'placeholder': "Example: Overview of client's needs."
+                'placeholder': "Пример: Описание для клиентов."
             }),
             'duration': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'HH:MM:SS, (example: 00:15:00 for 15 minutes)'
+                'placeholder': 'ЧЧ:MM:СС, (Пример: 00:15:00 для 15 минут)'
             }),
             'price': forms.NumberInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Example: 100.00 (0 for free)'
+                'placeholder': 'Пример: 100.00 (0 for free)'
             }),
         }

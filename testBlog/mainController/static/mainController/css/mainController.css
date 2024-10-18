@@ -70,7 +70,7 @@ body {
 .main-content {
   flex: 1;
   padding: 50px;
-  margin: 0 auto;
+  margin-left: 50px;
   text-align: center;
 
 
@@ -266,6 +266,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100vh;
+    position: fixed;
 }
 
 #sidebar.expand {
@@ -305,7 +306,9 @@ body {
     padding: 2rem 0;
     flex: 1 1 auto;
 }
-
+.btn btn-primary{
+    background-color: white;
+}
 a.sidebar-link {
     padding: .625rem 1.625rem;
     color: #FFF;

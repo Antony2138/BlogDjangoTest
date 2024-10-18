@@ -28,6 +28,36 @@ class Service(models.Model):
     def __str__(self):
         return self.name
 
+    def get_duration_parts(self):
+        total_seconds = int(self.duration.total_seconds())
+        days = total_seconds // 86400
+        hours = (total_seconds % 86400) // 3600
+        minutes = (total_seconds % 3600) // 60
+        seconds = total_seconds % 60
+        return days, hours, minutes, seconds
+
+    def get_duration(self):
+        days, hours, minutes, seconds = self.get_duration_parts()
+        parts = []
+
+        if days:
+            parts.append(f"{days} day{'s' if days > 1 else ''}")
+        if hours:
+            parts.append(f"{hours} час{'а' if hours > 1 else ''}")
+        if minutes:
+            parts.append(f"{minutes} минут")
+        if seconds:
+            parts.append(f"{seconds} секунд{'ы' if seconds > 1 else ''}")
+
+        return ' '.join(parts)
+
+    def get_price(self):
+        # Check if the decimal part is 0
+        return (f"{self.price} рублей")
+
+    def get_description(self):
+        return self.description
+
 
 class StaffMember(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

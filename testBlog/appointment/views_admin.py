@@ -3,21 +3,28 @@ from django.shortcuts import render, redirect
 
 from .decorators import require_user_authenticated, require_superuser
 from .forms import ServiceForm
+from .models import Service
 
 
+@require_user_authenticated
+@require_superuser
 def add_or_update_service(request):
     if request.method == 'POST':
         form = ServiceForm(request.POST)
         if form.is_valid:
             form.save()
             messages.success(request, "Услуга успешно добавлена")
-            return redirect('/add-service')
+            return redirect('add_service')
     form = ServiceForm()
-    data = {
-        'form': form,
-        "btn_text": "Добавить",
-    }
-    return render(request, 'administration/manage_service.html', data)
+    return render(request, 'administration/manage_service.html', {'form': form})
+
+
+@require_user_authenticated
+@require_superuser
+def get_service_list(request):
+    services = Service.objects.all()
+    context = {'services': services}
+    return render(request, 'administration/service_list.html', context=context)
 
 
 @require_user_authenticated
