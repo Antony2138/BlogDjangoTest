@@ -1,103 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif; /* Modern font */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f8f9fa; /* Lighter background */
-        }
+{% extends 'mainController/layout.html'%}
+{% load static %}
 
-        .login {
-            background-color: #fff;
-            padding: 40px 60px; /* Wider padding */
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 400px; /* Adjust width as needed */
-        }
-
-        .form-group {
-            margin-bottom: 25px; /* More space between form elements */
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500; /* Slightly bolder labels */
-            color: #333; /* Darker label color */
-        }
-
-        input[type="text"],
-        input[type="password"] {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ced4da;
-            border-radius: 5px;
-            box-sizing: border-box;
-            font-size: 16px; /* Larger font size */
-            color: #333;
-        }
-
-        input[type="text"]:focus,
-        input[type="password"]:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px #ffc107; /* Focus outline in yellow */
-        }
-
-        .btn-warning {
-            background-color: #40b74f;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 5px;
-            color: #fff;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background-color 0.3s ease; /* Smooth transition on hover */
-        }
-
-        .btn-warning:hover {
-            background-color: #e0a800;
-        }
-
-        .login p {
-            margin-top: 20px;
-            font-size: 14px;
-        }
-
-        .login a {
-            color: #ffc107;
-            text-decoration: none;
-        }
-
-        .login a:hover {
-            text-decoration: underline;
-        }
-    </style>
-</head>
-<body>
-    <div class="login">
-        <form method="POST">
-            {% csrf_token %}
-            <h2>Вход</h2>
-            {{ form }}
-            <br>
-            <button type="submit" class="btn btn-warning">Вход</button>
-        </form>
-        <p>Нужен аккаунт? <a class="ml-2" href="{% url 'registration' %}">Регистрация</a></p>
-        {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-{{ message.tags }}">
-            {{ message }}
-          </div>
-        {% endfor %}
-        {% endif %}
+{% block body %}
+<div class="login">
+    <form method="POST">
+        {% csrf_token %}
+        <h2>Вход</h2>
+        {{ form }}
+        <br>
+        <button type="submit" class="btn btn-warning">Вход</button>
+    </form>
+    <p>Нет аккаунта? <a class="ml-2" href="{% url 'registration' %}">Регистрация</a></p>
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
     </div>
-</body>
-</html>
+    {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}
