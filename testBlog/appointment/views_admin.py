@@ -10,12 +10,12 @@ def add_or_update_service(request):
         form = ServiceForm(request.POST)
         if form.is_valid:
             form.save()
-            messages.success(request, "Service saved successfully!")
+            messages.success(request, "Услуга успешно добавлена")
             return redirect('/add-service')
     form = ServiceForm()
     data = {
         'form': form,
-        "btn_text": "Save",
+        "btn_text": "Добавить",
     }
     return render(request, 'administration/manage_service.html', data)
 
