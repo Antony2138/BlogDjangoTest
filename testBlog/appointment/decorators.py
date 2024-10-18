@@ -7,7 +7,7 @@ Since: 2.0.0
 """
 
 from functools import wraps
-
+from .utils.error_codes import ErrorCode
 from .utils.json_context import json_response
 from .utils.view_helpers import is_ajax
 

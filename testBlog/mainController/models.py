@@ -5,7 +5,6 @@ from django.db import models
 # Create your models here.
 
 
-
 class Meet(models.Model):
     """Модель записи."""
     name = models.CharField(max_length=100)
@@ -27,4 +26,3 @@ class Chank(models.Model):
 
     def __str__(self):
         return f"{self.start_time} - {self.end_time}"
-

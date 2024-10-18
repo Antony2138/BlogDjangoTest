@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.shortcuts import render, redirect
 
+from .decorators import require_user_authenticated, require_superuser
 from .forms import ServiceForm
 
 
@@ -19,6 +20,8 @@ def add_or_update_service(request):
     return render(request, 'administration/manage_service.html', data)
 
 
+@require_user_authenticated
+@require_superuser
 def show_abilities(request):
     return render(request, 'administration/manege_all.html')
 

@@ -4,7 +4,7 @@ from django.core.cache import cache
 import datetime
 from django.apps import apps
 
-from ..settings import(
+from ..settings import (
     APPOINTMENT_BUFFER_TIME, APPOINTMENT_FINISH_TIME, APPOINTMENT_LEAD_TIME,
     APPOINTMENT_SLOT_DURATION
 )
@@ -134,10 +134,10 @@ def get_appointments_for_date_and_time(date, start_time, end_time, staff_member)
     :return: QuerySet, all appointments that overlap with the specified date and time range
     """
     return Appointment.objects.filter(
-            appointment_request__date=date,
-            appointment_request__start_time__lte=end_time,
-            appointment_request__end_time__gte=start_time,
-            appointment_request__staff_member=staff_member
+        appointment_request__date=date,
+        appointment_request__start_time__lte=end_time,
+        appointment_request__end_time__gte=start_time,
+        appointment_request__staff_member=staff_member
     )
 
 
@@ -197,7 +197,6 @@ def get_working_hours_for_staff_and_day(staff_member, day_of_week):
         'start_time': working_hours.start_time,
         'end_time': working_hours.end_time
     }
-
 
 
 def get_config():

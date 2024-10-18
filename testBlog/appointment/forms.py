@@ -1,6 +1,5 @@
 from django import forms
 
-
 from .models import (
     Appointment, AppointmentRequest, Service, StaffMember, WorkingHours
 )
@@ -21,7 +20,6 @@ class SlotForm(forms.Form):
 
 
 class AppointmentForm(forms.ModelForm):
-
     class Meta:
         model = Appointment
         fields = ('phone',)
@@ -29,26 +27,26 @@ class AppointmentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['phone'].widget.attrs.update(
-                {
-                    'placeholder': '1234567890'
-                })
+            {
+                'placeholder': '1234567890'
+            })
         self.fields['additional_info'].widget.attrs.update(
-                {
-                    'rows': 2,
-                    'class': 'form-control',
-                })
+            {
+                'rows': 2,
+                'class': 'form-control',
+            })
         self.fields['address'].widget.attrs.update(
-                {
-                    'rows': 2,
-                    'class': 'form-control',
-                    'placeholder': '1234 Main St, City, State, Zip Code',
-                    'required': 'true'
-                })
+            {
+                'rows': 2,
+                'class': 'form-control',
+                'placeholder': '1234 Main St, City, State, Zip Code',
+                'required': 'true'
+            })
         self.fields['additional_info'].widget.attrs.update(
-                {
-                    'class': 'form-control',
-                    'placeholder': 'I would like to be contacted by phone.'
-                })
+            {
+                'class': 'form-control',
+                'placeholder': 'I would like to be contacted by phone.'
+            })
 
 
 class ServiceForm(forms.ModelForm):

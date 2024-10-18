@@ -12,6 +12,7 @@ ajax_urlpatterns = [
 admin_urlpatterns = [
     path('', views_admin.show_abilities, name='show_all'),
     path('add-service/', views_admin.add_or_update_service, name='add_service'),
+
 ]
 
 urlpatterns = [
