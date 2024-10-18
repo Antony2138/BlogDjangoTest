@@ -13,6 +13,9 @@ admin_urlpatterns = [
     path('', views_admin.show_abilities, name='show_all'),
     path('add-service/', views_admin.add_or_update_service, name='add_service'),
     path('service-list/', views_admin.get_service_list, name='get_service_list'),
+    path('update-service/<int:service_id>/', views_admin.add_or_update_service, name='update_service'),
+    path('delete-service/<int:service_id>/', views_admin.delete_service, name='delete_service'),
+    path('view-service/<int:service_id>/<int:view>/', views_admin.add_or_update_service, name='view_service'),
 
 ]
 

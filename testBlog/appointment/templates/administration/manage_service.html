@@ -5,13 +5,14 @@
 
 {% block body %}
     <section class="content content-wrapper">
-        <div class="service-form-wrapper">
+        <div class="service-form-wrapper" style="margin: 0 auto; width: 40%;">
             <div class="service-form-content">
-                <h2>Добавление услуги</h2>
+                <h2>{{page_title}}</h2>
                 <form method="post">
                     {% csrf_token %}
                     {{ form }}
-                    <button type="submit" class="btn btn-primary">Добавить</button>
+                    <br>
+                    <button type="submit" class="btn btn-primary">{{bnt_text}}</button>
                 </form>
                 <div class="messages" style="margin: 20px 0">
                     {% if messages %}

@@ -1,5 +1,6 @@
 import datetime
 
+from .forms import ServiceForm
 from .models import (
     Appointment, AppointmentRequest,  Config, Service,
     StaffMember
@@ -48,6 +49,21 @@ def get_available_slots(date, appointments):
     slots = calculate_slots(start_time, end_time, buffer_time, slot_duration)
     slots = exclude_booked_slots(appointments, slots, slot_duration)
     return [slot.strftime('%I:%M %p') for slot in slots]
+
+
+def handle_service_management_request(post_data, files_data=None, service_id=None):
+    try:
+        if service_id:
+            service = Service.objects.get(pk=service_id)
+            form = ServiceForm(post_data, files_data, instance=service)
+        else:
+            form = ServiceForm(post_data, files_data)
+
+        if form.is_valid():
+            form.save()
+            return form.instance, True, "Service saved successfully."
+    except Exception as e:
+        return None, False, str(e)
 
 
 def get_appointments_and_slots(date_, service=None):

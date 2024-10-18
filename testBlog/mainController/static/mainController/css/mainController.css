@@ -59,8 +59,6 @@ body {
   transform: scale(1.05);
 }
 
-
-
 .logotype .img{
    width: 80px;
    margin-left: 70px;
@@ -219,10 +217,6 @@ FONT-FAMILY: fantasy;
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-}
-
-a {
-    text-decoration: none;
 }
 
 li {
