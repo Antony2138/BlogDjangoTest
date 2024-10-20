@@ -64,22 +64,24 @@ class StaffMember(models.Model):
     services_offered = models.ManyToManyField(Service)
     slot_duration = models.PositiveIntegerField(
         null=True, blank=True,
-        help_text="Minimum time for an appointment in minutes, recommended 30."
+        help_text='(Количество слотов доступных для записи к данному работнику, день будет разбит на промежутки по'
+                  ' установленному количеству минут)'
+
     )
     lead_time = models.TimeField(
         null=True, blank=True,
-        help_text="Time when the staff member starts working."
+        help_text="Время начала рабочего дня"
     )
     finish_time = models.TimeField(
         null=True, blank=True,
-        help_text="Time when the staff member stops working."
+        help_text="Время конца рабочего дня"
     )
     appointment_buffer_time = models.FloatField(
         blank=True, null=True,
-        help_text='Time between now and the first available slot for the current day (doesn\'t affect tomorrow). '
-                  'e.g: If you start working at 9:00 AM and the current time is 8:30 AM and you set it to 30 '
-                  'minutes, the first available slot will be at 9:00 AM. If you set the appointment buffer time to '
-                  '60 minutes, the first available slot will be at 9:30 AM.'
+        help_text='Время между текущим моментом и первым доступным интервалом на текущий день (не влияет на завтра). '
+                  'Например: если вы начинаете работать в 9:00 утра, а текущее время — 8:30 утра, и вы устанавливаете его на 30 '
+                  'минут, первый доступный интервал будет в 9:00 утра. Если вы устанавливаете время буфера встреч на '
+                  '60 минут, первый доступный интервал будет в 9:30 утра.'
     )
 
 
