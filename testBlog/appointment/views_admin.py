@@ -24,6 +24,7 @@ def add_or_update_service(request, service_id=None):
         if form.is_valid():
             form.save()
             if service:
+
                 messages.success(request, "Услуга успешно сохранена")
             else:
                 messages.success(request, "Услуга успешно добавлена")
