@@ -1,5 +1,3 @@
-from importlib.resources._common import _
-
 from django import forms
 
 from .models import (
@@ -52,7 +50,6 @@ class AppointmentForm(forms.ModelForm):
 
 
 class ServiceForm(forms.ModelForm):
-
     class Meta:
         model = Service
         fields = ['name', 'description', 'duration', 'price']
