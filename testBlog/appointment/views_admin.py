@@ -1,4 +1,6 @@
 from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.shortcuts import render, redirect, get_object_or_404
 
 from .decorators import require_user_authenticated, require_superuser, require_staff_or_superuser
@@ -67,13 +69,18 @@ def add_staff_member_info(request):
     if request.method == 'POST':
         form = StaffMemberForm(request.POST)
         if form.is_valid():
+            user = form.cleaned_data['user']
+            user.is_staff = True
+            user.save()
             form.save()
-            return redirect('profile')
+            messages.success(request, "Работник успешно создан!")
+            return redirect('get_staff_list')
     else:
         form = StaffMemberForm()
-
-    context = get_generic_context_with_extra(request=request, extra={'form': form})
-    return render(request, 'administration/manage_staff.html', context)
+    context = {
+        'form': form
+    }
+    return render(request, 'administration/manage_staff.html', context=context)
 
 
 @require_user_authenticated
@@ -82,3 +89,15 @@ def get_staff_list(request):
     staff_members = StaffMember.objects.all()
     context = {'staff_members': staff_members}
     return render(request, 'administration/staff_list.html', context=context)
+
+
+@require_user_authenticated
+@require_superuser
+def remove_staff_member(request, staff_user_id):
+    staff_member = get_object_or_404(StaffMember, user_id=staff_user_id)
+    staff_member.delete()
+    user = User.objects.get(pk=staff_user_id)
+    user.is_staff = False
+    user.save()
+    messages.success(request, "Работник успешно удален!")
+    return redirect('get_staff_list')

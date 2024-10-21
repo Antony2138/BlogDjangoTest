@@ -95,7 +95,7 @@ class StaffMemberForm(forms.ModelForm):
             'appointment_buffer_time': 'Через сколько будет разрешена запись с начала рабочего времени:',
         }
         widgets = {
-            'user': forms.Select(attrs={'class': 'form-control', 'option': 'Выберите пользователя'}),
+            'user': forms.Select(attrs={'class': 'form-control'}),
             'service_offered': forms.Select(attrs={'class': 'form-control'}),
             'slot_duration': forms.NumberInput(attrs={
                 'class': 'form-control',

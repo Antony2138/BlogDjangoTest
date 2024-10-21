@@ -31,6 +31,10 @@
                             <tr>
                                 <td>{{ staff_member.get_staff_member_name }}</td>
                                 <td>{{ staff_member.user.email|default:"Не указано" }}</td>
+                                <td>
+                                    <a href="{% url 'remove_staff_member' staff_member.user.id %}"
+                                       class="modify-btn button-color-red">{% trans 'Remove' %}</a>
+                                </td>
                             </tr>
                         {% empty %}
                             <tr>
