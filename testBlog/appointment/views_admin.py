@@ -20,7 +20,7 @@ def add_or_update_service(request, service_id=None):
         page_title = "Добавление услуги"
         btn_text = "Добавить"
     if request.method == 'POST':
-        form = ServiceForm(request.POST, request.FILES, instance=service)
+        form = ServiceForm(request.POST, instance=service)
         if form.is_valid():
             form.save()
             if service:
