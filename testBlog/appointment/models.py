@@ -84,6 +84,9 @@ class StaffMember(models.Model):
                   '60 минут, первый доступный интервал будет в 9:30 утра.'
     )
 
+    def get_staff_member_name(self):
+        return f"{self.user.first_name} {self.user.last_name}"
+
 
 class AppointmentRequest(models.Model):
     date = models.DateField()

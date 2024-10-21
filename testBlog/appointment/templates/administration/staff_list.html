@@ -30,7 +30,7 @@
                         {% for staff_member in staff_members %}
                             <tr>
                                 <td>{{ staff_member.get_staff_member_name }}</td>
-                                <td>{{ staff_member.user.email|default:"N/A" }}</td>
+                                <td>{{ staff_member.user.email|default:"Не указано" }}</td>
                             </tr>
                         {% empty %}
                             <tr>
