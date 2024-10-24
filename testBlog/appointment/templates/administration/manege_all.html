@@ -1,6 +1,20 @@
 {% extends 'mainController/layout.html'%}
-{% load i18n %}
-{% load static %}
+
 {% block body %}
-<button class="btn btn-primary"><a href="{% url 'add_service'%}"> Добавить услугу</a></button>
+<div class="custom-wrapper">
+    <div>
+        <h2>Управление услугами</h2>
+        <button class="btn btn-primary"><a href="{% url 'add_service'%}"> Добавить услугу</a></button>
+        <button class="btn btn-primary"><a href="{% url 'get_service_list'%}"> Список услуг</a></button>
+
+    </div>
+    <div>
+        <h2>Управление работниками</h2>
+        <button class="btn btn-primary"><a href="{% url 'add_staff_member_info'%}"> Добавить работника </a></button>
+        <button class="btn btn-primary"><a href="{% url 'get_staff_list'%}"> Список работников </a></button>
+
+    </div>
+
+</div>
+
 {% endblock %}

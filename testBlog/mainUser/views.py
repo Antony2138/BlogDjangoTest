@@ -4,7 +4,6 @@ from django.contrib import messages
 from .forms import UserRegisterForm
 from django.contrib.auth.decorators import login_required
 
-
 # Create your views here.
 
 
@@ -12,7 +11,9 @@ def registration(request):
     if request.method == "POST":
         form = UserRegisterForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])
+            user.save()
             messages.success(request, f'Ваш аккаунт создан: можно войти на сайт.')
             return redirect('login')
         else:

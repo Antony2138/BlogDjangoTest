@@ -59,8 +59,6 @@ body {
   transform: scale(1.05);
 }
 
-
-
 .logotype .img{
    width: 80px;
    margin-left: 70px;
@@ -70,7 +68,7 @@ body {
 .main-content {
   flex: 1;
   padding: 50px;
-  margin: 0 auto;
+  margin-left: 50px;
   text-align: center;
 
 
@@ -221,10 +219,6 @@ FONT-FAMILY: fantasy;
     padding: 0;
 }
 
-a {
-    text-decoration: none;
-}
-
 li {
     list-style: none;
 }
@@ -266,6 +260,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100vh;
+    position: fixed;
 }
 
 #sidebar.expand {
@@ -305,7 +300,9 @@ body {
     padding: 2rem 0;
     flex: 1 1 auto;
 }
-
+.btn btn-primary{
+    background-color: white;
+}
 a.sidebar-link {
     padding: .625rem 1.625rem;
     color: #FFF;
@@ -425,4 +422,9 @@ a.sidebar-link:hover {
     border-radius: 5px;
     background: #e94848bf;
     color: white;
+}
+
+.content content-wrapper{
+    margin: 0 auto;
+    width: 40%;
 }

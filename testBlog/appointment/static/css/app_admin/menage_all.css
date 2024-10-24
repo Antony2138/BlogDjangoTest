@@ -1,0 +1,33 @@
+.custom-wrapper{
+    display: flex;
+    justify-content: space-evenly;
+
+.service-form-wrapper{
+    margin: 0 auto;
+    width: 40%;
+}
+
+.staff-form-wrapper{
+    margin: 0 auto;
+    width: 40%;
+}
+
+.section-header{
+    display:flex;
+}
+
+a:hover {
+    color: #0056b3;
+    text-decoration: none;
+}
+
+.btn-primary {
+    color: black;
+    background-color: white;
+    border-color: #007bff;
+    cursor: pointer;
+}
+.btn-primary:hover {
+    background-color: #0e2238;
+
+}

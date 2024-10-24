@@ -109,6 +109,19 @@ def get_staff_member_buffer_time(staff_member: StaffMember, date: datetime.date)
     return staff_member.appointment_buffer_time or buffer_minutes
 
 
+def get_staff_member_from_user_id_or_logged_in(user, user_id=None):
+    """Fetch StaffMember based on the user_id or the logged-in user."""
+    staff_member = None
+    try:
+        if user_id:
+            staff_member = StaffMember.objects.get(user_id=user_id)
+        else:
+            staff_member = user.staffmember
+    except StaffMember.DoesNotExist:
+        pass
+    return staff_member
+
+
 def get_staff_member_end_time(staff_member: StaffMember, date: datetime.date) -> Optional[datetime.time]:
     """Return the end time for the given staff member on the given date."""
     weekday_num = get_weekday_num_from_date(date)

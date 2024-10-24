@@ -11,14 +11,24 @@ ajax_urlpatterns = [
 
 admin_urlpatterns = [
     path('', views_admin.show_abilities, name='show_all'),
+
+    # add, remove, show, update service
     path('add-service/', views_admin.add_or_update_service, name='add_service'),
+    path('service-list/', views_admin.get_service_list, name='get_service_list'),
+    path('update-service/<int:service_id>/', views_admin.add_or_update_service, name='update_service'),
+    path('delete-service/<int:service_id>/', views_admin.delete_service, name='delete_service'),
+
+    # add, remove, show, (update) staff member
+    path('add-staff-member-info/', views_admin.add_staff_member_info, name='add_staff_member_info'),
+    path('staff-list/', views_admin.get_staff_list, name='get_staff_list'),
+
+    path('remove-staff-member/<int:staff_user_id>/', views_admin.remove_staff_member, name='remove_staff_member')
 
 ]
 
 urlpatterns = [
     path('request/<int:service_id>/', views.appointment_request, name='appointment_request'),
-    path('', views.appointment_request_submit, name='appointment_request_submit'),
     path('ajax', include(ajax_urlpatterns)),
-    path('app-admin/', include(admin_urlpatterns), name='app-admin'),
+    path('', include(admin_urlpatterns), name='app-admin'),
 
 ]
