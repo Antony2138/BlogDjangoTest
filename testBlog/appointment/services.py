@@ -1,18 +1,26 @@
 import datetime
-from audioop import reverse
+from django.urls import reverse
 
-from .forms import ServiceForm
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.shortcuts import render, redirect
+
+from .forms import ServiceForm, PersonalInformationForm, StaffDaysOffForm, StaffWorkingHoursForm
 from .models import (
-    Appointment, AppointmentRequest,  Config, Service,
-    StaffMember
+    Appointment, AppointmentRequest, Config, Service,
+    StaffMember, WorkingHours
 )
 
 from django.utils import timezone
+
+from .utils.date_time import convert_12_hour_time_to_24_hour_time
 from .utils.db_helpers import (
     get_times_from_config, calculate_slots, exclude_booked_slots, get_weekday_num_from_date,
     get_working_hours_for_staff_and_day, calculate_staff_slots, get_appointments_for_date_and_time,
-    get_staff_member_from_user_id_or_logged_in
+    get_staff_member_from_user_id_or_logged_in, day_off_exists_for_date_range, working_hours_exist
 )
+from .utils.error_codes import ErrorCode
+from .utils.json_context import json_response, get_generic_context
 
 
 def get_available_slots_for_staff(date, staff_member):
@@ -34,7 +42,6 @@ def get_available_slots_for_staff(date, staff_member):
     appointments = get_appointments_for_date_and_time(date, working_hours_dict['start_time'],
                                                       working_hours_dict['end_time'], staff_member)
     return exclude_booked_slots(appointments, slots, slot_duration)
-
 
 
 def get_available_slots(date, appointments):
@@ -92,61 +99,22 @@ def get_appointments_and_slots(date_, service=None):
 
 def prepare_user_profile_data(user, staff_user_id):
     """Prepare the data for the user profile page.
-
-    :param user: The user instance.
-    :param staff_user_id: The staff user id.
-    :return: A dictionary containing the data for the user profile page.
     """
-    if user.is_superuser and staff_user_id is None:
-        staff_members = StaffMember.objects.all()
-        btn_staff_me = "Staff me"
-        btn_staff_me_link = reverse('appointment:make_superuser_staff_member')
-        if StaffMember.objects.filter(user=user).exists():
-            btn_staff_me = "Remove me"
-            btn_staff_me_link = reverse('appointment:remove_superuser_staff_member')
-        data = {
-            'error': False,
-            'template': 'administration/staff_list.html',
-            'extra_context': {
-                'staff_members': staff_members,
-                'btn_staff_me': btn_staff_me,
-                'btn_staff_me_link': btn_staff_me_link
-            }
-        }
-        return data
-
-    if staff_user_id and staff_user_id != user.pk and not user.is_superuser:
-        return {
-            'error': True,
-            'extra_context': {'message': "You can only view your own profile",
-                              'back_url': reverse('appointment:user_profile')},
-            'status_code': 403
-        }
     staff_member = get_staff_member_from_user_id_or_logged_in(user, staff_user_id)
-
-    if not staff_member:
-        return {
-            'error': True,
-            'extra_context': {'message': "Not authorized.", 'back_url': reverse('appointment:user_profile')},
-            'status_code': 403
-        }
-
     bt_help = StaffMember._meta.get_field('appointment_buffer_time')
     bt_help_text = bt_help.help_text
 
     sd_help = StaffMember._meta.get_field('slot_duration')
     sd_help_text = sd_help.help_text
-    if user.is_superuser:
-        service_msg = "Here you can add/remove services offered by this staff member by modifying this section."
-    else:
-        service_msg = "Here you can add/remove services offered by you by modifying this section."
-    return {
+    service_msg = "Здесь вы можете добавлять/удалять предлагаемые вами услуги, изменяя этот раздел."
+    data = {
         'error': False,
         'template': 'administration/user_profile.html',
         'extra_context': {
             'superuser': user if user.is_superuser else None,
             'user': staff_member.user if staff_member else user,
-            'staff_member': staff_member,
+            'staff_member': staff_member if staff_member else user,
+            'days_off': staff_member.get_days_off().order_by('start_date') if staff_member else [],
             'working_hours': staff_member.get_working_hours() if staff_member else [],
             'services_offered': staff_member.get_services_offered() if staff_member else [],
             'staff_member_not_found': not bool(staff_member),
@@ -155,3 +123,167 @@ def prepare_user_profile_data(user, staff_user_id):
             'service_msg': service_msg,
         }
     }
+    return data
+
+
+def update_personal_info_service(staff_user_id, post_data, current_user):
+    try:
+        user = User.objects.get(pk=staff_user_id) if staff_user_id else current_user
+    except User.DoesNotExist:
+        return None, False, "Пользователь не найден."
+
+    form = PersonalInformationForm(post_data, user=user)
+    if form.is_valid():
+        user.first_name = form.cleaned_data['first_name']
+        user.last_name = form.cleaned_data['last_name']
+        user.email = form.cleaned_data['email']
+        user.save()
+        return user, True, None
+    else:
+        return None, False, 'Заполните все поля'
+
+
+def handle_entity_management_request(request, staff_member, entity_type, instance=None, staff_user_id=None,
+                                     instance_id=None, add=True):
+
+    if not staff_member:
+        return json_response("Not authorized", status=403, success=False,
+                             error_code=ErrorCode.NOT_AUTHORIZED)
+
+    button_text = 'Сохранить' if instance else 'Добавить'
+    if entity_type == 'day_off':
+        form = StaffDaysOffForm(instance=instance)
+        context = get_working_hours_and_days_off_context(request, button_text, 'day_off_form', form)
+        template = 'administration/manage_day_off.html'
+    else:
+        form = StaffWorkingHoursForm(instance=instance)
+        context = get_working_hours_and_days_off_context(request, button_text, 'working_hours_form', form,
+                                                         staff_user_id, instance,
+                                                         instance_id)
+        template = 'administration/manage_working_hours.html'
+
+    if request.method == 'POST' and entity_type == 'day_off':
+        day_off_form = StaffDaysOffForm(request.POST, instance=instance)
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+
+        if day_off_exists_for_date_range(staff_member, start_date, end_date, getattr(instance, 'id', None)):
+            return json_response("Days off for this date range already exist.", status=400, success=False,
+                                 error_code=ErrorCode.DAY_OFF_CONFLICT)
+        return handle_day_off_form(day_off_form, staff_member)
+
+    elif request.method == 'POST' and entity_type == 'working_hours':
+        day_of_week = request.POST.get('day_of_week')
+        start_time = request.POST.get('start_time')
+        end_time = request.POST.get('end_time')
+
+        return handle_working_hours_form(staff_member, day_of_week, start_time, end_time, add, instance_id)
+
+    return render(request, template, context, status=200)
+
+
+def get_working_hours_and_days_off_context(request, btn_txt, form_name, form, user_id=None, instance=None, wh_id=None):
+    """Get the context for the working hours and days off forms.
+
+    :param request: The request object.
+    :param btn_txt: The text to display on the submit button.
+    :param form_name: The name of the form which depends on if it's a working hours or days off form.
+    :param form: The form instance itself.
+    :param user_id: The staff user id.
+    :param instance: The working hour form instance.
+    :param wh_id: The working hour id.
+    :return: A dictionary containing the context.
+    """
+    context = get_generic_context(request)
+    context.update({
+        'button_text': btn_txt,
+        form_name: form,
+    })
+    if user_id:
+        context.update({
+            'staff_user_id': user_id,
+        })
+    if instance:
+        context.update({
+            'working_hours_instance': instance,
+        })
+    if wh_id:
+        context.update({
+            'working_hours_id': wh_id,
+        })
+    return context
+
+
+def handle_day_off_form(day_off_form, staff_member):
+    """Handle the day off form.
+    """
+    if day_off_form.is_valid():
+        day_off = day_off_form.save(commit=False)
+        day_off.staff_member = staff_member
+        day_off.save()
+        redirect_url = reverse('user_profile',
+                               kwargs={'staff_user_id': staff_member.user.id})
+        return json_response("Выходные успешно добавлены", custom_data={'redirect_url': redirect_url})
+    else:
+        message = "Invalid data:"
+        message += get_error_message_in_form(form=day_off_form)
+        return json_response(message, status=400, success=False, error_code=ErrorCode.INVALID_DATA)
+
+
+def get_error_message_in_form(form):
+    """
+    Get the error message in a form.
+    """
+    error_messages = []
+    for field, errors in form.errors.items():
+        error_messages.append(f"{field}: {','.join(errors)}")
+    if len(error_messages) == 3:
+        return "Empty fields are not allowed."
+    return " ".join(error_messages)
+
+
+def handle_working_hours_form(staff_member, day_of_week, start_time, end_time, add, wh_id=None):
+    # Handle the working hours form.
+
+    # Validate inputs
+    if not (staff_member and day_of_week and start_time and end_time):
+        return json_response("Invalid data.", status=400, success=False, error_code=ErrorCode.INVALID_DATA)
+
+    # Convert start time and end time to 24-hour format
+    start_time = convert_12_hour_time_to_24_hour_time(start_time)
+    end_time = convert_12_hour_time_to_24_hour_time(end_time)
+
+    # Ensure start time is before end time
+    if start_time >= end_time:
+        return json_response("Start time must be before end time.", status=400, success=False,
+                             error_code=ErrorCode.INVALID_DATA)
+
+    if add:
+        # Create new working hours
+        if working_hours_exist(day_of_week=day_of_week, staff_member=staff_member):
+            return json_response("Выходные уже выбраны.", status=400, success=False,
+                                 error_code=ErrorCode.WORKING_HOURS_CONFLICT)
+        wk = WorkingHours(staff_member=staff_member, day_of_week=day_of_week, start_time=start_time, end_time=end_time)
+    else:
+        # Ensure working_hours_id is provided
+        if not wh_id:
+            return json_response("Invalid or no working_hours_id provided.", status=400, success=False,
+                                 error_code=ErrorCode.INVALID_DATA)
+
+        # Get the working hours instance to update
+        try:
+            wk = WorkingHours.objects.get(pk=wh_id)
+            wk.day_of_week = day_of_week
+            wk.start_time = start_time
+            wk.end_time = end_time
+        except WorkingHours.DoesNotExist:
+            return json_response("Working hours does not exist.", status=400, success=False,
+                                 error_code=ErrorCode.WORKING_HOURS_NOT_FOUND)
+
+        # Save working hours
+    wk.save()
+
+    # Return success with redirect URL
+    redirect_url = reverse('user_profile', kwargs={'staff_user_id': staff_member.user.id}) \
+        if staff_member.user.id else reverse('user_profile')
+    return json_response("Working hours saved successfully.", custom_data={'redirect_url': redirect_url})

@@ -8,7 +8,7 @@
     <section class="content content-wrapper">
         <div class="staff-form-wrapper" style="margin: 0 auto; width: 40%;">
             <div class="staff-form-content">
-                <h3>Создание сотрудника</h3>
+                <h3>{{ page_title }}</h3>
                 <form method="post">
                     {% csrf_token %}
                     <div class="form-group">
@@ -44,7 +44,7 @@
                         <small>{{ form.appointment_buffer_time.help_text }}</small>
                     </div>
 
-                    <button type="submit" class="btn btn-primary">Создать</button>
+                    <button type="submit" class="btn btn-primary">{{btn_text}}</button>
                 </form>
                 <div class="messages" style="margin: 20px 0">
                     {% if messages %}

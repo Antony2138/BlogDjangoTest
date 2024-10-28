@@ -4,7 +4,6 @@ body {
 }
 
 .container {
-  display: flex;
   height: 100vh; /* Занимает всю высоту экрана */
 }
 
@@ -67,9 +66,8 @@ body {
 
 .main-content {
   flex: 1;
-  padding: 50px;
   margin-left: 50px;
-  text-align: center;
+
 
 
 }

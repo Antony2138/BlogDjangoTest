@@ -1,4 +1,4 @@
-{% extends BASE_TEMPLATE %}
+{% extends 'mainController/layout.html'%}
 {% load i18n %}
 {% load static %}
 {% block customCSS %}
@@ -25,7 +25,7 @@ Please provide your information to create an account and complete the payment pr
         {% endif %}
 
         <form method="post"
-              action="{% url 'appointment:appointment_client_information' ar.id ar.get_id_request %}"
+              action="{% url 'appointment_client_information' ar.id ar.get_id_request %}"
               class="page-body">
             {% csrf_token %}
             <div class="appointment-user-info">

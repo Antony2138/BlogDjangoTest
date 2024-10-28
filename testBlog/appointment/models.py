@@ -3,6 +3,8 @@ import datetime
 from django.db import models
 from django.core.validators import MaxLengthValidator, MinLengthValidator, MinValueValidator
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from .utils.date_time import convert_minutes_in_human_readable_format
 
 # Create your models here.
 
@@ -78,14 +80,54 @@ class StaffMember(models.Model):
     )
     appointment_buffer_time = models.FloatField(
         blank=True, null=True,
-        help_text='Время между текущим моментом и первым доступным интервалом на текущий день (не влияет на завтра). '
-                  'Например: если вы начинаете работать в 9:00 утра, а текущее время — 8:30 утра, и вы устанавливаете его на 30 '
-                  'минут, первый доступный интервал будет в 9:00 утра. Если вы устанавливаете время буфера встреч на '
-                  '60 минут, первый доступный интервал будет в 9:30 утра.'
+        help_text='Время между текущим моментом и первым доступным интервалом на текущий день (не влияет на завтра)'
     )
 
+    def __str__(self):
+        return f"{self.get_staff_member_name()}"
+
+    def get_lead_time(self):
+        config = Config.objects.first()
+        return self.lead_time or (config.lead_time if config else None)
+
     def get_staff_member_name(self):
-        return f"{self.user.first_name} {self.user.last_name}"
+        name_options = [
+            getattr(self.user, 'get_full_name', lambda: '')(),
+            f"{self.user.first_name} {self.user.last_name}",
+            self.user.username,
+            self.user.email,
+            f"Staff Member {self.id}"
+        ]
+        return next((name.strip() for name in name_options if name.strip()), "Unknown")
+
+    def get_days_off(self):
+        return DayOff.objects.filter(staff_member=self)
+
+    def get_finish_time(self):
+        config = Config.objects.first()
+        return self.finish_time or (config.finish_time if config else None)
+
+    def get_slot_duration(self):
+        config = Config.objects.first()
+        return self.slot_duration or (config.slot_duration if config else 0)
+
+    def get_working_hours(self):
+        return self.workinghours_set.all()
+
+    def get_services_offered(self):
+        return self.services_offered.all()
+
+    def get_slot_duration_text(self):
+        slot_duration = self.get_slot_duration()
+        return convert_minutes_in_human_readable_format(slot_duration)
+
+    def get_appointment_buffer_time(self):
+        config = Config.objects.first()
+        return self.appointment_buffer_time or (config.appointment_buffer_time if config else 0)
+
+    def get_appointment_buffer_time_text(self):
+        # convert buffer time (which is in minutes) in day hours minutes if necessary
+        return convert_minutes_in_human_readable_format(self.get_appointment_buffer_time())
 
 
 class AppointmentRequest(models.Model):
@@ -144,3 +186,32 @@ class WorkingHours(models.Model):
 
     def __str__(self):
         return f"{self.get_day_of_week_display()} - {self.start_time} to {self.end_time}"
+
+    def get_day_of_week_str(self):
+        # return the name of the day instead of the integer
+        return self.get_day_of_week_display()
+
+    def is_owner(self, user_id):
+        return self.staff_member.user.id == user_id
+
+
+class DayOff(models.Model):
+    staff_member = models.ForeignKey(StaffMember, on_delete=models.CASCADE)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    description = models.CharField(max_length=255, blank=True, null=True)
+
+    # meta data
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.start_date} to {self.end_date} - {self.description if self.description else 'Day off'}"
+
+    def clean(self):
+        if self.start_date is not None and self.end_date is not None:
+            if self.start_date > self.end_date:
+                raise ValidationError("Start date must be before end date")
+
+    def is_owner(self, user_id):
+        return self.staff_member.user.id == user_id
