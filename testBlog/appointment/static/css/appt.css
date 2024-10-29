@@ -1,12 +1,14 @@
 .djangoAppt_main-container {
-    margin: 20px auto;
+    margin: 0 auto;
     max-width: 1200px;
-    padding: 20px;
+    padding: 10px;
     background-color: rgba(248, 249, 250, 0.4);
     border-radius: 5px;
-    box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
 }
-
+.main-content{
+    margin-top: 0px;
+}
 .djangoAppt_body-container {
     margin: 0 auto;
     max-width: 1120px;

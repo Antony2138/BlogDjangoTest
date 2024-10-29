@@ -17,13 +17,6 @@
                 <form method="post" action="">
                     {% csrf_token %}
                     <!-- Staff Member -->
-                    {% if error_message %}
-                        <script type="text/javascript">
-                            document.addEventListener("DOMContentLoaded", function () {
-                                showErrorModal("{{ error_message }}");
-                            });
-                        </script>
-                    {% endif %}
 
                     {% if days_off_form.staff_member %}
                         <div class="form-group">
@@ -49,7 +42,7 @@
                         <label for="{{ day_off_form.end_date.id_for_label }}_display">{% trans 'End date' %}:</label>
                         <input type="text" id="{{ day_off_form.end_date.id_for_label }}_display"
                                class="datepicker-display"
-                               value="{{ day_off_form.end_date.value }}" readonly>
+                               value="{{ day_off_form.end_date.value}}" readonly>
                         <!-- Actual value to be submitted -->
                         <input type="hidden" id="{{ day_off_form.end_date.id_for_label }}"
                                name="{{ day_off_form.end_date.name }}" class="datepicker-actual"
@@ -66,13 +59,6 @@
 
                     <button type="submit" class="btn btn-primary">{% trans "Submit" %}</button>
                 </form>
-                <div class="row-form-errors" style="margin: 10px 0">
-                    {% if days_off_form.errors %}
-                        <div class="alert alert-danger">
-                            {{ days_off_form.errors }}
-                        </div>
-                    {% endif %}
-                </div>
 
                 <div class="messages" style="margin: 20px 0">
                     {% if messages %}

@@ -1,0 +1,19 @@
+{% extends 'mainController/layout.html'%}
+{% load static %}
+
+{% block customCSS %}
+
+{% endblock %}
+{% block body %}
+{% for service in services %}
+<div class="card" style="width: 18rem;">
+    <img src="..." class="card-img-top" alt="...">
+    <div class="card-body">
+        <h5 class="card-title">{{service.name}}</h5>
+        <p class="card-text">{{service.get_description}}</p>
+        <a href="{% url 'appointment_request' service.id%}" class="btn btn-primary">Go somewhere</a>
+    </div>
+</div>
+{% endfor %}
+
+{%endblock%}

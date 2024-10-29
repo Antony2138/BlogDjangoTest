@@ -36,6 +36,7 @@ def add_or_update_service(request, service_id=None):
                 messages.success(request, "Услуга успешно добавлена")
             return redirect('get_service_list' if service else 'add_service')
     else:
+        # is it necessary instance??
         form = ServiceForm(instance=service)
     context = {
         'page_title': page_title,
@@ -92,11 +93,11 @@ def add_staff_member_info(request):
 
 @require_user_authenticated
 @require_staff_or_superuser
-def update_personal_info(request, staff_user_id=None):
-    # only superuser or the staff member can update the personal info
-    if not check_permissions(staff_user_id=staff_user_id, user=request.user) or (
-            not staff_user_id and not request.user.is_superuser):
-        return json_response("Not authorized.", status=403, success=False, error_code=ErrorCode.NOT_AUTHORIZED)
+def update_personal_info(request, staff_user_id=None, response_type='html'):
+
+    if not check_permissions(staff_user_id=staff_user_id, user=request.user):
+        message = "Вы можете изменять только собственную персональную информацию"
+        return handle_unauthorized_response(request, message, response_type)
 
     if request.method == 'POST':
         user, is_valid, error_message = update_personal_info_service(staff_user_id, request.POST, request.user)
@@ -130,8 +131,13 @@ def get_staff_list(request):
 
 
 @require_user_authenticated
-@require_superuser
-def remove_staff_member(request, staff_user_id):
+@require_staff_or_superuser
+def remove_staff_member(request, staff_user_id, response_type='html'):
+
+    if not check_permissions(staff_user_id, request.user):
+        message = "Вы не можете удалить чужой профиль"
+        return handle_unauthorized_response(request, message, response_type)
+
     staff_member = get_object_or_404(StaffMember, user_id=staff_user_id)
     staff_member.delete()
     user = User.objects.get(pk=staff_user_id)
@@ -152,12 +158,13 @@ def user_profile(request, staff_user_id=None):
 
 @require_user_authenticated
 @require_staff_or_superuser
-def update_staff_info(request, user_id=None):
+def update_staff_info(request, user_id=None, response_type='html'):
+
+    if not check_permissions(staff_user_id=user_id, user=request.user):
+        message = "Вы можете изменять только собственную информацию приема"
+        return handle_unauthorized_response(request, message, response_type)
+
     user = request.user
-
-    if not check_permissions(staff_user_id=user_id, user=user):
-        return json_response("Not authorized.", status=403, success=False, error_code=ErrorCode.NOT_AUTHORIZED)
-
     staff_member = StaffMember.objects.get(user=user)
 
     if request.method == 'POST':
@@ -182,7 +189,7 @@ def update_staff_info(request, user_id=None):
 def add_day_off(request, staff_user_id=None, response_type='html'):
     staff_user_id = staff_user_id or request.user.pk
     if not check_permissions(staff_user_id, request.user):
-        message = "You can only add your own days off"
+        message = "Вы можете добавлять только свои собственные выходные дни."
         return handle_unauthorized_response(request, message, response_type)
 
     staff_user_id = staff_user_id if staff_user_id else request.user.pk
@@ -193,6 +200,11 @@ def add_day_off(request, staff_user_id=None, response_type='html'):
 @require_user_authenticated
 @require_staff_or_superuser
 def update_day_off(request, day_off_id, staff_user_id=None, response_type='html'):
+
+    if not check_permissions(staff_user_id=staff_user_id, user=request.user):
+        message = "Вы можете изменять только собственные выходные дни"
+        return handle_unauthorized_response(request, message, response_type)
+
     day_off = DayOff.objects.get(pk=day_off_id)
     if not day_off:
         if response_type == 'json':
@@ -201,6 +213,7 @@ def update_day_off(request, day_off_id, staff_user_id=None, response_type='html'
         else:
             context = get_generic_context(request=request)
             return render(request, 'error_pages/404_not_found.html', context=context, status=404)
+
     staff_user_id = staff_user_id or request.user.pk
     staff_member = StaffMember.objects.get(user_id=staff_user_id)
     return handle_entity_management_request(request, staff_member, entity_type='day_off', instance=day_off)

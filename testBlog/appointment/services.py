@@ -224,10 +224,6 @@ def handle_day_off_form(day_off_form, staff_member):
         redirect_url = reverse('user_profile',
                                kwargs={'staff_user_id': staff_member.user.id})
         return json_response("Выходные успешно добавлены", custom_data={'redirect_url': redirect_url})
-    else:
-        message = "Invalid data:"
-        message += get_error_message_in_form(form=day_off_form)
-        return json_response(message, status=400, success=False, error_code=ErrorCode.INVALID_DATA)
 
 
 def get_error_message_in_form(form):

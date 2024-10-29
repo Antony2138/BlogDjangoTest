@@ -179,8 +179,19 @@ class StaffDaysOffForm(forms.ModelForm):
         model = DayOff
         fields = ['start_date', 'end_date', 'description']
         widgets = {
-            'start_date': forms.DateInput(attrs={'class': 'datepicker'}),
-            'end_date': forms.DateInput(attrs={'class': 'datepicker'}),
+            'start_date': forms.DateInput(attrs={
+                'class': 'datepicker',
+                'placeholder': 'Начало выходных'
+            }),
+            'end_date': forms.DateInput(attrs={
+                'class': 'datepicker',
+                'placeholder': 'Начало выходных'
+            }),
+            'duration': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Причина выходного дня'
+            }),
+
         }
 
     def clean(self):

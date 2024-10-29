@@ -255,3 +255,11 @@ def get_non_working_days_ajax(request):
 
     custom_data = {'error': error}
     return json_response(message=message, custom_data=custom_data, success=not error, error_code=error_code)
+
+
+def show_services(request):
+    services = Service.objects.all()
+    context = {
+        'services': services
+    }
+    return render(request, 'appointment/show_services.html', context)

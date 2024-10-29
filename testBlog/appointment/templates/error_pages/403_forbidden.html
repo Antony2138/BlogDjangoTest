@@ -1,7 +1,6 @@
 {% extends BASE_TEMPLATE %}
 {% load i18n %}
 {% load static %}
-{% block site_description %}Designer: Adams Pierre David, Category: Resources forbidden, code 403{% endblock %}
 {% block title %}Resources forbidden | 403{% endblock %}
 {% block customMetaTag %}
     <meta name="robots" content="noindex,nofollow">
@@ -85,11 +84,11 @@
     <body>
     <br><br><br><br>
     <div class="logo">
-        {% trans "Reality" %}
+        Ошибка
     </div>
     <br>
     <div class="error">
-        {% trans "Error 403" %}!
+        Error 403
     </div>
     <br>
     <div class="error2">
@@ -103,7 +102,7 @@
     <div class="options" align="center">
         {% if back_url %}
             <button type="button" class="btn btn-primary" id="back" onclick="Back()">
-                <i class="fa fa-undo"></i> {% trans "Go to profile" %}
+                <i class="fa fa-undo"></i> Профиль
             </button>
         {% else %}
             <button type="button" class="btn btn-primary" id="back" onclick="Back()">

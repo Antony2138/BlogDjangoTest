@@ -58,16 +58,13 @@ body {
   transform: scale(1.05);
 }
 
-.logotype .img{
-   width: 80px;
-   margin-left: 70px;
-}
 
 
 .main-content {
   flex: 1;
-  margin-left: 50px;
-
+  margin: 0 auto;
+  margin-left: 80px;
+  margin-top: 60px;
 
 
 }
