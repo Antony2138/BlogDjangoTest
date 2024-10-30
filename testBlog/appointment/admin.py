@@ -38,3 +38,4 @@ class WorkingHoursAdmin(admin.ModelAdmin):
     list_display = ('staff_member', 'day_of_week', 'start_time', 'end_time')
     search_fields = ('day_of_week',)
     list_filter = ('day_of_week', 'start_time', 'end_time')
+

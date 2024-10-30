@@ -14,7 +14,8 @@ from .models import (
     StaffMember, DayOff
 )
 from .decorators import require_ajax
-from .utils.db_helpers import get_weekday_num_from_date, is_working_day, get_non_working_days_for_staff
+from .utils.db_helpers import get_weekday_num_from_date, is_working_day, get_non_working_days_for_staff, \
+    check_day_off_for_staff
 from .utils.error_codes import ErrorCode
 from .utils.json_context import get_generic_context_with_extra, json_response
 
@@ -44,6 +45,12 @@ def get_available_slots_ajax(request):
     sm = slot_form.cleaned_data['staff_member']
     date_chosen = selected_date.strftime("%a, %B %d, %Y")
     custom_data = {'date_chosen': date_chosen}
+
+    days_off_exist = check_day_off_for_staff(staff_member=sm, date=selected_date)
+    if days_off_exist:
+        message = "Day off. Please select another date!"
+        custom_data['available_slots'] = []
+        return json_response(message=message, custom_data=custom_data, success=False, error_code=ErrorCode.INVALID_DATE)
 
     # if selected_date is not a working day for the staff, return an empty list of slots and 'message' is Day Off
     weekday_num = get_weekday_num_from_date(selected_date)

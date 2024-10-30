@@ -7,7 +7,7 @@
 {% block body %}
 {% for service in services %}
 <div class="card" style="width: 18rem;">
-    <img src="..." class="card-img-top" alt="...">
+    <img src="{{service.get_image_url}}" class="card-img-top" alt="...">
     <div class="card-body">
         <h5 class="card-title">{{service.name}}</h5>
         <p class="card-text">{{service.get_description}}</p>

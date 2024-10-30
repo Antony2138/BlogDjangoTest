@@ -24,6 +24,7 @@ class Service(models.Model):
     description = models.TextField(blank=True, null=True)
     duration = models.DurationField(validators=[MinValueValidator(datetime.timedelta(seconds=1))])
     price = models.DecimalField(max_digits=8, decimal_places=2, validators=[MinValueValidator(0)])
+    image = models.ImageField(upload_to='services/', blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 

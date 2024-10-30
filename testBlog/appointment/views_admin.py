@@ -164,8 +164,8 @@ def update_staff_info(request, user_id=None, response_type='html'):
         message = "Вы можете изменять только собственную информацию приема"
         return handle_unauthorized_response(request, message, response_type)
 
-    user = request.user
-    staff_member = StaffMember.objects.get(user=user)
+
+    staff_member = StaffMember.objects.get(user=user_id)
 
     if request.method == 'POST':
         form = StaffAppointmentInformationForm(request.POST, instance=staff_member)
@@ -187,12 +187,10 @@ def update_staff_info(request, user_id=None, response_type='html'):
 @require_user_authenticated
 @require_staff_or_superuser
 def add_day_off(request, staff_user_id=None, response_type='html'):
-    staff_user_id = staff_user_id or request.user.pk
     if not check_permissions(staff_user_id, request.user):
         message = "Вы можете добавлять только свои собственные выходные дни."
         return handle_unauthorized_response(request, message, response_type)
 
-    staff_user_id = staff_user_id if staff_user_id else request.user.pk
     staff_member = StaffMember.objects.get(user_id=staff_user_id)
     return handle_entity_management_request(request, staff_member, entity_type='day_off')
 

@@ -181,15 +181,12 @@ class StaffDaysOffForm(forms.ModelForm):
         widgets = {
             'start_date': forms.DateInput(attrs={
                 'class': 'datepicker',
-                'placeholder': 'Начало выходных'
             }),
             'end_date': forms.DateInput(attrs={
                 'class': 'datepicker',
-                'placeholder': 'Начало выходных'
             }),
             'duration': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Причина выходного дня'
             }),
 
         }

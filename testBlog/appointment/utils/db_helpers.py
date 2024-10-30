@@ -137,6 +137,14 @@ def get_non_working_days_for_staff(staff_member_id):
         return []
 
 
+def check_day_off_for_staff(staff_member, date) -> bool:
+    """Check if the given staff member is off on the given date.
+    :param staff_member: The staff member to check.
+    :param date: The date to check.
+    """
+    return DayOff.objects.filter(staff_member=staff_member, start_date__lte=date, end_date__gte=date).exists()
+
+
 def get_staff_member_end_time(staff_member: StaffMember, date: datetime.date) -> Optional[datetime.time]:
     """Return the end time for the given staff member on the given date."""
     weekday_num = get_weekday_num_from_date(date)

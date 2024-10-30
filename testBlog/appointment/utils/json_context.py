@@ -16,10 +16,10 @@ def get_generic_context(request, admin=True):
     }
 
 
-def json_response(message, status=200, success=True, custom_data=None, error_code=None, **kwargs):
+def json_response(message=None, status=200, success=True, custom_data=None, error_code=None, **kwargs):
     """Return a generic JSON response."""
     response_data = {
-        "message": message,
+        "messages": message,
         "success": success
     }
     if error_code:

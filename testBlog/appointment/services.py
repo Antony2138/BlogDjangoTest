@@ -145,7 +145,6 @@ def update_personal_info_service(staff_user_id, post_data, current_user):
 
 def handle_entity_management_request(request, staff_member, entity_type, instance=None, staff_user_id=None,
                                      instance_id=None, add=True):
-
     if not staff_member:
         return json_response("Not authorized", status=403, success=False,
                              error_code=ErrorCode.NOT_AUTHORIZED)
@@ -168,8 +167,10 @@ def handle_entity_management_request(request, staff_member, entity_type, instanc
         end_date = request.POST.get('end_date')
 
         if day_off_exists_for_date_range(staff_member, start_date, end_date, getattr(instance, 'id', None)):
-            return json_response("Days off for this date range already exist.", status=400, success=False,
-                                 error_code=ErrorCode.DAY_OFF_CONFLICT)
+            messages.error(request, "Такие выходные уже установлены")
+            redirect_url = reverse('add_day_off',
+                                   kwargs={'staff_user_id': staff_member.user.id})
+            return json_response(custom_data={'redirect_url': redirect_url})
         return handle_day_off_form(day_off_form, staff_member)
 
     elif request.method == 'POST' and entity_type == 'working_hours':
@@ -211,6 +212,9 @@ def get_working_hours_and_days_off_context(request, btn_txt, form_name, form, us
         context.update({
             'working_hours_id': wh_id,
         })
+    context.update({
+        'today': timezone.now(),
+    })
     return context
 
 
@@ -224,6 +228,12 @@ def handle_day_off_form(day_off_form, staff_member):
         redirect_url = reverse('user_profile',
                                kwargs={'staff_user_id': staff_member.user.id})
         return json_response("Выходные успешно добавлены", custom_data={'redirect_url': redirect_url})
+    else:
+        print("check")
+        message = "Invalid data:"
+        message += get_error_message_in_form(form=day_off_form)
+        print(message, 'asdasdasd')
+        return json_response(message, status=400, success=False, error_code=ErrorCode.INVALID_DATA)
 
 
 def get_error_message_in_form(form):
