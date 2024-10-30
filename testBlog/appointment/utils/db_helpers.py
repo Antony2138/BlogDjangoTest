@@ -4,6 +4,7 @@ from django.core.cache import cache
 import datetime
 from django.apps import apps
 
+from ..models import DayOff
 from ..settings import (
     APPOINTMENT_BUFFER_TIME, APPOINTMENT_FINISH_TIME, APPOINTMENT_LEAD_TIME,
     APPOINTMENT_SLOT_DURATION
@@ -122,6 +123,28 @@ def get_staff_member_from_user_id_or_logged_in(user, user_id=None):
     return staff_member
 
 
+def get_non_working_days_for_staff(staff_member_id):
+    """Return the non-working days for the given staff member or an empty list if the staff member does not exist."""
+    all_days = set(range(7))  # Represents all days (0-6)
+    try:
+        staff_member = StaffMember.objects.get(id=staff_member_id)
+        working_days = set(WorkingHours.objects.filter(staff_member=staff_member).values_list('day_of_week', flat=True))
+
+        # Subtracting working_days from all_days to get non-working days
+        non_working_days = list(all_days - working_days)
+        return non_working_days
+    except StaffMember.DoesNotExist:
+        return []
+
+
+def check_day_off_for_staff(staff_member, date) -> bool:
+    """Check if the given staff member is off on the given date.
+    :param staff_member: The staff member to check.
+    :param date: The date to check.
+    """
+    return DayOff.objects.filter(staff_member=staff_member, start_date__lte=date, end_date__gte=date).exists()
+
+
 def get_staff_member_end_time(staff_member: StaffMember, date: datetime.date) -> Optional[datetime.time]:
     """Return the end time for the given staff member on the given date."""
     weekday_num = get_weekday_num_from_date(date)
@@ -137,15 +160,7 @@ def get_staff_member_slot_duration(staff_member: StaffMember, date: datetime.dat
 
 
 def get_appointments_for_date_and_time(date, start_time, end_time, staff_member):
-    """Returns all appointments that overlap with the specified date and time range.
 
-    :param date: The date to filter appointments on.
-    :param start_time: The starting time to filter appointments on.
-    :param end_time: The ending time to filter appointments on.
-    :param staff_member: The staff member to filter appointments on.
-
-    :return: QuerySet, all appointments that overlap with the specified date and time range
-    """
     return Appointment.objects.filter(
         appointment_request__date=date,
         appointment_request__start_time__lte=end_time,
@@ -155,12 +170,8 @@ def get_appointments_for_date_and_time(date, start_time, end_time, staff_member)
 
 
 def calculate_staff_slots(date, staff_member):
-    """Calculate the available slots for the given staff member on the given date.
+    # Calculate the available slots for the given staff member on the given date.
 
-    :param date: The date to calculate the slots for.
-    :param staff_member: The staff member to calculate the slots for.
-    :return: A list of available slots.
-    """
     # Convert the times to datetime objects
     weekday_num = get_weekday_num_from_date(date)
     if not is_working_day(staff_member, weekday_num):
@@ -220,3 +231,24 @@ def get_config():
         # Cache the configuration for 1 hour (3600 seconds)
         cache.set('config', config, 3600)
     return config
+
+
+def day_off_exists_for_date_range(staff_member, start_date, end_date, days_off_id=None) -> bool:
+    """Check if a day off exists for the given staff member and date range.
+
+    :param staff_member: The staff member to check.
+    :param start_date: The start date of the date range.
+    :param end_date: The end date of the date range.
+    :param days_off_id: The ID of the day off to exclude from the check.
+    :return: True if a day off exists for the given staff member and date range; otherwise, False.
+    """
+    days_off = DayOff.objects.filter(staff_member=staff_member, start_date__lte=end_date, end_date__gte=start_date)
+    if days_off_id:
+        days_off = days_off.exclude(id=days_off_id)
+    return days_off.exists()
+
+
+def working_hours_exist(day_of_week, staff_member):
+    """Check if working hours exist for the given day of the week and staff member."""
+    return WorkingHours.objects.filter(day_of_week=day_of_week, staff_member=staff_member).exists()
+

@@ -55,3 +55,13 @@
         color: #0056b3;
         text-decoration: none;
     }
+
+    .profile-container {
+        margin: 0 auto;
+        width: 1440px;
+    }
+
+    .profile-section {
+        margin: 0 auto;
+        width: 1440px;
+    }

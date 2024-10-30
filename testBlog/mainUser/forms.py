@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 
 
 class UserRegisterForm(forms.ModelForm):
+
     class Meta:
         model = User
         fields = ['username', 'first_name', 'last_name', 'email', 'password']
@@ -31,3 +32,4 @@ class UserRegisterForm(forms.ModelForm):
                 'placeholder': 'Введите пароль'
             }),
         }
+

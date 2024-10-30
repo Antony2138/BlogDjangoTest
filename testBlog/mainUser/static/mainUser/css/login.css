@@ -3,8 +3,9 @@
             background-color: #fff;
             padding: 40px 60px; /* Wider padding */
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 400px; /* Adjust width as needed */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            width: 400px;
+            text-align: center;/* Adjust width as needed */
         }
 
         .form-group {

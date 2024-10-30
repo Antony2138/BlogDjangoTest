@@ -10,11 +10,12 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from .services import get_appointments_and_slots, get_available_slots_for_staff
 from .models import (
-    Appointment, AppointmentRequest,  Config, Service,
-    StaffMember
+    Appointment, AppointmentRequest, Config, Service,
+    StaffMember, DayOff
 )
 from .decorators import require_ajax
-from .utils.db_helpers import get_weekday_num_from_date, is_working_day
+from .utils.db_helpers import get_weekday_num_from_date, is_working_day, get_non_working_days_for_staff, \
+    check_day_off_for_staff
 from .utils.error_codes import ErrorCode
 from .utils.json_context import get_generic_context_with_extra, json_response
 
@@ -45,6 +46,12 @@ def get_available_slots_ajax(request):
     date_chosen = selected_date.strftime("%a, %B %d, %Y")
     custom_data = {'date_chosen': date_chosen}
 
+    days_off_exist = check_day_off_for_staff(staff_member=sm, date=selected_date)
+    if days_off_exist:
+        message = "Day off. Please select another date!"
+        custom_data['available_slots'] = []
+        return json_response(message=message, custom_data=custom_data, success=False, error_code=ErrorCode.INVALID_DATE)
+
     # if selected_date is not a working day for the staff, return an empty list of slots and 'message' is Day Off
     weekday_num = get_weekday_num_from_date(selected_date)
     is_working_day_ = is_working_day(staff_member=sm, day=weekday_num)
@@ -71,6 +78,55 @@ def get_available_slots_ajax(request):
     return json_response(message='Successfully retrieved available slots', custom_data=custom_data, success=True)
 
 
+@require_ajax
+def get_next_available_date_ajax(request, service_id):
+    """This view function handles AJAX requests to get the next available date for a service.
+
+    :param request: The request instance.
+    :param service_id: The ID of the service.
+    :return: A JSON response containing the next available date.
+    """
+    staff_id = request.GET.get('staff_member')
+
+    # If staff_id is not provided, you should handle it accordingly.
+    if staff_id and staff_id != 'none':
+        staff_member = get_object_or_404(StaffMember, pk=staff_id)
+        service = get_object_or_404(Service, pk=service_id)
+
+        # Fetch the days off for the staff
+        days_off = DayOff.objects.filter(staff_member=staff_member).filter(
+                Q(start_date__lte=date.today(), end_date__gte=date.today()) |
+                Q(start_date__gte=date.today())
+        )
+
+        current_date = date.today()
+        next_available_date = None
+        day_offset = 0
+
+        while next_available_date is None:
+            potential_date = current_date + timedelta(days=day_offset)
+
+            # Check if the potential date is a day off for the staff
+            is_day_off = any([day_off.start_date <= potential_date <= day_off.end_date for day_off in days_off])
+            # Check if the potential date is a working day for the staff
+            weekday_num = get_weekday_num_from_date(potential_date)
+            is_working_day_ = is_working_day(staff_member=staff_member, day=weekday_num)
+
+            if not is_day_off and is_working_day_:
+                x, available_slots = get_appointments_and_slots(potential_date, service)
+                if available_slots:
+                    next_available_date = potential_date
+
+            day_offset += 1
+        message = 'Successfully retrieved next available date'
+        data = {'next_available_date': next_available_date.isoformat()}
+        return json_response(message=message, custom_data=data, success=True)
+    else:
+        data = {'error': True}
+        message = 'No staff member selected'
+        return json_response(message=message, custom_data=data, success=False, error_code=ErrorCode.STAFF_ID_REQUIRED)
+
+
 def appointment_request(request, service_id=None, staff_member_id=None):
     """This view function handles requests to book an appointment for a service.
 
@@ -84,8 +140,7 @@ def appointment_request(request, service_id=None, staff_member_id=None):
     staff_member = None
     all_staff_members = None
     available_slots = []
-    config = Config.objects.first()
-    label = config.app_offered_by_label if config else "Offered by"
+    label = '"Lacky" пилка'
 
     if service_id:
         service = get_object_or_404(Service, pk=service_id)
@@ -134,7 +189,7 @@ def appointment_request_submit(request):
                 ar = form.save()
                 request.session[f'appointment_completed_{ar.id_request}'] = False
                 # Redirect the user to the account creation page
-                return redirect('appointment:appointment_client_information', appointment_request_id=ar.id,
+                return redirect('appointment_client_information', appointment_request_id=ar.id,
                                 id_request=ar.id_request)
         else:
             # Handle the case if the form is not valid
@@ -189,3 +244,29 @@ def get_next_available_date_ajax(request, service_id):
         data = {'error': True}
         message = 'No staff member selected'
         return json_response(message=message, custom_data=data, success=False, error_code=ErrorCode.STAFF_ID_REQUIRED)
+
+
+def get_non_working_days_ajax(request):
+    staff_id = request.GET.get('staff_member')
+    error = False
+    message = 'Successfully retrieved non-working days'
+
+    if not staff_id or staff_id == 'none':
+        message = 'No staff member selected'
+        error_code = ErrorCode.STAFF_ID_REQUIRED
+        error = True
+    else:
+        non_working_days = get_non_working_days_for_staff(staff_id)
+        custom_data = {"non_working_days": non_working_days}
+        return json_response(message=message, custom_data=custom_data, success=not error)
+
+    custom_data = {'error': error}
+    return json_response(message=message, custom_data=custom_data, success=not error, error_code=error_code)
+
+
+def show_services(request):
+    services = Service.objects.all()
+    context = {
+        'services': services
+    }
+    return render(request, 'appointment/show_services.html', context)
