@@ -2,18 +2,38 @@
 {% load static %}
 
 {% block customCSS %}
-
+<link rel="stylesheet" type="text/css" href="{% static 'css/app/show_services.css' %}"/>
 {% endblock %}
+
 {% block body %}
-{% for service in services %}
-<div class="card" style="width: 18rem;">
-    <img src="{{service.get_image_url}}" class="card-img-top" alt="...">
-    <div class="card-body">
-        <h5 class="card-title">{{service.name}}</h5>
-        <p class="card-text">{{service.get_description}}</p>
-        <a href="{% url 'appointment_request' service.id%}" class="btn btn-primary">Go somewhere</a>
+<div class="container-show">
+    <h3>Услуги <span>{{ services|length }}</span></h3>
+    {% for service in services %}
+    <div class="service-section">
+        <div class="service">
+            <img src="{{service.get_image_url}}" alt="Фотография услуги">
+            <div class="about">
+                <div class="text-about">
+                    <a class="title " href="{% url 'update_service' service_id=service.id %}">
+                        {{service.name}} </a>
+                    <div class="type">{{ service.get_duration }}</div>
+                </div>
+            </div>
+            <div class="details">
+                <div class="text-details">
+                    <div class="price">
+                        {{ service.get_price }}
+                    </div>
+                </div>
+                <div class="book">
+                    <a href="{% url 'appointment_request' service_id=service.id %}"
+                       class="btn btn-primary">Записаться</a>
+                </div>
+            </div>
+        </div>
     </div>
+    {% endfor %}
 </div>
-{% endfor %}
+
 
 {%endblock%}

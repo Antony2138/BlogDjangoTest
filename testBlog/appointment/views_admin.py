@@ -27,7 +27,7 @@ def add_or_update_service(request, service_id=None):
         page_title = "Добавление услуги"
         btn_text = "Добавить"
     if request.method == 'POST':
-        form = ServiceForm(request.POST, instance=service)
+        form = ServiceForm(request.POST, request.FILES, instance=service)
         if form.is_valid():
             form.save()
             if service:
@@ -36,7 +36,6 @@ def add_or_update_service(request, service_id=None):
                 messages.success(request, "Услуга успешно добавлена")
             return redirect('get_service_list' if service else 'add_service')
     else:
-        # is it necessary instance??
         form = ServiceForm(instance=service)
     context = {
         'page_title': page_title,

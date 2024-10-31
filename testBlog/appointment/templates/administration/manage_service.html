@@ -8,7 +8,7 @@
         <div class="service-form-wrapper" style="margin: 0 auto; width: 40%; text-align:center;">
             <div class="service-form-content">
                 <h2>{{page_title}}</h2>
-                <form method="post">
+                <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     {{ form }}
                     <br>

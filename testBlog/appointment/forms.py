@@ -53,12 +53,13 @@ class AppointmentForm(forms.ModelForm):
 class ServiceForm(forms.ModelForm):
     class Meta:
         model = Service
-        fields = ['name', 'description', 'duration', 'price']
+        fields = ['name', 'description', 'duration', 'price', 'image']
         labels = {
             'name': 'Название',
             'description': 'Описание',
             'duration': 'Продолжительность',
             'price': 'Цена',
+            'image': 'Фотография',
         }
         widgets = {
             'name': forms.TextInput(attrs={
@@ -77,8 +78,9 @@ class ServiceForm(forms.ModelForm):
             }),
             'price': forms.NumberInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Пример: 100.00 (0 for free)'
+                'placeholder': 'Пример: 100.00'
             }),
+            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
 
 
