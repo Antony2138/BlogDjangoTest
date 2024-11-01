@@ -139,7 +139,7 @@ def remove_staff_member(request, staff_user_id, response_type='html'):
 
     staff_member = get_object_or_404(StaffMember, user_id=staff_user_id)
     staff_member.delete()
-    user = User.objects.get(pk=staff_user_id)
+    user = get_user_model().objects.get(pk=staff_user_id)
     user.is_staff = False
     user.save()
     messages.success(request, "Работник успешно удален!")

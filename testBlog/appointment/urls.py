@@ -49,6 +49,7 @@ urlpatterns = [
     path('services/',  views.show_services, name='services'),
     path('request/<int:service_id>/', views.appointment_request, name='appointment_request'),
     path('request-submit/', views.appointment_request_submit, name='appointment_request_submit'),
+    path('thank-you/<int:appointment_id>/', views.default_thank_you, name='default_thank_you'),
     path('ajax/', include(ajax_urlpatterns)),
     path('app-admin/', include(admin_urlpatterns), name='app-admin'),
 

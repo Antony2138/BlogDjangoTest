@@ -17,7 +17,7 @@ def registration(request):
             messages.success(request, f'Ваш аккаунт создан: можно войти на сайт.')
             return redirect('login')
         else:
-            messages.info(request, f'Такой логин занят')
+            messages.info(request, f'Форма заполнена неправильно')
             return redirect('registration')
 
     else:

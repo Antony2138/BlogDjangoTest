@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.shortcuts import render, redirect
 
+from django.contrib.auth import get_user_model
+
 from .forms import ServiceForm, PersonalInformationForm, StaffDaysOffForm, StaffWorkingHoursForm
 from .models import (
     Appointment, AppointmentRequest, Config, Service,
@@ -128,8 +130,8 @@ def prepare_user_profile_data(user, staff_user_id):
 
 def update_personal_info_service(staff_user_id, post_data, current_user):
     try:
-        user = User.objects.get(pk=staff_user_id) if staff_user_id else current_user
-    except User.DoesNotExist:
+        user = get_user_model().objects.get(pk=staff_user_id) if staff_user_id else current_user
+    except get_user_model().DoesNotExist:
         return None, False, "Пользователь не найден."
 
     form = PersonalInformationForm(post_data, user=user)

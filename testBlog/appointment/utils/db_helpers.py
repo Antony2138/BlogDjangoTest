@@ -1,15 +1,17 @@
 from typing import Optional
 
+from django.contrib.auth import get_user_model
 from django.core.cache import cache
 import datetime
 from django.apps import apps
+from django.shortcuts import get_object_or_404
 
 from ..models import DayOff
 from ..settings import (
     APPOINTMENT_BUFFER_TIME, APPOINTMENT_FINISH_TIME, APPOINTMENT_LEAD_TIME,
     APPOINTMENT_SLOT_DURATION
 )
-
+from django.core.exceptions import FieldDoesNotExist
 from .date_time import combine_date_and_time, get_weekday_num
 
 Appointment = apps.get_model('appointment', 'Appointment')
@@ -231,6 +233,32 @@ def get_config():
         # Cache the configuration for 1 hour (3600 seconds)
         cache.set('config', config, 3600)
     return config
+
+
+def create_and_save_appointment(ar, request):
+    """Create and save a new appointment based on the provided appointment request and client data.
+
+    :param ar: The appointment request associated with the new appointment.
+    :param client_data: The data of the client making the appointment.
+    :param appointment_data: Additional data for the appointment, including phone number, address, etc.
+    :param request: The request object.
+    :return: The newly created appointment.
+    """
+
+    user = get_object_or_404(get_user_model(), pk=request.user.id)
+    appointment = Appointment.objects.create(client=user, appointment_request=ar)
+    appointment.save()
+
+    return appointment
+
+
+def username_in_user_model():
+    try:
+        # Check if the 'username' field exists in the User model
+        get_user_model()._meta.get_field('username')
+        return True
+    except FieldDoesNotExist:
+        return False
 
 
 def day_off_exists_for_date_range(staff_member, start_date, end_date, days_off_id=None) -> bool:

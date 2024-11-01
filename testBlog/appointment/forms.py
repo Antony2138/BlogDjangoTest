@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
 from .models import (
     Appointment, AppointmentRequest, Service, StaffMember, WorkingHours, DayOff
@@ -18,36 +18,6 @@ class SlotForm(forms.Form):
     selected_date = forms.DateField(validators=[not_in_the_past])
     staff_member = forms.ModelChoiceField(StaffMember.objects.all(),
                                           error_messages={'invalid_choice': 'Staff member does not exist'})
-
-
-class AppointmentForm(forms.ModelForm):
-    class Meta:
-        model = Appointment
-        fields = ('phone',)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['phone'].widget.attrs.update(
-            {
-                'placeholder': '1234567890'
-            })
-        self.fields['additional_info'].widget.attrs.update(
-            {
-                'rows': 2,
-                'class': 'form-control',
-            })
-        self.fields['address'].widget.attrs.update(
-            {
-                'rows': 2,
-                'class': 'form-control',
-                'placeholder': '1234 Main St, City, State, Zip Code',
-                'required': 'true'
-            })
-        self.fields['additional_info'].widget.attrs.update(
-            {
-                'class': 'form-control',
-                'placeholder': 'I would like to be contacted by phone.'
-            })
 
 
 class ServiceForm(forms.ModelForm):
@@ -82,6 +52,11 @@ class ServiceForm(forms.ModelForm):
             }),
             'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
+
+
+class ClientDataForm(forms.Form):
+    name = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
 
 
 class StaffMemberForm(forms.ModelForm):
@@ -134,9 +109,9 @@ class PersonalInformationForm(forms.Form):
         if self.user:
             if self.user.email == email:
                 return email
-            queryset = User.objects.exclude(pk=self.user.pk)
+            queryset = get_user_model().objects.exclude(pk=self.user.pk)
         else:
-            queryset = User.objects.all()
+            queryset = get_user_model().objects.all()
 
         if queryset.filter(email=email).exists():
             raise forms.ValidationError("This email is already taken.")

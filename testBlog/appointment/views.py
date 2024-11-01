@@ -1,12 +1,17 @@
 from datetime import date, timedelta
 
+from django.contrib.auth.models import User
 from django.db.models import Q
 from django.template.defaulttags import now
 
-from .forms import AppointmentForm, AppointmentRequestForm, SlotForm
+from django.utils import timezone
+
+from .forms import AppointmentRequestForm, SlotForm, ClientDataForm
 from django.contrib import messages
 
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.http import HttpResponseRedirect
 
 from .services import get_appointments_and_slots, get_available_slots_for_staff
 from .models import (
@@ -15,13 +20,12 @@ from .models import (
 )
 from .decorators import require_ajax
 from .utils.db_helpers import get_weekday_num_from_date, is_working_day, get_non_working_days_for_staff, \
-    check_day_off_for_staff
+    check_day_off_for_staff, create_and_save_appointment, username_in_user_model
 from .utils.error_codes import ErrorCode
 from .utils.json_context import get_generic_context_with_extra, json_response
 
 
 # Create your views here.
-@require_ajax
 def get_available_slots_ajax(request):
     """This view function handles AJAX requests to get available slots for a selected date.
 
@@ -51,7 +55,6 @@ def get_available_slots_ajax(request):
         message = "Day off. Please select another date!"
         custom_data['available_slots'] = []
         return json_response(message=message, custom_data=custom_data, success=False, error_code=ErrorCode.INVALID_DATE)
-
     # if selected_date is not a working day for the staff, return an empty list of slots and 'message' is Day Off
     weekday_num = get_weekday_num_from_date(selected_date)
     is_working_day_ = is_working_day(staff_member=sm, day=weekday_num)
@@ -66,7 +69,7 @@ def get_available_slots_ajax(request):
 
     # Check if the selected_date is today and filter out past slots
     if selected_date == date.today():
-        current_time = now().time()
+        current_time = timezone.now().time()
         available_slots = [slot for slot in available_slots if slot.time() > current_time]
 
     custom_data['available_slots'] = [slot.strftime('%I:%M %p') for slot in available_slots]
@@ -76,6 +79,88 @@ def get_available_slots_ajax(request):
         return json_response(message=message, custom_data=custom_data, success=False, error_code=ErrorCode.INVALID_DATE)
     custom_data['error'] = False
     return json_response(message='Successfully retrieved available slots', custom_data=custom_data, success=True)
+
+
+
+def appointment_client_information(request, appointment_request_id, id_request):
+    """This view function handles client information submission for an appointment.
+
+    :param request: The request instance.
+    :param appointment_request_id: The ID of the appointment request.
+    :param id_request: The unique ID of the appointment request.
+    :return: The rendered HTML page.
+    """
+    ar = get_object_or_404(AppointmentRequest, pk=appointment_request_id)
+
+    if request.session.get(f'appointment_submitted_{id_request}', False):
+        context = get_generic_context_with_extra(request, {'service_id': ar.service_id}, admin=False)
+        return render(request, 'error_pages/304_already_submitted.html', context=context)
+
+    if request.method == 'POST':
+        appointment_form = AppointmentForm(request.POST)
+
+        if appointment_form.is_valid():
+            ar.save()
+            print('alsjdbwkehvbkhawebfvqahjbwkfcqabv')
+            # Create a new appointment
+            response = create_appointment(request, ar)
+            request.session.setdefault(f'appointment_submitted_{id_request}', True)
+            return response
+    else:
+        appointment_form = AppointmentForm()
+        client_data_form = ClientDataForm()
+
+    extra_context = {
+        'ar': ar,
+        'form': appointment_form,
+        'client_data_form': client_data_form,
+        'service_name': ar.service.name,
+    }
+    context = get_generic_context_with_extra(request, extra_context, admin=False)
+    return render(request, 'appointment/appointment_client_information.html', context=context)
+
+
+def create_appointment(request, appointment_request_obj):
+    """This function creates a new appointment and redirects to the payment page or the thank-you page.
+
+    :param request: The request instance.
+    :param appointment_request_obj: The AppointmentRequest instance.
+    :return: The redirect response.
+    """
+    appointment = create_and_save_appointment(appointment_request_obj, request)
+    return redirect_to_payment_or_thank_you_page(appointment)
+
+
+def default_thank_you(request, appointment_id):
+    """This view function handles the default thank you page.
+
+    :param request: The request instance.
+    :param appointment_id: The ID of the appointment.
+    :return: The rendered HTML page.
+    """
+    appointment = get_object_or_404(Appointment, pk=appointment_id)
+    email = appointment.client.email
+    account_details = {
+        'Email address': email,
+    }
+    if username_in_user_model():
+        account_details['Username'] = appointment.client.username
+    extra_context = {
+        'appointment': appointment,
+    }
+    context = get_generic_context_with_extra(request, extra_context, admin=False)
+    return render(request, 'appointment/default_thank_you.html', context=context)
+
+
+def redirect_to_payment_or_thank_you_page(appointment):
+    """This function redirects to the payment page or the thank-you page based on the configuration.
+
+    :param appointment: The Appointment instance.
+    :return: The redirect response.
+    """
+    thank_you_url_key = 'default_thank_you'
+    thank_you_url = reverse(thank_you_url_key, kwargs={'appointment_id': appointment.id})
+    return HttpResponseRedirect(thank_you_url)
 
 
 @require_ajax
@@ -187,10 +272,9 @@ def appointment_request_submit(request):
                 messages.error(request, "Selected staff member does not exist.")
             else:
                 ar = form.save()
+                response = create_appointment(request, ar)
                 request.session[f'appointment_completed_{ar.id_request}'] = False
-                # Redirect the user to the account creation page
-                return redirect('appointment_client_information', appointment_request_id=ar.id,
-                                id_request=ar.id_request)
+                return response
         else:
             # Handle the case if the form is not valid
             messages.error(request, 'There was an error in your submission. Please check the form and try again.')

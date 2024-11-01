@@ -1,5 +1,6 @@
 import datetime
 from gettext import ngettext
+from django.utils import timezone
 
 
 def combine_date_and_time(date, time) -> datetime.datetime:
@@ -10,6 +11,15 @@ def combine_date_and_time(date, time) -> datetime.datetime:
     :return: A datetime object.
     """
     return datetime.datetime.combine(date, time)
+
+
+def get_timestamp() -> str:
+    """Get the current timestamp as a string without the decimal part.
+
+    :return: The current timestamp (e.g. "1612345678")
+    """
+    timestamp = str(timezone.now().timestamp())
+    return timestamp.replace('.', '')
 
 
 def get_weekday_num(weekday: str) -> int:

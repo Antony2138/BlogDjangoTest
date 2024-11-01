@@ -4,7 +4,8 @@ from django.db import models
 from django.core.validators import MaxLengthValidator, MinLengthValidator, MinValueValidator
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from .utils.date_time import convert_minutes_in_human_readable_format
+from .utils.date_time import convert_minutes_in_human_readable_format, get_timestamp
+from .utils.view_helpers import generate_random_id
 
 # Create your models here.
 
@@ -149,11 +150,55 @@ class AppointmentRequest(models.Model):
     def __str__(self):
         return f"{self.date} - {self.start_time} to {self.end_time} - {self.service.name}"
 
+    def clean(self):
+        if self.start_time is not None and self.end_time is not None:
+            if self.start_time > self.end_time:
+                raise ValidationError("Start time must be before end time")
+            if self.start_time == self.end_time:
+                raise ValidationError("Start time and end time cannot be the same")
+
+        # Ensure the date is not in the past:
+        if self.date and self.date < datetime.date.today():
+            raise ValidationError("Date cannot be in the past")
+
+    def save(self, *args, **kwargs):
+        # if no id_request is provided, generate one
+        if self.id_request is None:
+            self.id_request = f"{get_timestamp()}{self.service.id}{generate_random_id()}"
+        # start time should not be equal to end time
+        if self.start_time == self.end_time:
+            raise ValidationError("Start time and end time cannot be the same")
+        # date should not be in the past
+        if self.date < datetime.date.today():
+            raise ValidationError("Date cannot be in the past")
+        # duration should not exceed the service duration
+        return super().save(*args, **kwargs)
+
+    def get_service_name(self):
+        return self.service.name
+
+    def get_service_price(self):
+        return self.service.get_price()
+
+    def get_service_down_payment(self):
+        return self.service.get_down_payment()
+
+    def get_service_image(self):
+        return self.service.image
+
+    def get_service_image_url(self):
+        return self.service.get_image_url()
+
+    def get_service_description(self):
+        return self.service.description
+
+    def get_id_request(self):
+        return self.id_request
+
 
 class Appointment(models.Model):
     client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     appointment_request = models.OneToOneField(AppointmentRequest, on_delete=models.CASCADE)
-    phone = models.DecimalField(max_digits=8, decimal_places=2)
     id_request = models.CharField(max_length=100, blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -162,6 +207,65 @@ class Appointment(models.Model):
         return f"{self.client} - " \
                f"{self.appointment_request.start_time.strftime('%Y-%m-%d %H:%M')} to " \
                f"{self.appointment_request.end_time.strftime('%Y-%m-%d %H:%M')}"
+
+    def save(self, *args, **kwargs):
+        if not hasattr(self, 'appointment_request'):
+            raise ValidationError("Appointment request is required")
+        return super().save(*args, **kwargs)
+
+    def get_client_name(self):
+        if hasattr(self.client, 'get_full_name') and callable(getattr(self.client, 'get_full_name')):
+            name = self.client.get_full_name()
+        else:
+            name = self.client.first_name
+        return name
+
+    def get_date(self):
+        return self.appointment_request.date
+
+    def get_start_time(self):
+        return datetime.datetime.combine(self.get_date(), self.appointment_request.start_time)
+
+    def get_end_time(self):
+        return datetime.datetime.combine(self.get_date(), self.appointment_request.end_time)
+
+    def get_service(self):
+        return self.appointment_request.service
+
+    def get_service_name(self):
+        return self.appointment_request.get_service_name()
+
+    def get_service_duration(self):
+        return self.appointment_request.service.get_duration()
+
+    def get_staff_member_name(self):
+        if not self.appointment_request.staff_member:
+            return ""
+        return self.appointment_request.staff_member.get_staff_member_name()
+
+    def get_staff_member(self):
+        return self.appointment_request.staff_member
+
+    def get_service_price(self):
+        return self.appointment_request.get_service_price()
+
+    def get_service_down_payment(self):
+        return self.appointment_request.get_service_down_payment()
+
+    def get_service_img(self):
+        return self.appointment_request.get_service_image()
+
+    def get_service_img_url(self):
+        return self.appointment_request.get_service_image_url()
+
+    def get_service_description(self):
+        return self.appointment_request.get_service_description()
+
+    def get_appointment_date(self):
+        return self.appointment_request.date
+
+    def get_appointment_id_request(self):
+        return self.id_request
 
 
 class Config(models.Model):
