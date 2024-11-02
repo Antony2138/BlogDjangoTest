@@ -1,30 +1,37 @@
 import datetime
 
-from django.db import models
-from django.core.validators import MaxLengthValidator, MinLengthValidator, MinValueValidator
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from .utils.date_time import convert_minutes_in_human_readable_format
+from django.core.validators import MinValueValidator
+from django.db import models
+
+from .utils.date_time import (convert_minutes_in_human_readable_format,
+                              get_timestamp)
+from .utils.view_helpers import generate_random_id
 
 # Create your models here.
 
 DAYS_OF_WEEK = (
-    (0, 'Sunday'),
-    (1, 'Monday'),
-    (2, 'Tuesday'),
-    (3, 'Wednesday'),
-    (4, 'Thursday'),
-    (5, 'Friday'),
-    (6, 'Saturday'),
+    (0, "Sunday"),
+    (1, "Monday"),
+    (2, "Tuesday"),
+    (3, "Wednesday"),
+    (4, "Thursday"),
+    (5, "Friday"),
+    (6, "Saturday"),
 )
 
 
 class Service(models.Model):
     name = models.CharField(max_length=100, blank=False)
     description = models.TextField(blank=True, null=True)
-    duration = models.DurationField(validators=[MinValueValidator(datetime.timedelta(seconds=1))])
-    price = models.DecimalField(max_digits=8, decimal_places=2, validators=[MinValueValidator(0)])
-    image = models.ImageField(upload_to='services/', blank=True, null=True)
+    duration = models.DurationField(
+        validators=[MinValueValidator(datetime.timedelta(seconds=1))]
+    )
+    price = models.DecimalField(
+        max_digits=8, decimal_places=2, validators=[MinValueValidator(0)]
+    )
+    image = models.ImageField(upload_to="services/", blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -52,11 +59,11 @@ class Service(models.Model):
         if seconds:
             parts.append(f"{seconds} секунд{'ы' if seconds > 1 else ''}")
 
-        return ' '.join(parts)
+        return " ".join(parts)
 
     def get_price(self):
         # Check if the decimal part is 0
-        return (f"{self.price} рублей")
+        return f"{self.price} рублей"
 
     def get_image_url(self):
         if not self.image:
@@ -71,22 +78,21 @@ class StaffMember(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     services_offered = models.ManyToManyField(Service)
     slot_duration = models.PositiveIntegerField(
-        null=True, blank=True,
-        help_text='(Количество слотов доступных для записи к данному работнику, день будет разбит на промежутки по'
-                  ' установленному количеству минут)'
-
+        null=True,
+        blank=True,
+        help_text="(Количество слотов доступных для записи к данному работнику, день будет разбит на промежутки по"
+        " установленному количеству минут)",
     )
     lead_time = models.TimeField(
-        null=True, blank=True,
-        help_text="Время начала рабочего дня"
+        null=True, blank=True, help_text="Время начала рабочего дня"
     )
     finish_time = models.TimeField(
-        null=True, blank=True,
-        help_text="Время конца рабочего дня"
+        null=True, blank=True, help_text="Время конца рабочего дня"
     )
     appointment_buffer_time = models.FloatField(
-        blank=True, null=True,
-        help_text='Время между текущим моментом и первым доступным интервалом на текущий день (не влияет на завтра)'
+        blank=True,
+        null=True,
+        help_text="Время между текущим моментом и первым доступным интервалом на текущий день (не влияет на завтра)",
     )
 
     def __str__(self):
@@ -98,11 +104,11 @@ class StaffMember(models.Model):
 
     def get_staff_member_name(self):
         name_options = [
-            getattr(self.user, 'get_full_name', lambda: '')(),
+            getattr(self.user, "get_full_name", lambda: "")(),
             f"{self.user.first_name} {self.user.last_name}",
             self.user.username,
             self.user.email,
-            f"Staff Member {self.id}"
+            f"Staff Member {self.id}",
         ]
         return next((name.strip() for name in name_options if name.strip()), "Unknown")
 
@@ -129,11 +135,15 @@ class StaffMember(models.Model):
 
     def get_appointment_buffer_time(self):
         config = Config.objects.first()
-        return self.appointment_buffer_time or (config.appointment_buffer_time if config else 0)
+        return self.appointment_buffer_time or (
+            config.appointment_buffer_time if config else 0
+        )
 
     def get_appointment_buffer_time_text(self):
         # convert buffer time (which is in minutes) in day hours minutes if necessary
-        return convert_minutes_in_human_readable_format(self.get_appointment_buffer_time())
+        return convert_minutes_in_human_readable_format(
+            self.get_appointment_buffer_time()
+        )
 
 
 class AppointmentRequest(models.Model):
@@ -147,40 +157,153 @@ class AppointmentRequest(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.date} - {self.start_time} to {self.end_time} - {self.service.name}"
+        return (
+            f"{self.date} - {self.start_time} to {self.end_time} - {self.service.name}"
+        )
+
+    def clean(self):
+        if self.start_time is not None and self.end_time is not None:
+            if self.start_time > self.end_time:
+                raise ValidationError("Start time must be before end time")
+            if self.start_time == self.end_time:
+                raise ValidationError("Start time and end time cannot be the same")
+
+        # Ensure the date is not in the past:
+        if self.date and self.date < datetime.date.today():
+            raise ValidationError("Date cannot be in the past")
+
+    def save(self, *args, **kwargs):
+        # if no id_request is provided, generate one
+        if self.id_request is None:
+            self.id_request = (
+                f"{get_timestamp()}{self.service.id}{generate_random_id()}"
+            )
+        # start time should not be equal to end time
+        if self.start_time == self.end_time:
+            raise ValidationError("Start time and end time cannot be the same")
+        # date should not be in the past
+        if self.date < datetime.date.today():
+            raise ValidationError("Date cannot be in the past")
+        # duration should not exceed the service duration
+        return super().save(*args, **kwargs)
+
+    def get_service_name(self):
+        return self.service.name
+
+    def get_service_price(self):
+        return self.service.get_price()
+
+    def get_service_down_payment(self):
+        return self.service.get_down_payment()
+
+    def get_service_image(self):
+        return self.service.image
+
+    def get_service_image_url(self):
+        return self.service.get_image_url()
+
+    def get_service_description(self):
+        return self.service.description
+
+    def get_id_request(self):
+        return self.id_request
 
 
 class Appointment(models.Model):
-    client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
-    appointment_request = models.OneToOneField(AppointmentRequest, on_delete=models.CASCADE)
-    phone = models.DecimalField(max_digits=8, decimal_places=2)
+    client = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
+    )
+    appointment_request = models.OneToOneField(
+        AppointmentRequest, on_delete=models.CASCADE
+    )
     id_request = models.CharField(max_length=100, blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.client} - " \
-               f"{self.appointment_request.start_time.strftime('%Y-%m-%d %H:%M')} to " \
-               f"{self.appointment_request.end_time.strftime('%Y-%m-%d %H:%M')}"
+        return (
+            f"{self.client} - "
+            f"{self.appointment_request.start_time.strftime('%Y-%m-%d %H:%M')} to "
+            f"{self.appointment_request.end_time.strftime('%Y-%m-%d %H:%M')}"
+        )
+
+    def save(self, *args, **kwargs):
+        if not hasattr(self, "appointment_request"):
+            raise ValidationError("Appointment request is required")
+        return super().save(*args, **kwargs)
+
+    def get_client_name(self):
+        if hasattr(self.client, "get_full_name") and callable(
+            getattr(self.client, "get_full_name")
+        ):
+            name = self.client.get_full_name()
+        else:
+            name = self.client.first_name
+        return name
+
+    def get_date(self):
+        return self.appointment_request.date
+
+    def get_start_time(self):
+        return datetime.datetime.combine(
+            self.get_date(), self.appointment_request.start_time
+        )
+
+    def get_end_time(self):
+        return datetime.datetime.combine(
+            self.get_date(), self.appointment_request.end_time
+        )
+
+    def get_service(self):
+        return self.appointment_request.service
+
+    def get_service_name(self):
+        return self.appointment_request.get_service_name()
+
+    def get_service_duration(self):
+        return self.appointment_request.service.get_duration()
+
+    def get_staff_member_name(self):
+        if not self.appointment_request.staff_member:
+            return ""
+        return self.appointment_request.staff_member.get_staff_member_name()
+
+    def get_staff_member(self):
+        return self.appointment_request.staff_member
+
+    def get_service_price(self):
+        return self.appointment_request.get_service_price()
+
+    def get_service_down_payment(self):
+        return self.appointment_request.get_service_down_payment()
+
+    def get_service_img(self):
+        return self.appointment_request.get_service_image()
+
+    def get_service_img_url(self):
+        return self.appointment_request.get_service_image_url()
+
+    def get_service_description(self):
+        return self.appointment_request.get_service_description()
+
+    def get_appointment_date(self):
+        return self.appointment_request.date
+
+    def get_appointment_id_request(self):
+        return self.id_request
 
 
 class Config(models.Model):
     slot_duration = models.PositiveIntegerField(
         null=True,
-        help_text="Minimum time for an appointment in minutes, recommended 30."
+        help_text="Minimum time for an appointment in minutes, recommended 30.",
     )
 
-    lead_time = models.TimeField(
-        null=True,
-        help_text="Time when we start working."
-    )
-    finish_time = models.TimeField(
-        null=True,
-        help_text="Time when we stop working."
-    )
+    lead_time = models.TimeField(null=True, help_text="Time when we start working.")
+    finish_time = models.TimeField(null=True, help_text="Time when we stop working.")
     appointment_buffer_time = models.FloatField(
         null=True,
-        help_text="Time between now and the first available slot for the current day (doesn't affect tomorrow)."
+        help_text="Time between now and the first available slot for the current day (doesn't affect tomorrow).",
     )
 
 
@@ -191,7 +314,9 @@ class WorkingHours(models.Model):
     end_time = models.TimeField()
 
     def __str__(self):
-        return f"{self.get_day_of_week_display()} - {self.start_time} to {self.end_time}"
+        return (
+            f"{self.get_day_of_week_display()} - {self.start_time} to {self.end_time}"
+        )
 
     def get_day_of_week_str(self):
         # return the name of the day instead of the integer

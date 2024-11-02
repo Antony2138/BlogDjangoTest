@@ -275,6 +275,7 @@ function getAvailableSlots(selectedDate, staffId = null) {
                         errorMessageContainer.append(`<p class="djangoAppt_no-availability-text">${data.message}</p>`);
                     }
                     // Check if the returned message is 'No availability'
+                    console.log("data", data);
                     if (data.message.toLowerCase() === 'no availability') {
                         if (slotContainer.find('.djangoAppt_btn-request-next-slot').length === 0) {
                             slotContainer.append(`<button class="btn btn-danger djangoAppt_btn-request-next-slot" data-service-id="${serviceId}">` + requestNonAvailableSlotBtnTxt + `</button>`);

@@ -8,8 +8,8 @@ slot_duration = 30
 appointment_buffer_time = 0
 
 Config.objects.create(
-            lead_time=lead_time,
-            finish_time=finish_time,
-            slot_duration=slot_duration,
-            appointment_buffer_time=appointment_buffer_time
-        )
+    lead_time=lead_time,
+    finish_time=finish_time,
+    slot_duration=slot_duration,
+    appointment_buffer_time=appointment_buffer_time,
+)
