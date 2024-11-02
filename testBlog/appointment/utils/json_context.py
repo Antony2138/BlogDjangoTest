@@ -19,7 +19,7 @@ def get_generic_context(request, admin=True):
 def json_response(message=None, status=200, success=True, custom_data=None, error_code=None, **kwargs):
     """Return a generic JSON response."""
     response_data = {
-        "messages": message,
+        "message": message,
         "success": success
     }
     if error_code:

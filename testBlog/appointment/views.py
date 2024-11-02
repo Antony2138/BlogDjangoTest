@@ -51,10 +51,13 @@ def get_available_slots_ajax(request):
     custom_data = {'date_chosen': date_chosen}
 
     days_off_exist = check_day_off_for_staff(staff_member=sm, date=selected_date)
+    ################################
+    # dont send a message why
     if days_off_exist:
         message = "Day off. Please select another date!"
         custom_data['available_slots'] = []
         return json_response(message=message, custom_data=custom_data, success=False, error_code=ErrorCode.INVALID_DATE)
+    ################################
     # if selected_date is not a working day for the staff, return an empty list of slots and 'message' is Day Off
     weekday_num = get_weekday_num_from_date(selected_date)
     is_working_day_ = is_working_day(staff_member=sm, day=weekday_num)
@@ -62,8 +65,9 @@ def get_available_slots_ajax(request):
     custom_data['staff_member'] = sm.get_staff_member_name()
     if not is_working_day_:
         message = "Not a working day for {staff_member}. Please select another date!".format(
-                staff_member=sm.get_staff_member_first_name())
+                staff_member=sm.get_staff_member_name())
         custom_data['available_slots'] = []
+        print("asdfasf")
         return json_response(message=message, custom_data=custom_data, success=False, error_code=ErrorCode.INVALID_DATE)
     available_slots = get_available_slots_for_staff(selected_date, sm)
 
