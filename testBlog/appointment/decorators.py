@@ -7,6 +7,7 @@ Since: 2.0.0
 """
 
 from functools import wraps
+
 from .utils.error_codes import ErrorCode
 from .utils.json_context import json_response
 from .utils.view_helpers import is_ajax
@@ -20,7 +21,12 @@ def require_user_authenticated(func):
     @wraps(func)
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return json_response("Not authorized.", status=401, success=False, error_code=ErrorCode.NOT_AUTHORIZED)
+            return json_response(
+                "Not authorized.",
+                status=401,
+                success=False,
+                error_code=ErrorCode.NOT_AUTHORIZED,
+            )
         return func(request, *args, **kwargs)
 
     return wrapper
@@ -34,7 +40,12 @@ def require_staff_or_superuser(func):
     @wraps(func)
     def wrapper(request, *args, **kwargs):
         if not (request.user.is_staff or request.user.is_superuser):
-            return json_response("Not authorized.", status=403, success=False, error_code=ErrorCode.NOT_AUTHORIZED)
+            return json_response(
+                "Not authorized.",
+                status=403,
+                success=False,
+                error_code=ErrorCode.NOT_AUTHORIZED,
+            )
         return func(request, *args, **kwargs)
 
     return wrapper
@@ -48,7 +59,12 @@ def require_superuser(func):
     @wraps(func)
     def wrapper(request, *args, **kwargs):
         if not request.user.is_superuser:
-            return json_response("Not authorized.", status=403, success=False, error_code=ErrorCode.NOT_AUTHORIZED)
+            return json_response(
+                "Not authorized.",
+                status=403,
+                success=False,
+                error_code=ErrorCode.NOT_AUTHORIZED,
+            )
         return func(request, *args, **kwargs)
 
     return wrapper
@@ -62,7 +78,12 @@ def require_ajax(func):
     @wraps(func)
     def wrapper(request, *args, **kwargs):
         if not is_ajax(request):
-            return json_response("Not an AJAX request.", status=400, success=False, error_code=ErrorCode.INVALID_DATA)
+            return json_response(
+                "Not an AJAX request.",
+                status=400,
+                success=False,
+                error_code=ErrorCode.INVALID_DATA,
+            )
         return func(request, *args, **kwargs)
 
     return wrapper

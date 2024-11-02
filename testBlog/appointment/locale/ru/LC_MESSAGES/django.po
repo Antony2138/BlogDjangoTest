@@ -107,7 +107,7 @@ msgstr ""
 
 #: .\templates\administration\staff_list.html:38
 msgid "Remove"
-msgstr ""
+msgstr "Удалить"
 
 #: .\templates\administration\staff_list.html:43
 msgid "Сотрудников не добавлено"

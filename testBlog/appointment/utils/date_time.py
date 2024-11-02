@@ -1,5 +1,6 @@
 import datetime
 from gettext import ngettext
+
 from django.utils import timezone
 
 
@@ -19,7 +20,7 @@ def get_timestamp() -> str:
     :return: The current timestamp (e.g. "1612345678")
     """
     timestamp = str(timezone.now().timestamp())
-    return timestamp.replace('.', '')
+    return timestamp.replace(".", "")
 
 
 def get_weekday_num(weekday: str) -> int:
@@ -29,13 +30,13 @@ def get_weekday_num(weekday: str) -> int:
     :return: The number of the weekday (0 for Sunday, 1 for Monday, etc.)
     """
     weekdays = {
-        'monday': 1,
-        'tuesday': 2,
-        'wednesday': 3,
-        'thursday': 4,
-        'friday': 5,
-        'saturday': 6,
-        'sunday': 0
+        "monday": 1,
+        "tuesday": 2,
+        "wednesday": 3,
+        "thursday": 4,
+        "friday": 5,
+        "saturday": 6,
+        "sunday": 0,
     }
     return weekdays.get(weekday.lower(), -1)
 
@@ -55,30 +56,40 @@ def convert_minutes_in_human_readable_format(minutes: float) -> str:
 
     parts = []
     if hours:
-        hours_display = ngettext("%(count)d час", "%(count)d часа", hours) % {'count': hours}
+        hours_display = ngettext("%(count)d час", "%(count)d часа", hours) % {
+            "count": hours
+        }
         parts.append(hours_display)
 
     if minutes:
-        minutes_display = ngettext("%(count)d минут", "%(count)d минут", minutes) % {'count': minutes}
+        minutes_display = ngettext("%(count)d минут", "%(count)d минут", minutes) % {
+            "count": minutes
+        }
         parts.append(minutes_display)
 
     if len(parts) == 1:
         return parts[0]
     elif len(parts) == 2:
-        return "{first_part} and {second_part}".format(first_part=parts[0], second_part=parts[1])
+        return "{first_part} and {second_part}".format(
+            first_part=parts[0], second_part=parts[1]
+        )
     elif len(parts) == 3:
-        return "{days}, {hours} and {minutes}".format(days=parts[0], hours=parts[1], minutes=parts[2])
+        return "{days}, {hours} and {minutes}".format(
+            days=parts[0], hours=parts[1], minutes=parts[2]
+        )
 
 
 def convert_12_hour_time_to_24_hour_time(time_to_convert) -> str:
     # Convert a 12-hour time to a 24-hour time.
     if isinstance(time_to_convert, (datetime.datetime, datetime.time)):
-        return time_to_convert.strftime('%H:%M:%S')
+        return time_to_convert.strftime("%H:%M:%S")
     elif isinstance(time_to_convert, str):
         try:
             time_str = time_to_convert.strip().upper()
-            return datetime.datetime.strptime(time_str, '%I:%M %p').strftime('%H:%M:%S')
+            return datetime.datetime.strptime(time_str, "%I:%M %p").strftime("%H:%M:%S")
         except ValueError:
             raise ValueError(f"Invalid 12-hour time format: {time_to_convert}")
     else:
-        raise ValueError(f"Unsupported data type for time conversion: {type(time_to_convert)}")
+        raise ValueError(
+            f"Unsupported data type for time conversion: {type(time_to_convert)}"
+        )

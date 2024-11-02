@@ -1,23 +1,21 @@
+import datetime
 from typing import Optional
 
+from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
-import datetime
-from django.apps import apps
+from django.core.exceptions import FieldDoesNotExist
 from django.shortcuts import get_object_or_404
 
 from ..models import DayOff
-from ..settings import (
-    APPOINTMENT_BUFFER_TIME, APPOINTMENT_FINISH_TIME, APPOINTMENT_LEAD_TIME,
-    APPOINTMENT_SLOT_DURATION
-)
-from django.core.exceptions import FieldDoesNotExist
-from .date_time import combine_date_and_time, get_weekday_num
+from ..settings import (APPOINTMENT_BUFFER_TIME, APPOINTMENT_FINISH_TIME,
+                        APPOINTMENT_LEAD_TIME, APPOINTMENT_SLOT_DURATION)
+from .date_time import get_weekday_num
 
-Appointment = apps.get_model('appointment', 'Appointment')
-Config = apps.get_model('appointment', 'Config')
-WorkingHours = apps.get_model('appointment', 'WorkingHours')
-StaffMember = apps.get_model('appointment', 'StaffMember')
+Appointment = apps.get_model("appointment", "Appointment")
+Config = apps.get_model("appointment", "Config")
+WorkingHours = apps.get_model("appointment", "WorkingHours")
+StaffMember = apps.get_model("appointment", "StaffMember")
 
 
 def calculate_slots(start_time, end_time, buffer_time, slot_duration):
@@ -46,17 +44,27 @@ def get_times_from_config(date):
     """
     config = get_config()
     if config:
-        start_time = datetime.datetime.combine(date, datetime.time(hour=config.lead_time.hour,
-                                                                   minute=config.lead_time.minute))
-        end_time = datetime.datetime.combine(date, datetime.time(hour=config.finish_time.hour,
-                                                                 minute=config.finish_time.minute))
+        start_time = datetime.datetime.combine(
+            date,
+            datetime.time(hour=config.lead_time.hour, minute=config.lead_time.minute),
+        )
+        end_time = datetime.datetime.combine(
+            date,
+            datetime.time(
+                hour=config.finish_time.hour, minute=config.finish_time.minute
+            ),
+        )
         slot_duration = datetime.timedelta(minutes=config.slot_duration)
         buff_time = datetime.timedelta(minutes=config.appointment_buffer_time)
     else:
         start_hour, start_minute = APPOINTMENT_LEAD_TIME
-        start_time = datetime.datetime.combine(date, datetime.time(hour=start_hour, minute=start_minute))
+        start_time = datetime.datetime.combine(
+            date, datetime.time(hour=start_hour, minute=start_minute)
+        )
         finish_hour, finish_minute = APPOINTMENT_FINISH_TIME
-        end_time = datetime.datetime.combine(date, datetime.time(hour=finish_hour, minute=finish_minute))
+        end_time = datetime.datetime.combine(
+            date, datetime.time(hour=finish_hour, minute=finish_minute)
+        )
         slot_duration = datetime.timedelta(minutes=APPOINTMENT_SLOT_DURATION)
         buff_time = datetime.timedelta(minutes=APPOINTMENT_BUFFER_TIME)
     return start_time, end_time, slot_duration, buff_time
@@ -94,18 +102,26 @@ def get_weekday_num_from_date(date: datetime.date = None) -> int:
 
 def is_working_day(staff_member: StaffMember, day: int) -> bool:
     """Check if the given day is a working day for the staff member."""
-    working_days = list(WorkingHours.objects.filter(staff_member=staff_member).values_list('day_of_week', flat=True))
+    working_days = list(
+        WorkingHours.objects.filter(staff_member=staff_member).values_list(
+            "day_of_week", flat=True
+        )
+    )
     return day in working_days
 
 
-def get_staff_member_start_time(staff_member: StaffMember, date: datetime.date) -> Optional[datetime.time]:
+def get_staff_member_start_time(
+    staff_member: StaffMember, date: datetime.date
+) -> Optional[datetime.time]:
     """Return the start time for the given staff member on the given date."""
     weekday_num = get_weekday_num_from_date(date)
     working_hours = get_working_hours_for_staff_and_day(staff_member, weekday_num)
-    return working_hours['start_time']
+    return working_hours["start_time"]
 
 
-def get_staff_member_buffer_time(staff_member: StaffMember, date: datetime.date) -> float:
+def get_staff_member_buffer_time(
+    staff_member: StaffMember, date: datetime.date
+) -> float:
     """Return the buffer time for the given staff member on the given date."""
     _, _, _, buff_time = get_times_from_config(date)
     buffer_minutes = buff_time.total_seconds() / 60
@@ -130,7 +146,11 @@ def get_non_working_days_for_staff(staff_member_id):
     all_days = set(range(7))  # Represents all days (0-6)
     try:
         staff_member = StaffMember.objects.get(id=staff_member_id)
-        working_days = set(WorkingHours.objects.filter(staff_member=staff_member).values_list('day_of_week', flat=True))
+        working_days = set(
+            WorkingHours.objects.filter(staff_member=staff_member).values_list(
+                "day_of_week", flat=True
+            )
+        )
 
         # Subtracting working_days from all_days to get non-working days
         non_working_days = list(all_days - working_days)
@@ -144,17 +164,23 @@ def check_day_off_for_staff(staff_member, date) -> bool:
     :param staff_member: The staff member to check.
     :param date: The date to check.
     """
-    return DayOff.objects.filter(staff_member=staff_member, start_date__lte=date, end_date__gte=date).exists()
+    return DayOff.objects.filter(
+        staff_member=staff_member, start_date__lte=date, end_date__gte=date
+    ).exists()
 
 
-def get_staff_member_end_time(staff_member: StaffMember, date: datetime.date) -> Optional[datetime.time]:
+def get_staff_member_end_time(
+    staff_member: StaffMember, date: datetime.date
+) -> Optional[datetime.time]:
     """Return the end time for the given staff member on the given date."""
     weekday_num = get_weekday_num_from_date(date)
     working_hours = get_working_hours_for_staff_and_day(staff_member, weekday_num)
-    return working_hours['end_time']
+    return working_hours["end_time"]
 
 
-def get_staff_member_slot_duration(staff_member: StaffMember, date: datetime.date) -> int:
+def get_staff_member_slot_duration(
+    staff_member: StaffMember, date: datetime.date
+) -> int:
     """Return the slot duration for the given staff member on the given date."""
     _, _, slot_duration, _ = get_times_from_config(date)
     slot_minutes = slot_duration.total_seconds() / 60
@@ -162,12 +188,11 @@ def get_staff_member_slot_duration(staff_member: StaffMember, date: datetime.dat
 
 
 def get_appointments_for_date_and_time(date, start_time, end_time, staff_member):
-
     return Appointment.objects.filter(
         appointment_request__date=date,
         appointment_request__start_time__lte=end_time,
         appointment_request__end_time__gte=start_time,
-        appointment_request__staff_member=staff_member
+        appointment_request__staff_member=staff_member,
     )
 
 
@@ -180,7 +205,9 @@ def calculate_staff_slots(date, staff_member):
         return []
     staff_member_start_time = get_staff_member_start_time(staff_member, date)
     start_time = datetime.datetime.combine(date, staff_member_start_time)
-    end_time = datetime.datetime.combine(date, get_staff_member_end_time(staff_member, date))
+    end_time = datetime.datetime.combine(
+        date, get_staff_member_end_time(staff_member, date)
+    )
 
     # Convert the buffer duration in minutes to a timedelta object
     buffer_duration_minutes = get_staff_member_buffer_time(staff_member, date)
@@ -202,7 +229,9 @@ def get_working_hours_for_staff_and_day(staff_member, day_of_week):
     :param day_of_week: The day of the week to get the working hours for.
     :return: The working hours for the given staff member and day of the week.
     """
-    working_hours = WorkingHours.objects.filter(staff_member=staff_member, day_of_week=day_of_week).first()
+    working_hours = WorkingHours.objects.filter(
+        staff_member=staff_member, day_of_week=day_of_week
+    ).first()
     start_time = staff_member.get_lead_time()
     end_time = staff_member.get_finish_time()
     if not working_hours and not (start_time and end_time):
@@ -210,28 +239,28 @@ def get_working_hours_for_staff_and_day(staff_member, day_of_week):
     # If no specific working hours are set for that day, use the default start and end times from StaffMember
     if not working_hours:
         return {
-            'staff_member': staff_member,
-            'day_of_week': day_of_week,
-            'start_time': staff_member.get_lead_time(),
-            'end_time': staff_member.get_finish_time()
+            "staff_member": staff_member,
+            "day_of_week": day_of_week,
+            "start_time": staff_member.get_lead_time(),
+            "end_time": staff_member.get_finish_time(),
         }
 
     # If a WorkingHours instance is found, convert it to a dictionary for consistent return type
     return {
-        'staff_member': working_hours.staff_member,
-        'day_of_week': working_hours.day_of_week,
-        'start_time': working_hours.start_time,
-        'end_time': working_hours.end_time
+        "staff_member": working_hours.staff_member,
+        "day_of_week": working_hours.day_of_week,
+        "start_time": working_hours.start_time,
+        "end_time": working_hours.end_time,
     }
 
 
 def get_config():
     """Returns the configuration object from the database or the cache."""
-    config = cache.get('config')
+    config = cache.get("config")
     if not config:
         config = Config.objects.first()
         # Cache the configuration for 1 hour (3600 seconds)
-        cache.set('config', config, 3600)
+        cache.set("config", config, 3600)
     return config
 
 
@@ -255,13 +284,15 @@ def create_and_save_appointment(ar, request):
 def username_in_user_model():
     try:
         # Check if the 'username' field exists in the User model
-        get_user_model()._meta.get_field('username')
+        get_user_model()._meta.get_field("username")
         return True
     except FieldDoesNotExist:
         return False
 
 
-def day_off_exists_for_date_range(staff_member, start_date, end_date, days_off_id=None) -> bool:
+def day_off_exists_for_date_range(
+    staff_member, start_date, end_date, days_off_id=None
+) -> bool:
     """Check if a day off exists for the given staff member and date range.
 
     :param staff_member: The staff member to check.
@@ -270,7 +301,9 @@ def day_off_exists_for_date_range(staff_member, start_date, end_date, days_off_i
     :param days_off_id: The ID of the day off to exclude from the check.
     :return: True if a day off exists for the given staff member and date range; otherwise, False.
     """
-    days_off = DayOff.objects.filter(staff_member=staff_member, start_date__lte=end_date, end_date__gte=start_date)
+    days_off = DayOff.objects.filter(
+        staff_member=staff_member, start_date__lte=end_date, end_date__gte=start_date
+    )
     if days_off_id:
         days_off = days_off.exclude(id=days_off_id)
     return days_off.exists()
@@ -278,5 +311,6 @@ def day_off_exists_for_date_range(staff_member, start_date, end_date, days_off_i
 
 def working_hours_exist(day_of_week, staff_member):
     """Check if working hours exist for the given day of the week and staff member."""
-    return WorkingHours.objects.filter(day_of_week=day_of_week, staff_member=staff_member).exists()
-
+    return WorkingHours.objects.filter(
+        day_of_week=day_of_week, staff_member=staff_member
+    ).exists()
