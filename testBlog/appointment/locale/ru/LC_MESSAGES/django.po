@@ -1,0 +1,313 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-11-02 14:58+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: .\templates\administration\manage_day_off.html:31
+#: .\templates\administration\manage_working_hours.html:34
+msgid "Staff Member"
+msgstr ""
+
+#: .\templates\administration\manage_day_off.html:38
+#: .\templates\administration\user_profile.html:120
+msgid "Start date"
+msgstr ""
+
+#: .\templates\administration\manage_day_off.html:52
+#: .\templates\administration\user_profile.html:121
+msgid "End date"
+msgstr ""
+
+#: .\templates\administration\manage_day_off.html:66
+#: .\templates\administration\user_profile.html:122
+msgid "Description"
+msgstr ""
+
+#: .\templates\administration\manage_staff_personal_info.html:13
+msgid "Персональная информация"
+msgstr ""
+
+#: .\templates\administration\manage_working_hours.html:24
+msgid "Manage Working Hours"
+msgstr ""
+
+#: .\templates\administration\manage_working_hours.html:40
+msgid "Day of Week"
+msgstr ""
+
+#: .\templates\administration\manage_working_hours.html:45
+msgid "Start time"
+msgstr ""
+
+#: .\templates\administration\manage_working_hours.html:59
+msgid "End time"
+msgstr ""
+
+#: .\templates\administration\service_list.html:16
+msgid "Список услуг"
+msgstr ""
+
+#: .\templates\administration\service_list.html:23
+msgid "Название"
+msgstr ""
+
+#: .\templates\administration\service_list.html:24
+msgid "Продолжительность"
+msgstr ""
+
+#: .\templates\administration\service_list.html:25
+msgid "Цена"
+msgstr ""
+
+#: .\templates\administration\service_list.html:26
+msgid "Описание"
+msgstr ""
+
+#: .\templates\administration\service_list.html:57
+msgid "Услуги не добавлены"
+msgstr ""
+
+#: .\templates\administration\staff_list.html:12
+msgid "Работники"
+msgstr ""
+
+#: .\templates\administration\staff_list.html:24
+msgid "Имя"
+msgstr ""
+
+#: .\templates\administration\staff_list.html:25
+#: .\templates\appointment\appointment_client_information.html:51
+msgid "Email"
+msgstr ""
+
+#: .\templates\administration\staff_list.html:26
+msgid "Детали"
+msgstr ""
+
+#: .\templates\administration\staff_list.html:36
+msgid "Профиль"
+msgstr ""
+
+#: .\templates\administration\staff_list.html:38
+msgid "Remove"
+msgstr ""
+
+#: .\templates\administration\staff_list.html:43
+msgid "Сотрудников не добавлено"
+msgstr ""
+
+#: .\templates\administration\user_profile.html:75
+msgid "To add/modify a new service, make a request to an admin."
+msgstr ""
+
+#: .\templates\administration\user_profile.html:76
+msgid "Changes made in one service will change it for every staff member."
+msgstr ""
+
+#: .\templates\administration\user_profile.html:99
+msgid "No service offered yet"
+msgstr ""
+
+#: .\templates\administration\user_profile.html:108
+msgid "Days Off"
+msgstr ""
+
+#: .\templates\administration\user_profile.html:123
+msgid "Action"
+msgstr ""
+
+#: .\templates\administration\user_profile.html:138
+msgid "Вы действительно хотите удалить выходные?"
+msgstr ""
+
+#: .\templates\administration\user_profile.html:190
+msgid "Вы действительно хотите удалить рабочие часы?"
+msgstr ""
+
+#: .\templates\appointment\appointment_client_information.html:8
+msgid "Client Information"
+msgstr ""
+
+#: .\templates\appointment\appointment_client_information.html:11
+#, python-format
+msgid ""
+"\n"
+"Your appointment request for %(service_name)s has been submitted.\n"
+"Please provide your information to create an account and complete the "
+"payment process.\n"
+msgstr ""
+
+#: .\templates\appointment\appointment_client_information.html:34
+msgid "Fill out your details"
+msgstr ""
+
+#: .\templates\appointment\appointment_client_information.html:40
+msgid "Tell us a bit about yourself"
+msgstr ""
+
+#: .\templates\appointment\appointment_client_information.html:43
+msgid "Already have an account?"
+msgstr ""
+
+#: .\templates\appointment\appointment_client_information.html:44
+msgid "Log in"
+msgstr ""
+
+#: .\templates\appointment\appointment_client_information.html:44
+msgid "for faster booking."
+msgstr ""
+
+#: .\templates\appointment\appointment_client_information.html:48
+msgid "Full Name"
+msgstr ""
+
+#: .\templates\appointment\appointment_client_information.html:59
+msgid "I want to receive an EMAIL reminder 24 hours before this session starts"
+msgstr ""
+
+#: .\templates\appointment\appointment_client_information.html:65
+msgid "Phone"
+msgstr ""
+
+#: .\templates\appointment\appointment_client_information.html:72
+msgid "City and State"
+msgstr ""
+
+#: .\templates\appointment\appointment_client_information.html:86
+msgid "Service Details"
+msgstr ""
+
+#: .\templates\appointment\appointment_client_information.html:94
+msgid "at"
+msgstr ""
+
+#: .\templates\appointment\appointment_client_information.html:103
+msgid "Payment Details"
+msgstr ""
+
+#: .\templates\appointment\appointment_client_information.html:105
+msgid "Total"
+msgstr ""
+
+#: .\templates\appointment\appointment_client_information.html:111
+msgid "Pay"
+msgstr ""
+
+#: .\templates\appointment\appointment_client_information.html:117
+msgid "Down Payment"
+msgstr ""
+
+#: .\templates\appointment\appointment_client_information.html:125
+#: .\templates\appointment\appointment_client_information.html:131
+msgid "Finish"
+msgstr ""
+
+#: .\templates\appointment\appointments.html:65
+msgid "Welcome"
+msgstr "Добро пожаловать"
+
+#: .\templates\appointment\appointments.html:118
+msgid "Request next available slot"
+msgstr ""
+
+#: .\templates\appointment\appointments.html:119
+msgid "No staff member selected."
+msgstr ""
+
+#: .\templates\appointment\appointments.html:120
+msgid "Please select a time slot before submitting the appointment request."
+msgstr ""
+
+#: .\templates\appointment\appointments.html:121
+msgid "Date is in the past."
+msgstr ""
+
+#: .\templates\appointment\appointments.html:122
+msgid "Please select a date and time"
+msgstr ""
+
+#: .\templates\appointment\default_thank_you.html:16
+msgid "See you soon"
+msgstr ""
+
+#: .\templates\appointment\default_thank_you.html:17
+msgid ""
+"We've successfully scheduled your appointment! Please check your email for "
+"all the details"
+msgstr ""
+
+#: .\templates\appointment\default_thank_you.html:18
+msgid "Appointment details"
+msgstr ""
+
+#: .\templates\appointment\default_thank_you.html:20
+msgid "Service"
+msgstr ""
+
+#: .\templates\appointment\default_thank_you.html:21
+msgid "Appointment Date"
+msgstr ""
+
+#: .\templates\appointment\default_thank_you.html:22
+msgid "Appointment Time"
+msgstr ""
+
+#: .\templates\appointment\default_thank_you.html:23
+msgid "Duration"
+msgstr ""
+
+#: .\templates\base_templates\base.html:7
+msgid "Appointment application"
+msgstr ""
+
+#: .\templates\error_pages\403_forbidden.html:98
+msgid "You don't have permission to view this resource, and you know it"
+msgstr ""
+
+#: .\templates\error_pages\403_forbidden.html:109
+msgid "Go back"
+msgstr ""
+
+#: .\templates\modal\confirm_modal.html:18
+#: .\templates\modal\error_modal.html:17
+msgid "Close"
+msgstr ""
+
+#: .\templates\modal\error_modal.html:7
+msgid "Error"
+msgstr ""
+
+#: .\utils\date_time.py:58
+#, python-format
+msgid "%(count)d час"
+msgid_plural "%(count)d часа"
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\utils\date_time.py:62
+#, python-format
+msgid "%(count)d минут"
+msgid_plural "%(count)d минут"
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\utils\validators.py:7
+msgid "Date is in the past"
+msgstr ""
