@@ -299,16 +299,15 @@ body {
     background-color: white;
 }
 a.sidebar-link {
-    padding: .625rem 1.625rem;
+    padding: .625rem 1.6rem;
     color: #FFF;
     display: block;
     font-size: 0.9rem;
     white-space: nowrap;
-    border-left: 3px solid transparent;
 }
 
 .sidebar-link i {
-    font-size: 1.35rem;
+    font-size: 1.3rem;
     margin-right: .75rem;
 }
 

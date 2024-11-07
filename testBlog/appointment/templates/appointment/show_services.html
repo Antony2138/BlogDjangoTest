@@ -7,6 +7,12 @@
 
 {% block body %}
 <div class="container-show">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-dismissible {% if message.tags %}alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}danger{% else %}{{ message.tags }}{% endif %}{% endif %}"
+                 role="alert">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
     <h3>Услуги <span>{{ services|length }}</span></h3>
     {% for service in services %}
     <div class="service-section">
@@ -14,8 +20,12 @@
             <img src="{{service.get_image_url}}" alt="Фотография услуги">
             <div class="about">
                 <div class="text-about">
-                    <a class="title " href="{% url 'update_service' service_id=service.id %}">
-                        {{service.name}} </a>
+                    {% if superuser or user.is_staff%}
+                        <a class="title " href="{% url 'update_service' service_id=service.id %}">
+                            {{service.name}} </a>
+                    {% else %}
+                        <p>{{service.name}}</p>
+                    {% endif %}
                     <div class="type">{{ service.get_duration }}</div>
                 </div>
             </div>

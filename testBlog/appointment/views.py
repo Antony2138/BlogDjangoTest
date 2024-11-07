@@ -3,15 +3,13 @@ from datetime import date, timedelta
 from django.contrib import messages
 from django.db.models import Q
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
 from .decorators import require_ajax
-from .forms import (AppointmentForm, AppointmentRequestForm, ClientDataForm,
-                    SlotForm)
-from .models import (Appointment, AppointmentRequest, DayOff, Service,
-                     StaffMember)
+from .forms import AppointmentRequestForm, SlotForm
+from .models import Appointment, DayOff, Service, StaffMember
 from .services import get_appointments_and_slots, get_available_slots_for_staff
 from .utils.db_helpers import (check_day_off_for_staff,
                                create_and_save_appointment,
@@ -54,10 +52,9 @@ def get_available_slots_ajax(request):
     custom_data = {"date_chosen": date_chosen}
 
     days_off_exist = check_day_off_for_staff(staff_member=sm, date=selected_date)
-    ################################
-    # dont send a message why
+
     if days_off_exist:
-        message = "Day off. Please select another date!"
+        message = "Выходные.Выберите другой день"
         custom_data["available_slots"] = []
         return json_response(
             message=message,
@@ -65,7 +62,6 @@ def get_available_slots_ajax(request):
             success=False,
             error_code=ErrorCode.INVALID_DATE,
         )
-    ################################
     # if selected_date is not a working day for the staff, return an empty list of slots and 'message' is Day Off
     weekday_num = get_weekday_num_from_date(selected_date)
     is_working_day_ = is_working_day(staff_member=sm, day=weekday_num)
@@ -73,12 +69,11 @@ def get_available_slots_ajax(request):
     custom_data["staff_member"] = sm.get_staff_member_name()
     if not is_working_day_:
         message = (
-            "Not a working day for {staff_member}. Please select another date!".format(
+            "{staff_member} Не работает в этот день. Выберите другой".format(
                 staff_member=sm.get_staff_member_name()
             )
         )
         custom_data["available_slots"] = []
-        print("asdfasf")
         return json_response(
             message=message,
             custom_data=custom_data,
@@ -95,7 +90,7 @@ def get_available_slots_ajax(request):
         ]
 
     custom_data["available_slots"] = [
-        slot.strftime("%I:%M %p") for slot in available_slots
+        slot.strftime("%H:%M") for slot in available_slots
     ]
     if len(available_slots) == 0:
         custom_data["error"] = True
@@ -111,50 +106,6 @@ def get_available_slots_ajax(request):
         message="Successfully retrieved available slots",
         custom_data=custom_data,
         success=True,
-    )
-
-
-def appointment_client_information(request, appointment_request_id, id_request):
-    """This view function handles client information submission for an appointment.
-
-    :param request: The request instance.
-    :param appointment_request_id: The ID of the appointment request.
-    :param id_request: The unique ID of the appointment request.
-    :return: The rendered HTML page.
-    """
-    ar = get_object_or_404(AppointmentRequest, pk=appointment_request_id)
-
-    if request.session.get(f"appointment_submitted_{id_request}", False):
-        context = get_generic_context_with_extra(
-            request, {"service_id": ar.service_id}, admin=False
-        )
-        return render(
-            request, "error_pages/304_already_submitted.html", context=context
-        )
-
-    if request.method == "POST":
-        appointment_form = AppointmentForm(request.POST)
-
-        if appointment_form.is_valid():
-            ar.save()
-            print("alsjdbwkehvbkhawebfvqahjbwkfcqabv")
-            # Create a new appointment
-            response = create_appointment(request, ar)
-            request.session.setdefault(f"appointment_submitted_{id_request}", True)
-            return response
-    else:
-        appointment_form = AppointmentForm()
-        client_data_form = ClientDataForm()
-
-    extra_context = {
-        "ar": ar,
-        "form": appointment_form,
-        "client_data_form": client_data_form,
-        "service_name": ar.service.name,
-    }
-    context = get_generic_context_with_extra(request, extra_context, admin=False)
-    return render(
-        request, "appointment/appointment_client_information.html", context=context
     )
 
 
@@ -276,7 +227,9 @@ def appointment_request(request, service_id=None, staff_member_id=None):
     all_staff_members = None
     available_slots = []
     label = '"Lacky" пилка'
-
+    if not request.user.is_authenticated:
+        messages.error(request, "Для записи вы должны быть зарегистрированны")
+        return redirect("services")
     if service_id:
         service = get_object_or_404(Service, pk=service_id)
         all_staff_members = StaffMember.objects.filter(services_offered=service)

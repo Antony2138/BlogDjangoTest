@@ -84,7 +84,7 @@ function initializeCalendar() {
     const formattedAppointments = formatAppointmentsForCalendar(appointments);
     const calendarEl = document.getElementById('calendar');
     AppState.calendar = new FullCalendar.Calendar(calendarEl, getCalendarConfig(formattedAppointments));
-    AppState.calendar.setOption('locale', locale);
+    AppState.calendar.setOption('locale', 'ru');
     AppState.calendar.render();
 }
 
@@ -95,7 +95,6 @@ function formatAppointmentsForCalendar(appointments) {
         start: appointment.start_time,
         end: appointment.end_time,
         client_name: appointment.client_name,
-        backgroundColor: appointment.background_color,
     }));
 }
 
@@ -176,7 +175,6 @@ function getCalendarConfig(events) {
                 const dotEl = info.el.querySelector('.fc-daygrid-event-dot') || document.createElement('span');
                 dotEl.classList.add('fc-daygrid-event-dot');
                 dotEl.style.borderRadius = '50%';
-                dotEl.style.backgroundColor = info.event.backgroundColor;
 
                 // Clear the inner HTML of the event element and append the dot
                 info.el.innerHTML = '';
@@ -202,7 +200,7 @@ function getCalendarConfig(events) {
 }
 
 function displayEventList(events, date) {
-    let eventListHtml = '<h4 style="font-size: 14px; font-weight: bold;">' + eventsOnTxt + ' ' + moment(date).format('MMMM Do, YYYY') + '</h4>';
+    let eventListHtml = '<h3 style="font-size: 16px; font-weight: bold;">' + eventsOnTxt + ' ' + moment(date).format('MMMM Do, YYYY') + '</h3>';
     eventListHtml += '<hr>';
 
     events.forEach(function (event) {
@@ -623,11 +621,7 @@ async function getAppointmentData(eventId, isCreatingMode, defaultStartTime) {
         client_name: '',
         client_email: '',
         client_phone: '',
-        client_address: '',
-        additional_info: '',
-        want_reminder: false,
-        background_color: '',
-        timezone: '',
+
     };
 }
 
@@ -658,10 +652,15 @@ async function showEventModal(eventId = null, isEditMode, isCreatingMode = false
         staffDropdown = await getStaffDropdown(appointment.staff_id, isEditMode);
         attachEventListenersToDropdown(); // Attach event listener
     }
-
+    console.log(appointment)
+    console.log(servicesDropdown)
+    console.log(staffDropdown)
+    console.log(isEditMode)
     document.getElementById('eventModalBody').innerHTML = generateModalContent(appointment, servicesDropdown, isEditMode, staffDropdown);
     adjustModalButtonsVisibility(isEditMode, isCreatingMode);
+    console.log(typeof $)
     $('#eventDetailsModal').modal('show');
+
 }
 
 // Adjust Modal Buttons Visibility

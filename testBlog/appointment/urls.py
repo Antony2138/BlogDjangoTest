@@ -16,10 +16,30 @@ ajax_urlpatterns = [
         views.get_non_working_days_ajax,
         name="get_non_working_days_ajax",
     ),
+    path('delete_appointment/',
+         views_admin.delete_appointment_ajax,
+         name="delete_appointment_ajax"),
+
+    path('fetch_service_list_for_staff/',
+         views_admin.fetch_service_list_for_staff,
+         name='fetch_service_list_for_staff'),
+
+    path('fetch_staff_list/', views_admin.fetch_staff_list, name='fetch_staff_list'),
+
+    path('update_appt_min_info/', views_admin.update_appt_min_info, name="update_appt_min_info"),
+
+    path('update_appt_date_time/', views_admin.update_appt_date_time, name="update_appt_date_time"),
+
+    path('is_user_staff_admin/', views_admin.is_user_staff_admin, name="is_user_staff_admin"),
 ]
 
 admin_urlpatterns = [
     path("", views_admin.show_abilities, name="show_all"),
+
+    path('appointments/<str:response_type>/', views_admin.get_user_appointments, name='get_user_event_type'),
+    path('appointments/', views_admin.get_user_appointments, name='get_user_appointments'),
+    path('display-appointment/<int:appointment_id>/', views_admin.display_appointment, name='display_appointment'),
+
     # add, remove, show, update service
     path("add-service/", views_admin.add_or_update_service, name="add_service"),
     path("service-list/", views_admin.get_service_list, name="get_service_list"),

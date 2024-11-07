@@ -2,25 +2,29 @@ import datetime
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext as _
 
 from .forms import (PersonalInformationForm, ServiceForm, StaffDaysOffForm,
                     StaffWorkingHoursForm)
 from .models import Appointment, Service, StaffMember, WorkingHours
-from .utils.date_time import convert_12_hour_time_to_24_hour_time
+from .utils.date_time import convert_str_to_time, get_ar_end_time
 from .utils.db_helpers import (calculate_slots, calculate_staff_slots,
                                day_off_exists_for_date_range,
-                               exclude_booked_slots,
+                               exclude_booked_slots, get_all_appointments,
                                get_appointments_for_date_and_time,
+                               get_staff_member_appointment_list,
                                get_staff_member_from_user_id_or_logged_in,
                                get_times_from_config,
                                get_weekday_num_from_date,
-                               get_working_hours_for_staff_and_day,
+                               get_working_hours_for_staff_and_day, parse_name,
                                working_hours_exist)
 from .utils.error_codes import ErrorCode
-from .utils.json_context import get_generic_context, json_response
+from .utils.json_context import (convert_appointment_to_json,
+                                 get_generic_context, json_response)
 
 
 def get_available_slots_for_staff(date, staff_member):
@@ -157,6 +161,153 @@ def update_personal_info_service(staff_user_id, post_data, current_user):
         return None, False, "Заполните все поля"
 
 
+def fetch_user_appointments(user):
+    """Fetch the appointments for a given user.
+
+    :param user: The user instance.
+    :return: A list of appointments.
+    """
+    if user.is_superuser:
+        return get_all_appointments()
+    try:
+        staff_member_instance = user.staffmember
+        return get_staff_member_appointment_list(staff_member_instance)
+    except ObjectDoesNotExist:
+        if user.is_staff:
+            return []
+
+    raise ValueError("User is not a staff member or a superuser")
+
+
+def prepare_appointment_display_data(user, appointment_id):
+    """Prepare the data for the appointment details page.
+
+    :param user: The user instance.
+    :param appointment_id: The appointment id.
+    :return: A tuple containing the appointment instance, page title, error message, and status code.
+    """
+    appointment = Appointment.objects.get(id=appointment_id)
+
+    # If the appointment doesn't exist
+    if not appointment:
+        return None, None, "Appointment does not exist.", 404
+
+    # Prepare the data for display
+    page_title = "Детали услуги" + ": {client_name}".format(client_name=appointment.get_client_name())
+    if user.is_superuser:
+        page_title += f' (у: {appointment.get_staff_member_name()})'
+
+    return appointment, page_title, None, 200
+
+
+def update_existing_appointment(data, request):
+    try:
+        appt = Appointment.objects.get(id=data.get("appointment_id"))
+        staff_id = data.get("staff_member")
+        data.get("want_reminder") == 'true'
+        appt = save_appointment(
+            appt,
+            client_name=data.get("client_name"),
+            client_email=data.get("client_email"),
+            start_time=data.get("start_time"),
+            phone_number=data.get("client_phone"),
+            service_id=data.get("service_id"),
+            staff_member_id=staff_id,
+            request=request,
+        )
+        if not appt:
+            return json_response("Service not offered by staff member.", status=400, success=False,
+                                 error_code=ErrorCode.SERVICE_NOT_FOUND)
+        appointments_json = convert_appointment_to_json(request, [appt])[0]
+        return json_response(_("Appointment updated successfully."), custom_data={'appt': appointments_json})
+    except Appointment.DoesNotExist:
+        return json_response("Appointment does not exist.", status=404, success=False,
+                             error_code=ErrorCode.APPOINTMENT_NOT_FOUND)
+    except Service.DoesNotExist:
+        return json_response("Service does not exist.", status=404, success=False,
+                             error_code=ErrorCode.SERVICE_NOT_FOUND)
+    except Exception as e:
+        return json_response(str(e.args[0]), status=400, success=False)
+
+
+def save_appointment(appt, client_name, client_email, start_time, phone_number, client_address, service_id, request,
+                     staff_member_id=None):
+    """Save an appointment's details.
+    :return: The modified appointment.
+    """
+    service = Service.objects.get(id=service_id)
+    if staff_member_id:
+        staff_member = StaffMember.objects.get(id=staff_member_id)
+        if not staff_member.get_service_is_offered(service_id):
+            return None
+    # Modify and save client details
+    first_name, last_name = parse_name(client_name)
+    client = appt.client
+    client.first_name = first_name
+    client.last_name = last_name
+    client.email = client_email
+    client.save()
+    # convert start time to a time object if it is a string
+    if isinstance(start_time, str):
+        start_time = convert_str_to_time(start_time)
+    # calculate end time from start time and service duration
+    end_time = get_ar_end_time(start_time, service.duration)
+
+    # Modify and save appointment request details
+    appt_request = appt.appointment_request
+
+    appt_request.service = service
+    appt_request.start_time = start_time
+    appt_request.end_time = end_time
+    appt_request.staff_member = staff_member
+    appt_request.save()
+
+    # Modify and save appointment details
+    appt.phone = phone_number
+    appt.address = client_address
+    appt.save()
+    return appt
+
+
+def save_appt_date_time(appt_start_time, appt_date, appt_id, request):
+    """Save the date and time of an appointment request.
+
+    :param appt_start_time: The start time of the appointment request.
+    :param appt_date: The date of the appointment request.
+    :param appt_id: The ID of the appointment to modify.
+    :param request: The request object.
+    :return: The modified appointment.
+    """
+    appt = Appointment.objects.get(id=appt_id)
+    service = appt.get_service()
+
+    # Convert start time to a time object if it is a string
+    if isinstance(appt_start_time, str):
+        time_format = "%H:%M:%S.%fZ"
+        appt_start_time_obj = datetime.datetime.strptime(appt_start_time, time_format).time()
+    else:
+        appt_start_time_obj = appt_start_time
+
+    # Calculate end time from start time and service duration
+    end_time_obj = get_ar_end_time(appt_start_time_obj, service.duration)
+
+    # Convert the appt_date from string to a date object if it's a string
+    if isinstance(appt_date, str):
+        appt_date_obj = datetime.datetime.strptime(appt_date, "%Y-%m-%d").date()
+    else:
+        appt_date_obj = appt_date
+
+    # Modify and save appointment request details
+    appt_request = appt.appointment_request
+    appt_request.date = appt_date_obj
+    appt_request.start_time = appt_start_time_obj
+    appt_request.end_time = end_time_obj
+    appt_request.save()
+    appt.save()
+
+    return appt
+
+
 def handle_entity_management_request(
     request,
     staff_member,
@@ -281,10 +432,8 @@ def handle_day_off_form(day_off_form, staff_member):
             "Выходные успешно добавлены", custom_data={"redirect_url": redirect_url}
         )
     else:
-        print("check")
         message = "Invalid data:"
         message += get_error_message_in_form(form=day_off_form)
-        print(message, "asdasdasd")
         return json_response(
             message, status=400, success=False, error_code=ErrorCode.INVALID_DATA
         )
@@ -317,8 +466,6 @@ def handle_working_hours_form(
         )
 
     # Convert start time and end time to 24-hour format
-    start_time = convert_12_hour_time_to_24_hour_time(start_time)
-    end_time = convert_12_hour_time_to_24_hour_time(end_time)
 
     # Ensure start time is before end time
     if start_time >= end_time:

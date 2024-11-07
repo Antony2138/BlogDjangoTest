@@ -1,6 +1,8 @@
-.custom-wrapper{
+.custom-wrapper {
     display: flex;
-    justify-content: space-evenly;
+    gap: 50px;
+    justify-content: center;
+}
 
 .service-form-wrapper{
     margin: 0 auto;

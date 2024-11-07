@@ -290,6 +290,24 @@ def username_in_user_model():
         return False
 
 
+def tg_in_user_model():
+    try:
+        # Check if the 'username' field exists in the User model
+        get_user_model()._meta.get_field("social_link_tg")
+        return True
+    except FieldDoesNotExist:
+        return False
+
+
+def vk_in_user_model():
+    try:
+        # Check if the 'username' field exists in the User model
+        get_user_model()._meta.get_field("social_link_vk")
+        return True
+    except FieldDoesNotExist:
+        return False
+
+
 def day_off_exists_for_date_range(
     staff_member, start_date, end_date, days_off_id=None
 ) -> bool:
@@ -314,3 +332,22 @@ def working_hours_exist(day_of_week, staff_member):
     return WorkingHours.objects.filter(
         day_of_week=day_of_week, staff_member=staff_member
     ).exists()
+
+
+def get_all_appointments() -> list:
+    """
+    :return: QuerySet, all appointments
+    """
+    return Appointment.objects.all()
+
+
+def get_staff_member_appointment_list(staff_member: StaffMember) -> list:
+    """Get a list of appointments for staff member."""
+    return Appointment.objects.filter(appointment_request__staff_member=staff_member)
+
+
+def parse_name(name: str):
+    parts = name.split(' ', 1)
+    if len(parts) == 1:
+        parts.append('')  # Add an empty string for the last name if not provided
+    return parts[0], parts[1]
