@@ -79,17 +79,24 @@ def exclude_booked_slots(appointments, slots, slot_duration=None, service_durati
     :return: The slots with the booked slots excluded.
     """
     available_slots = []
+    print(service_duration, "servise_duration", type(service_duration))
     for slot in slots:
 
         slot_end = slot + slot_duration
-        print(service_duration, "servise_duration", type(service_duration))
         print(slot, "slot", type(slot))
         slot_book = slot + service_duration
+
+        print("slot_book", slot_book)
 
         is_available = True
         for appointment in appointments:
             appointment_start_time = appointment.get_start_time()
             appointment_end_time = appointment.get_end_time()
+
+            print("appointment_start_time", appointment_start_time)
+            print("appointment_end_time", appointment_end_time)
+            print()
+
             if appointment_start_time < slot_end and slot < appointment_end_time:
                 is_available = False
                 break
@@ -120,7 +127,7 @@ def is_working_day(staff_member: StaffMember, day: int) -> bool:
 
 
 def get_staff_member_start_time(
-    staff_member: StaffMember, date: datetime.date
+        staff_member: StaffMember, date: datetime.date
 ) -> Optional[datetime.time]:
     """Return the start time for the given staff member on the given date."""
     weekday_num = get_weekday_num_from_date(date)
@@ -129,7 +136,7 @@ def get_staff_member_start_time(
 
 
 def get_staff_member_buffer_time(
-    staff_member: StaffMember, date: datetime.date
+        staff_member: StaffMember, date: datetime.date
 ) -> float:
     """Return the buffer time for the given staff member on the given date."""
     _, _, _, buff_time = get_times_from_config(date)
@@ -179,7 +186,7 @@ def check_day_off_for_staff(staff_member, date) -> bool:
 
 
 def get_staff_member_end_time(
-    staff_member: StaffMember, date: datetime.date
+        staff_member: StaffMember, date: datetime.date
 ) -> Optional[datetime.time]:
     """Return the end time for the given staff member on the given date."""
     weekday_num = get_weekday_num_from_date(date)
@@ -188,7 +195,7 @@ def get_staff_member_end_time(
 
 
 def get_staff_member_slot_duration(
-    staff_member: StaffMember, date: datetime.date
+        staff_member: StaffMember, date: datetime.date
 ) -> int:
     """Return the slot duration for the given staff member on the given date."""
     _, _, slot_duration, _ = get_times_from_config(date)
@@ -318,7 +325,7 @@ def vk_in_user_model():
 
 
 def day_off_exists_for_date_range(
-    staff_member, start_date, end_date, days_off_id=None
+        staff_member, start_date, end_date, days_off_id=None
 ) -> bool:
     """Check if a day off exists for the given staff member and date range.
 

@@ -1,7 +1,8 @@
 from django.contrib import admin
 
 from .forms import StaffMemberForm
-from .models import Config, Service, StaffMember, WorkingHours
+from .models import Config, Service, StaffMember, WorkingHours, Appointment
+
 
 # Register your models here.
 
@@ -40,3 +41,7 @@ class WorkingHoursAdmin(admin.ModelAdmin):
     list_display = ("staff_member", "day_of_week", "start_time", "end_time")
     search_fields = ("day_of_week",)
     list_filter = ("day_of_week", "start_time", "end_time")
+
+@admin.register(Appointment)
+class AppointmentAdmin(admin.ModelAdmin):
+    pass

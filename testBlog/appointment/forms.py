@@ -14,6 +14,10 @@ class AppointmentRequestForm(forms.ModelForm):
 
 class SlotForm(forms.Form):
     selected_date = forms.DateField(validators=[not_in_the_past])
+    service = forms.ModelChoiceField(
+        Service.objects.all(),
+        error_messages={"invalid_choice": "Service does not exist"},
+    )
     staff_member = forms.ModelChoiceField(
         StaffMember.objects.all(),
         error_messages={"invalid_choice": "Staff member does not exist"},

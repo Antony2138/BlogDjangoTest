@@ -27,7 +27,7 @@ def get_available_slots_ajax(request):
     :param request: The request instance.
     :return: A JSON response containing available slots, selected date, an error flag, and an optional error message.
     """
-    print(request)
+    # print("request", request.__dict__)
     slot_form = SlotForm(request.GET)
     error_code = 0
     if not slot_form.is_valid():
@@ -48,6 +48,7 @@ def get_available_slots_ajax(request):
 
     selected_date = slot_form.cleaned_data["selected_date"]
     sm = slot_form.cleaned_data["staff_member"]
+    service = slot_form.cleaned_data["service"]
     date_chosen = selected_date.strftime("%a, %B %d, %Y")
     custom_data = {"date_chosen": date_chosen}
 
@@ -79,7 +80,7 @@ def get_available_slots_ajax(request):
             success=False,
             error_code=ErrorCode.INVALID_DATE,
         )
-    available_slots = get_available_slots_for_staff(selected_date, sm)
+    available_slots = get_available_slots_for_staff(selected_date, sm, service)
 
     # Check if the selected_date is today and filter out past slots
     if selected_date == date.today():

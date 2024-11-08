@@ -27,11 +27,12 @@ from .utils.json_context import (convert_appointment_to_json,
                                  get_generic_context, json_response)
 
 
-def get_available_slots_for_staff(date, staff_member):
+def get_available_slots_for_staff(date, staff_member, service: Service):
     """Calculate the available time slots for a given date and a staff member.
 
     :param date: The date for which to calculate the available slots
     :param staff_member: The staff member for which to calculate the available slots
+    :param service: service_id
     :return: A list of available time slots as strings in the format '%I:%M %p' like ['10:00 AM', '10:30 AM']
     """
 
@@ -51,7 +52,7 @@ def get_available_slots_for_staff(date, staff_member):
         working_hours_dict["end_time"],
         staff_member,
     )
-    return exclude_booked_slots(appointments, slots, slot_duration)
+    return exclude_booked_slots(appointments, slots, slot_duration, service.duration)
 
 
 def get_available_slots(date, appointments, service_duration):
@@ -311,13 +312,13 @@ def save_appt_date_time(appt_start_time, appt_date, appt_id, request):
 
 
 def handle_entity_management_request(
-    request,
-    staff_member,
-    entity_type,
-    instance=None,
-    staff_user_id=None,
-    instance_id=None,
-    add=True,
+        request,
+        staff_member,
+        entity_type,
+        instance=None,
+        staff_user_id=None,
+        instance_id=None,
+        add=True,
 ):
     if not staff_member:
         return json_response(
@@ -353,7 +354,7 @@ def handle_entity_management_request(
         end_date = request.POST.get("end_date")
 
         if day_off_exists_for_date_range(
-            staff_member, start_date, end_date, getattr(instance, "id", None)
+                staff_member, start_date, end_date, getattr(instance, "id", None)
         ):
             messages.error(request, "Такие выходные уже установлены")
             redirect_url = reverse(
@@ -375,7 +376,7 @@ def handle_entity_management_request(
 
 
 def get_working_hours_and_days_off_context(
-    request, btn_txt, form_name, form, user_id=None, instance=None, wh_id=None
+        request, btn_txt, form_name, form, user_id=None, instance=None, wh_id=None
 ):
     """Get the context for the working hours and days off forms.
 
@@ -454,7 +455,7 @@ def get_error_message_in_form(form):
 
 
 def handle_working_hours_form(
-    staff_member, day_of_week, start_time, end_time, add, wh_id=None
+        staff_member, day_of_week, start_time, end_time, add, wh_id=None
 ):
     # Handle the working hours form.
 

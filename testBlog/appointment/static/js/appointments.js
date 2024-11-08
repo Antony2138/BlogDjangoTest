@@ -232,6 +232,7 @@ function getAvailableSlots(selectedDate, staffId = null) {
     let ajaxData = {
         'selected_date': selectedDate,
         'staff_member': staffId,
+        'service': serviceId,
     };
     fetchNonWorkingDays(staffId, function (nonWorkingDays) {
         // Check if nonWorkingDays is an array
