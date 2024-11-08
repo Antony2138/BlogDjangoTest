@@ -65,7 +65,7 @@ const calendar = new FullCalendar.Calendar(calendarEl, {
     },
 });
 
-calendar.setOption('locale', locale);
+calendar.setOption('locale', 'ru-RU');
 
 $(document).ready(function () {
     staffId = $('#staff_id').val() || null;
@@ -97,7 +97,7 @@ body.on('click', '.btn-submit-appointment', function () {
         return;
     }
     if (selectedSlot && selectedDate) {
-        const startTime = convertTo24Hour(selectedSlot);
+        const startTime = selectedSlot;
         const APPOINTMENT_BASE_TEMPLATE = localStorage.getItem('APPOINTMENT_BASE_TEMPLATE');
         // Convert the selectedDate string to a valid format
         const dateParts = selectedDate.split(', ');
@@ -122,7 +122,6 @@ body.on('click', '.btn-submit-appointment', function () {
         form.append($('<input>', {type: 'hidden', name: 'start_time', value: startTime}));
         form.append($('<input>', {type: 'hidden', name: 'end_time', value: endTime}));
         form.append($('<input>', {type: 'hidden', name: 'service', value: serviceId}));
-        form.append($('<input>', {type: 'hidden', name: 'reason_for_rescheduling', value: reasonForRescheduling}));
         form.submit();
     } else {
         const warningContainer = $('.warning-message');
@@ -134,6 +133,7 @@ body.on('click', '.btn-submit-appointment', function () {
 
 $('#staff_id').on('change', function () {
     staffId = $(this).val() || null;  // If staffId is an empty string, set it to null
+    console.log(staffId)
     let currentDate = null
     if (selectedDate == null) {
         currentDate = moment.tz(timezone).format('YYYY-MM-DD');
@@ -220,14 +220,14 @@ function getAvailableSlots(selectedDate, staffId = null) {
 
     // Correctly check if staffId is 'none', null, or undefined and exit the function if true
     // Check if 'staffId' is 'none', null, or undefined and display an error message
-    if (staffId === 'none' || staffId === null || staffId === undefined) {
-        console.log('No staff ID provided, displaying error message.');
-        const errorMessage = $('<p class="djangoAppt_no-availability-text">' + noStaffMemberSelectedTxt + '</p>');
-        errorMessageContainer.append(errorMessage);
-        // Optionally disable the "submit" button here
-        $('.btn-submit-appointment').attr('disabled', 'disabled');
-        return; // Exit the function early
-    }
+//    if (staffId === 'none' || staffId === null || staffId === undefined) {
+//        console.log('No staff ID provided, displaying error message.');
+//        const errorMessage = $('<p class="djangoAppt_no-availability-text">' + noStaffMemberSelectedTxt + '</p>');
+//        errorMessageContainer.append(errorMessage);
+//        // Optionally disable the "submit" button here
+//        $('.btn-submit-appointment').attr('disabled', 'disabled');
+//        return; // Exit the function early
+//    }
 
     let ajaxData = {
         'selected_date': selectedDate,

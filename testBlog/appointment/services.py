@@ -54,7 +54,7 @@ def get_available_slots_for_staff(date, staff_member):
     return exclude_booked_slots(appointments, slots, slot_duration)
 
 
-def get_available_slots(date, appointments):
+def get_available_slots(date, appointments, service_duration):
     """Calculate the available time slots for a given date and a list of appointments.
 
     :param date: The date for which to calculate the available slot
@@ -66,7 +66,7 @@ def get_available_slots(date, appointments):
     now = timezone.now()
     buffer_time = now + buff_time if date == now.date() else now
     slots = calculate_slots(start_time, end_time, buffer_time, slot_duration)
-    slots = exclude_booked_slots(appointments, slots, slot_duration)
+    slots = exclude_booked_slots(appointments, slots, slot_duration, service_duration)
     return [slot.strftime("%I:%M %p") for slot in slots]
 
 
@@ -104,7 +104,9 @@ def get_appointments_and_slots(date_, service=None):
         )
     else:
         appointments = Appointment.objects.filter(appointment_request__date=date_)
-    available_slots = get_available_slots(date_, appointments)
+    service_duration = service.duration
+    print(service_duration, 'sdfsdegdwegwegwegvwegefwef')
+    available_slots = get_available_slots(date_, appointments, service_duration)
     return appointments, available_slots
 
 
@@ -491,6 +493,7 @@ def handle_working_hours_form(
             start_time=start_time,
             end_time=end_time,
         )
+        print(wk)
     else:
         # Ensure working_hours_id is provided
         if not wh_id:

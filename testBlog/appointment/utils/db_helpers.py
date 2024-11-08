@@ -70,7 +70,7 @@ def get_times_from_config(date):
     return start_time, end_time, slot_duration, buff_time
 
 
-def exclude_booked_slots(appointments, slots, slot_duration=None):
+def exclude_booked_slots(appointments, slots, slot_duration=None, service_duration=None):
     """Exclude the booked slots from the given list of slots.
 
     :param appointments: The appointments to exclude.
@@ -80,7 +80,12 @@ def exclude_booked_slots(appointments, slots, slot_duration=None):
     """
     available_slots = []
     for slot in slots:
+
         slot_end = slot + slot_duration
+        print(service_duration, "servise_duration", type(service_duration))
+        print(slot, "slot", type(slot))
+        slot_book = slot + service_duration
+
         is_available = True
         for appointment in appointments:
             appointment_start_time = appointment.get_start_time()
@@ -88,6 +93,10 @@ def exclude_booked_slots(appointments, slots, slot_duration=None):
             if appointment_start_time < slot_end and slot < appointment_end_time:
                 is_available = False
                 break
+            if appointment_start_time >= slot_book:
+                is_available = False
+                break
+
         if is_available:
             available_slots.append(slot)
     return available_slots

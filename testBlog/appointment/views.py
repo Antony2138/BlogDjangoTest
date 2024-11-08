@@ -27,7 +27,7 @@ def get_available_slots_ajax(request):
     :param request: The request instance.
     :return: A JSON response containing available slots, selected date, an error flag, and an optional error message.
     """
-
+    print(request)
     slot_form = SlotForm(request.GET)
     error_code = 0
     if not slot_form.is_valid():
@@ -65,7 +65,6 @@ def get_available_slots_ajax(request):
     # if selected_date is not a working day for the staff, return an empty list of slots and 'message' is Day Off
     weekday_num = get_weekday_num_from_date(selected_date)
     is_working_day_ = is_working_day(staff_member=sm, day=weekday_num)
-
     custom_data["staff_member"] = sm.get_staff_member_name()
     if not is_working_day_:
         message = (
@@ -268,7 +267,6 @@ def appointment_request_submit(request):
         if form.is_valid():
             # Use form.cleaned_data to get the cleaned and validated data
             staff_member = form.cleaned_data["staff_member"]
-
             staff_exists = StaffMember.objects.filter(id=staff_member.id).exists()
             if not staff_exists:
                 messages.error(request, "Selected staff member does not exist.")

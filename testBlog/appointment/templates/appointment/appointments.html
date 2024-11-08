@@ -53,7 +53,7 @@
                                 {% endif %}
                                 {% for sf in all_staff_members %}
                                 <option value="{{ sf.id }}"
-                                        {% if staff_member and staff_member.id== sf.id %}selected{% endif %}>
+                                        {% if staff_member and staff_member.id == sf.id %}selected{% endif %}>
                                     {{ sf.get_staff_member_first_name }}
                                 </option>
                                 {% endfor %}
