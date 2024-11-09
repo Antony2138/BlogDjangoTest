@@ -61,6 +61,9 @@ const calendar = new FullCalendar.Calendar(calendarEl, {
         if (nonWorkingDays.includes(day)) {
             return ['disabled-day'];
         }
+        if (info.date < getDateWithoutTime(new Date())) {
+            return ['disabled-day'];
+        }
         return [];
     },
 });
@@ -104,7 +107,9 @@ body.on('click', '.btn-submit-appointment', function () {
         const monthDayYear = dateParts[1] + "," + dateParts[2];
         const formattedDate = new Date(monthDayYear + " " + startTime);
 
+
         const date = formattedDate.toISOString().slice(0, 10);
+        console.log(date)
         const endTimeDate = new Date(formattedDate.getTime() + serviceDuration * 60000);
         const endTime = formatTime(endTimeDate);
         const reasonForRescheduling = $('#reason_for_rescheduling').val();
@@ -118,6 +123,7 @@ body.on('click', '.btn-submit-appointment', function () {
                 value: appointmentRequestId
             }));
         }
+
         form.append($('<input>', {type: 'hidden', name: 'date', value: date}));
         form.append($('<input>', {type: 'hidden', name: 'start_time', value: startTime}));
         form.append($('<input>', {type: 'hidden', name: 'end_time', value: endTime}));
@@ -218,8 +224,8 @@ function getAvailableSlots(selectedDate, staffId = null) {
     nextAvailableDateSelector = $('.djangoAppt_next-available-date'); // Update the selector
     nextAvailableDateSelector.remove();
 
-    // Correctly check if staffId is 'none', null, or undefined and exit the function if true
-    // Check if 'staffId' is 'none', null, or undefined and display an error message
+//     Correctly check if staffId is 'none', null, or undefined and exit the function if true
+//     Check if 'staffId' is 'none', null, or undefined and display an error message
 //    if (staffId === 'none' || staffId === null || staffId === undefined) {
 //        console.log('No staff ID provided, displaying error message.');
 //        const errorMessage = $('<p class="djangoAppt_no-availability-text">' + noStaffMemberSelectedTxt + '</p>');
@@ -276,7 +282,7 @@ function getAvailableSlots(selectedDate, staffId = null) {
                         errorMessageContainer.append(`<p class="djangoAppt_no-availability-text">${data.message}</p>`);
                     }
                     // Check if the returned message is 'No availability'
-                    if (data.message.toLowerCase() === 'no availability') {
+                    if (data.message.toLowerCase() === 'Нет доступных слотов') {
                         if (slotContainer.find('.djangoAppt_btn-request-next-slot').length === 0) {
                             slotContainer.append(`<button class="btn btn-danger djangoAppt_btn-request-next-slot" data-service-id="${serviceId}">` + requestNonAvailableSlotBtnTxt + `</button>`);
                         }
@@ -307,11 +313,31 @@ function getAvailableSlots(selectedDate, staffId = null) {
                     // Continue with the existing logic
                     const selectedSlot = $(this).text();
                     $('#service-datetime-chosen').text(data.date_chosen + ' ' + selectedSlot);
+                    const DateObj = data.date_look;
+                    const nextDate = moment.tz(DateObj, timezone);
+                    const nextAvaDate = nextDate.toDate();
+                    formattedDatee = new Intl.DateTimeFormat('ru-RU', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    }).format(nextAvaDate);
+                    $('#service-datetime-look').text(formattedDatee + ' ' + selectedSlot);
                 });
             }
+            const DateObj = data.date_look;
+            const nextDate = moment.tz(DateObj, timezone);
+            const nextAvaDate = nextDate.toDate();
+            formattedDatee = new Intl.DateTimeFormat('ru-RU', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            }).format(nextAvaDate);
             // Update the date chosen
             $('.djangoAppt_date_chosen').text(data.date_chosen);
+            $('.djangoAppt_date_look').text(formattedDatee);
             $('#service-datetime-chosen').text(data.date_chosen);
+            $('#service-datetime-look').text(formattedDatee);
+
             isRequestInProgress = false;
         },
         error: function() {
@@ -343,7 +369,7 @@ function requestNextAvailableSlot(serviceId) {
                 nextAvailableDateResponse = data.next_available_date;
                 const selectedDateObj = moment.tz(nextAvailableDateResponse, timezone);
                 const nextAvailableDate = selectedDateObj.toDate();
-                formattedDate = new Intl.DateTimeFormat('en-US', {
+                formattedDate = new Intl.DateTimeFormat('ru-RU', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric'
@@ -356,7 +382,7 @@ function requestNextAvailableSlot(serviceId) {
             if (data.error) {
                 nextAvailableDateText = nextAvailableDateResponse;
             } else {
-                nextAvailableDateText = `Next available date: ${formattedDate}`;
+                nextAvailableDateText = `Следущая доступная дата: ${formattedDate}`;
             }
             if (nextAvailableDateSelector.length > 0) {
                 // Update the content of the existing .next-available-date element

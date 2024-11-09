@@ -79,33 +79,27 @@ def exclude_booked_slots(appointments, slots, slot_duration=None, service_durati
     :return: The slots with the booked slots excluded.
     """
     available_slots = []
-    print(service_duration, "servise_duration", type(service_duration))
     for slot in slots:
 
         slot_end = slot + slot_duration
-        print(slot, "slot", type(slot))
-        slot_book = slot + service_duration
 
-        print("slot_book", slot_book)
+        slot_book = slot + service_duration
 
         is_available = True
         for appointment in appointments:
             appointment_start_time = appointment.get_start_time()
             appointment_end_time = appointment.get_end_time()
 
-            print("appointment_start_time", appointment_start_time)
-            print("appointment_end_time", appointment_end_time)
-            print()
-
             if appointment_start_time < slot_end and slot < appointment_end_time:
                 is_available = False
                 break
-            if appointment_start_time >= slot_book:
+            if appointment_start_time < slot_book and slot < appointment_end_time:
                 is_available = False
                 break
 
         if is_available:
             available_slots.append(slot)
+
     return available_slots
 
 

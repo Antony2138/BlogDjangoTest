@@ -1,8 +1,8 @@
 
         .login {
             background-color: #fff;
-            padding: 40px 60px; /* Wider padding */
-            border-radius: 10px;
+            padding: 90px 60px; /* Wider padding */
+            border-radius: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             width: 400px;
             text-align: center;/* Adjust width as needed */

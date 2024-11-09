@@ -37,9 +37,8 @@ def get_available_slots_for_staff(date, staff_member, service: Service):
     """
 
     # Check if the staff member works on the provided date
-    day_of_week = (
-        get_weekday_num_from_date()
-    )  # Python's weekday starts from Monday (0) to Sunday (6)
+    day_of_week = get_weekday_num_from_date()
+    # Python's weekday starts from Monday (0) to Sunday (6)
     working_hours_dict = get_working_hours_for_staff_and_day(staff_member, day_of_week)
     if not working_hours_dict:
         return []
@@ -106,7 +105,6 @@ def get_appointments_and_slots(date_, service=None):
     else:
         appointments = Appointment.objects.filter(appointment_request__date=date_)
     service_duration = service.duration
-    print(service_duration, 'sdfsdegdwegwegwegvwegefwef')
     available_slots = get_available_slots(date_, appointments, service_duration)
     return appointments, available_slots
 

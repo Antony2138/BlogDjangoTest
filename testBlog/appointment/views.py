@@ -27,7 +27,6 @@ def get_available_slots_ajax(request):
     :param request: The request instance.
     :return: A JSON response containing available slots, selected date, an error flag, and an optional error message.
     """
-    # print("request", request.__dict__)
     slot_form = SlotForm(request.GET)
     error_code = 0
     if not slot_form.is_valid():
@@ -45,12 +44,12 @@ def get_available_slots_ajax(request):
             success=False,
             error_code=error_code,
         )
-
     selected_date = slot_form.cleaned_data["selected_date"]
     sm = slot_form.cleaned_data["staff_member"]
     service = slot_form.cleaned_data["service"]
     date_chosen = selected_date.strftime("%a, %B %d, %Y")
-    custom_data = {"date_chosen": date_chosen}
+    date_look = selected_date
+    custom_data = {"date_chosen": date_chosen, "date_look": date_look}
 
     days_off_exist = check_day_off_for_staff(staff_member=sm, date=selected_date)
 
@@ -94,7 +93,7 @@ def get_available_slots_ajax(request):
     ]
     if len(available_slots) == 0:
         custom_data["error"] = True
-        message = "No availability"
+        message = "Нет достпуных слотов"
         return json_response(
             message=message,
             custom_data=custom_data,
@@ -200,7 +199,7 @@ def get_next_available_date_ajax(request, service_id):
 
             day_offset += 1
         message = "Successfully retrieved next available date"
-        data = {"next_available_date": next_available_date.isoformat()}
+        data = {"Следующий доступный день": next_available_date.isoformat()}
         return json_response(message=message, custom_data=data, success=True)
     else:
         data = {"error": True}
@@ -245,12 +244,14 @@ def appointment_request(request, service_id=None, staff_member_id=None):
         y, available_slots = get_appointments_and_slots(date.today(), service)
 
     date_chosen = date.today().strftime("%a, %B %d, %Y")
+    date_look = date.today()
     extra_context = {
         "service": service,
         "staff_member": staff_member,
         "all_staff_members": all_staff_members,
         "available_slots": available_slots,
         "date_chosen": date_chosen,
+        "date_look": date_look,
         "label": label,
     }
     context = get_generic_context_with_extra(request, extra_context, admin=False)
