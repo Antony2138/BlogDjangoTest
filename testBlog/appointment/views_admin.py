@@ -45,7 +45,8 @@ def add_or_update_service(request, service_id=None):
             if service:
                 messages.success(request, "Услуга успешно сохранена")
             else:
-                messages.success(request, "Услуга успешно добавлена")
+                messages.success(request, "Услуга успешно добавлена. Не забудьте выбрать мастера "
+                                          "предоставляющего услугу")
             return redirect("get_service_list" if service else "add_service")
     else:
         form = ServiceForm(instance=service)
