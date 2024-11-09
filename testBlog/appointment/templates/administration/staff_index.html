@@ -310,6 +310,7 @@
         const serviceId = "{{ service.id }}";
         const serviceDuration = parseInt("{{ service.duration.total_seconds }}") / 60;
         let appointments = {{ appointments|safe }};
+        console.log("appointments", appointments)
         const fetchServiceListForStaffURL = "{% url 'fetch_service_list_for_staff' %}";
         const fetchStaffListURL = "{% url 'fetch_staff_list' %}";
         const updateApptMinInfoURL = "{% url 'update_appt_min_info' %}";

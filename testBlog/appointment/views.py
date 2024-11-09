@@ -54,7 +54,7 @@ def get_available_slots_ajax(request):
     days_off_exist = check_day_off_for_staff(staff_member=sm, date=selected_date)
 
     if days_off_exist:
-        message = "Выходные.Выберите другой день"
+        message = "Выходные. Выберите другой день"
         custom_data["available_slots"] = []
         return json_response(
             message=message,
@@ -199,7 +199,7 @@ def get_next_available_date_ajax(request, service_id):
 
             day_offset += 1
         message = "Successfully retrieved next available date"
-        data = {"Следующий доступный день": next_available_date.isoformat()}
+        data = {"next_available_date": next_available_date.isoformat()}
         return json_response(message=message, custom_data=data, success=True)
     else:
         data = {"error": True}

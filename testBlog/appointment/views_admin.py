@@ -270,7 +270,7 @@ def add_working_hours(request, staff_user_id=None):
 @require_user_authenticated
 @require_staff_or_superuser
 def update_working_hours(
-    request, working_hours_id, staff_user_id=None, response_type="html"
+        request, working_hours_id, staff_user_id=None, response_type="html"
 ):
     working_hours = WorkingHours.objects.get(pk=working_hours_id)
     if not working_hours:

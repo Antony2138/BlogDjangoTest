@@ -42,7 +42,7 @@
                 </div>
                 <div class="djangoAppt_service-description">
                     <form method="post" action="{% url 'appointment_request_submit' %}"
-                          class="appointment-form" novalidate>
+                          class="appointment-form">
                         {% csrf_token %}
                         <div class="staff-members-list">
                             <label class="djangoAppt_item-name" for="staff_id"><h3>{{ label }}</h3></label>

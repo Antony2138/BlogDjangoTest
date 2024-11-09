@@ -58,7 +58,7 @@ class UserRegisterForm(forms.Form):
         social_link_tg = cleaned_data.get("social_link_tg")
         social_link_vk = cleaned_data.get("social_link_vk")
 
-        if not social_link_tg and not social_link_vk or "@" not in social_link_tg:
+        if not social_link_tg and not social_link_vk:
             self.add_error('social_link_vk', 'Укажите верно хотя бы одно: Telegram или VK.')
             self.add_error('social_link_tg', 'Укажите верно хотя бы одно: Telegram или VK.')
         return cleaned_data
