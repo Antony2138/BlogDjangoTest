@@ -70,7 +70,7 @@ def get_times_from_config(date):
     return start_time, end_time, slot_duration, buff_time
 
 
-def exclude_booked_slots(appointments, slots, slot_duration=None):
+def exclude_booked_slots(appointments, slots, slot_duration=None, service_duration=None):
     """Exclude the booked slots from the given list of slots.
 
     :param appointments: The appointments to exclude.
@@ -80,16 +80,26 @@ def exclude_booked_slots(appointments, slots, slot_duration=None):
     """
     available_slots = []
     for slot in slots:
+
         slot_end = slot + slot_duration
+
+        slot_book = slot + service_duration
+
         is_available = True
         for appointment in appointments:
             appointment_start_time = appointment.get_start_time()
             appointment_end_time = appointment.get_end_time()
+
             if appointment_start_time < slot_end and slot < appointment_end_time:
                 is_available = False
                 break
+            if appointment_start_time < slot_book and slot < appointment_end_time:
+                is_available = False
+                break
+
         if is_available:
             available_slots.append(slot)
+
     return available_slots
 
 
@@ -111,7 +121,7 @@ def is_working_day(staff_member: StaffMember, day: int) -> bool:
 
 
 def get_staff_member_start_time(
-    staff_member: StaffMember, date: datetime.date
+        staff_member: StaffMember, date: datetime.date
 ) -> Optional[datetime.time]:
     """Return the start time for the given staff member on the given date."""
     weekday_num = get_weekday_num_from_date(date)
@@ -120,7 +130,7 @@ def get_staff_member_start_time(
 
 
 def get_staff_member_buffer_time(
-    staff_member: StaffMember, date: datetime.date
+        staff_member: StaffMember, date: datetime.date
 ) -> float:
     """Return the buffer time for the given staff member on the given date."""
     _, _, _, buff_time = get_times_from_config(date)
@@ -170,7 +180,7 @@ def check_day_off_for_staff(staff_member, date) -> bool:
 
 
 def get_staff_member_end_time(
-    staff_member: StaffMember, date: datetime.date
+        staff_member: StaffMember, date: datetime.date
 ) -> Optional[datetime.time]:
     """Return the end time for the given staff member on the given date."""
     weekday_num = get_weekday_num_from_date(date)
@@ -179,7 +189,7 @@ def get_staff_member_end_time(
 
 
 def get_staff_member_slot_duration(
-    staff_member: StaffMember, date: datetime.date
+        staff_member: StaffMember, date: datetime.date
 ) -> int:
     """Return the slot duration for the given staff member on the given date."""
     _, _, slot_duration, _ = get_times_from_config(date)
@@ -290,8 +300,26 @@ def username_in_user_model():
         return False
 
 
+def tg_in_user_model():
+    try:
+        # Check if the 'username' field exists in the User model
+        get_user_model()._meta.get_field("social_link_tg")
+        return True
+    except FieldDoesNotExist:
+        return False
+
+
+def vk_in_user_model():
+    try:
+        # Check if the 'username' field exists in the User model
+        get_user_model()._meta.get_field("social_link_vk")
+        return True
+    except FieldDoesNotExist:
+        return False
+
+
 def day_off_exists_for_date_range(
-    staff_member, start_date, end_date, days_off_id=None
+        staff_member, start_date, end_date, days_off_id=None
 ) -> bool:
     """Check if a day off exists for the given staff member and date range.
 
@@ -314,3 +342,22 @@ def working_hours_exist(day_of_week, staff_member):
     return WorkingHours.objects.filter(
         day_of_week=day_of_week, staff_member=staff_member
     ).exists()
+
+
+def get_all_appointments() -> list:
+    """
+    :return: QuerySet, all appointments
+    """
+    return Appointment.objects.all()
+
+
+def get_staff_member_appointment_list(staff_member: StaffMember) -> list:
+    """Get a list of appointments for staff member."""
+    return Appointment.objects.filter(appointment_request__staff_member=staff_member)
+
+
+def parse_name(name: str):
+    parts = name.split(' ', 1)
+    if len(parts) == 1:
+        parts.append('')  # Add an empty string for the last name if not provided
+    return parts[0], parts[1]

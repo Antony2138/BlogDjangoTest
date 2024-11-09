@@ -1,11 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-<h1>Work</h1>
+{% extends 'mainController/layout.html'%}
+{% load static %}
 
-</body>
-</html>
+{% block customCSS %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+{% endblock %}
+{% block body %}
+<h1>Work</h1>
+{% endblock %}

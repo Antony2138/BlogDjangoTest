@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.urls import reverse
 
 from .utils.date_time import (convert_minutes_in_human_readable_format,
                               get_timestamp)
@@ -111,6 +112,9 @@ class StaffMember(models.Model):
             f"Staff Member {self.id}",
         ]
         return next((name.strip() for name in name_options if name.strip()), "Unknown")
+
+    def get_staff_member_first_name(self):
+        return f"{self.user.first_name} {self.user.last_name}"
 
     def get_days_off(self):
         return DayOff.objects.filter(staff_member=self)
@@ -291,6 +295,13 @@ class Appointment(models.Model):
 
     def get_appointment_id_request(self):
         return self.id_request
+
+    def get_absolute_url(self, request=None):
+        url = reverse('display_appointment', args=[str(self.id)])
+        return request.build_absolute_uri(url) if request else url
+
+    def is_owner(self, staff_user_id):
+        return self.appointment_request.staff_member.user.id == staff_user_id
 
 
 class Config(models.Model):

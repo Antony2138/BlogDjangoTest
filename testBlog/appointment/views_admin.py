@@ -1,18 +1,30 @@
+import json
+
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.translation import gettext_lazy as _
+from django.views.decorators.http import require_POST
 
-from .decorators import require_staff_or_superuser, require_user_authenticated
+from .decorators import (require_ajax, require_staff_or_superuser,
+                         require_superuser, require_user_authenticated)
 from .forms import (PersonalInformationForm, ServiceForm,
                     StaffAppointmentInformationForm, StaffMemberForm)
-from .models import DayOff, Service, StaffMember, WorkingHours
-from .services import (handle_entity_management_request,
-                       prepare_user_profile_data, update_personal_info_service)
+from .models import Appointment, DayOff, Service, StaffMember, WorkingHours
+from .services import (fetch_user_appointments,
+                       handle_entity_management_request,
+                       prepare_appointment_display_data,
+                       prepare_user_profile_data, save_appt_date_time,
+                       update_existing_appointment,
+                       update_personal_info_service)
 from .utils.error_codes import ErrorCode
-from .utils.json_context import (get_generic_context,
+from .utils.json_context import (convert_appointment_to_json,
+                                 get_generic_context,
                                  get_generic_context_with_extra,
                                  handle_unauthorized_response, json_response)
-from .utils.permissions import check_permissions
+from .utils.permissions import (check_permissions,
+                                has_permission_to_delete_appointment)
 
 
 @require_user_authenticated
@@ -244,6 +256,7 @@ def delete_day_off(request, day_off_id):
 def add_working_hours(request, staff_user_id=None):
     staff_user_id = staff_user_id or request.user.pk
     staff_user_id = staff_user_id if staff_user_id else request.user.pk
+
     staff_member = StaffMember.objects.get(user_id=staff_user_id)
     return handle_entity_management_request(
         request=request,
@@ -293,3 +306,161 @@ def delete_working_hours(request, working_hours_id):
     working_hours.delete()
     messages.success(request, "Рабочие часы успешно удалены!")
     return redirect("user_profile", staff_user_id=request.user.id)
+
+
+@require_user_authenticated
+@require_staff_or_superuser
+def get_user_appointments(request, response_type='html'):
+    appointments = fetch_user_appointments(request.user)
+    appointments_json = convert_appointment_to_json(request, appointments)
+
+    if response_type == 'json':
+        return json_response("Successfully fetched appointments.", custom_data={'appointments': appointments_json},
+                             safe=False)
+
+    # Render the HTML template
+    extra_context = {
+        'appointments': json.dumps(appointments_json),
+    }
+    context = get_generic_context_with_extra(request=request, extra=extra_context)
+    # if appointment is empty and user doesn't have a staff-member instance, put a message
+    # it's not clean
+    if not appointments and not StaffMember.objects.filter(
+            user=request.user).exists() and not request.user.is_superuser:
+        messages.error(request, "User doesn't have a staff member instance. Please contact the administrator.")
+    return render(request, 'administration/staff_index.html', context)
+
+
+@require_user_authenticated
+@require_staff_or_superuser
+def display_appointment(request, appointment_id):
+    appointment, page_title, error_message, status_code = prepare_appointment_display_data(request.user, appointment_id)
+
+    if error_message:
+        context = get_generic_context(request=request)
+        return render(request, 'error_pages/404_not_found.html', context=context, status=status_code)
+    # If everything is okay, render the HTML template.
+    extra_context = {
+        'appointment': appointment,
+        'page_title': page_title,
+    }
+    context = get_generic_context_with_extra(request=request, extra=extra_context)
+    return render(request, 'administration/display_appointment.html', context)
+
+
+@require_user_authenticated
+@require_staff_or_superuser
+def delete_appointment_ajax(request):
+    data = json.loads(request.body)
+    appointment_id = data.get("appointment_id")
+    appointment = get_object_or_404(Appointment, pk=appointment_id)
+    if not has_permission_to_delete_appointment(request.user, appointment):
+        message = _("You can only delete your own appointments.")
+        return json_response(message, status=403, success=False, error_code=ErrorCode.NOT_AUTHORIZED)
+    appointment.delete()
+    return json_response(_("Appointment deleted successfully."))
+
+
+@require_user_authenticated
+@require_staff_or_superuser
+def fetch_service_list_for_staff(request):
+    appointment_id = request.GET.get('appointmentId')
+    staff_id = request.GET.get('staff_member')
+    if appointment_id:
+        # Fetch services for a specific appointment (edit mode)
+        if request.user.is_superuser:
+            appointment = Appointment.objects.get(id=appointment_id)
+            staff_member = appointment.get_staff_member()
+        else:
+            staff_member = StaffMember.objects.get(user=request.user)
+            # Ensure the staff member is associated with this appointment
+            if not Appointment.objects.filter(id=appointment_id,
+                                              appointment_request__staff_member=staff_member).exists():
+                return json_response(_("You do not have permission to access this appointment."), status_code=403)
+        services = list(staff_member.get_services_offered().values('id', 'name'))
+    elif staff_id:
+        # Fetch services for the specified staff member (new mode based on staff member selection)
+        staff_member = get_object_or_404(StaffMember, id=staff_id)
+        services = list(staff_member.get_services_offered().values('id', 'name'))
+    else:
+        # Fetch all services for the staff member (create mode)
+        try:
+            staff_member = StaffMember.objects.get(user=request.user)
+            services = list(staff_member.get_services_offered().values('id', 'name'))
+        except StaffMember.DoesNotExist:
+            if not request.user.is_superuser:
+                return json_response(_("You're not a staff member. Can't perform this action !"), status=400,
+                                     success=False)
+            else:
+                services = list(Service.objects.all().values('id', 'name'))
+
+    if len(services) == 0:
+        return json_response(_("No services offered by this staff member."), status=404, success=False,
+                             error_code=ErrorCode.SERVICE_NOT_FOUND)
+    return json_response(_("Successfully fetched services."), custom_data={'services_offered': services})
+
+
+@require_user_authenticated
+@require_superuser
+def fetch_staff_list(request):
+    staff_members = StaffMember.objects.all()
+    staff_data = []
+    for staff in staff_members:
+        staff_data.append({
+            'id': staff.id,
+            'name': staff.get_staff_member_name(),
+        })
+    return json_response("Successfully fetched staff members.", custom_data={'staff_members': staff_data}, safe=False)
+
+
+@require_user_authenticated
+@require_staff_or_superuser
+@require_ajax
+@require_POST
+def update_appt_min_info(request):
+    data = json.loads(request.body)
+    is_creating = data.get('isCreating', False)
+
+    if is_creating:
+        # Logic for creating a new appointment
+        return print("yt yflj")
+    else:
+        # Logic for updating an existing appointment
+        return update_existing_appointment(data, request)
+
+
+@require_user_authenticated
+@require_staff_or_superuser
+@require_ajax
+@require_POST
+def update_appt_date_time(request):
+    data = json.loads(request.body)
+
+    # Extracting the data
+    start_time = data.get("start_time")
+    appt_date = data.get("date")
+    appointment_id = data.get("appointment_id")
+
+    # save the data
+    try:
+        appt = save_appt_date_time(start_time, appt_date, appointment_id, request)
+    except Appointment.DoesNotExist:
+        return json_response(_("Appointment does not exist."), status=404, success=False,
+                             error_code=ErrorCode.APPOINTMENT_NOT_FOUND)
+    except ValidationError as e:
+        return json_response(e.message, status=400, success=False)
+    return json_response(_("Appointment updated successfully."), custom_data={'appt': appt.id})
+
+
+@require_user_authenticated
+@require_staff_or_superuser
+def is_user_staff_admin(request):
+    user = request.user
+    try:
+        StaffMember.objects.get(user=user)
+        return json_response(_("User is a staff member."), custom_data={'is_staff_admin': True})
+    except StaffMember.DoesNotExist:
+        # if superuser, all rights are granted even if not a staff member
+        if not user.is_superuser:
+            return json_response(_("User is not a staff member."), custom_data={'is_staff_admin': False})
+        return json_response(_("User is a superuser."), custom_data={'is_staff_admin': True})

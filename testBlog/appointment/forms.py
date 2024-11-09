@@ -1,8 +1,8 @@
 from django import forms
 from django.contrib.auth import get_user_model
 
-from .models import (Appointment, AppointmentRequest, DayOff, Service,
-                     StaffMember, WorkingHours)
+from .models import (AppointmentRequest, DayOff, Service, StaffMember,
+                     WorkingHours)
 from .utils.validators import not_in_the_past
 
 
@@ -14,39 +14,14 @@ class AppointmentRequestForm(forms.ModelForm):
 
 class SlotForm(forms.Form):
     selected_date = forms.DateField(validators=[not_in_the_past])
+    service = forms.ModelChoiceField(
+        Service.objects.all(),
+        error_messages={"invalid_choice": "Service does not exist"},
+    )
     staff_member = forms.ModelChoiceField(
         StaffMember.objects.all(),
         error_messages={"invalid_choice": "Staff member does not exist"},
     )
-
-
-class AppointmentForm(forms.ModelForm):
-    class Meta:
-        model = Appointment
-        fields = ("want_reminder", "address", "additional_info")
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["additional_info"].widget.attrs.update(
-            {
-                "rows": 2,
-                "class": "form-control",
-            }
-        )
-        self.fields["address"].widget.attrs.update(
-            {
-                "rows": 2,
-                "class": "form-control",
-                "placeholder": "1234 Main St, City, State, Zip Code",
-                "required": "true",
-            }
-        )
-        self.fields["additional_info"].widget.attrs.update(
-            {
-                "class": "form-control",
-                "placeholder": "I would like to be contacted by phone.",
-            }
-        )
 
 
 class ServiceForm(forms.ModelForm):
@@ -113,7 +88,7 @@ class StaffMemberForm(forms.ModelForm):
             "lead_time": "Время начала работы:",
             "finish_time": "Время окончания работы:",
             "appointment_buffer_time": "Через сколько будет разрешена"
-            " запись с начала рабочего времени:",
+                                       " запись с начала рабочего времени:",
         }
         widgets = {
             "user": forms.Select(attrs={"class": "form-control"}),
@@ -128,14 +103,14 @@ class StaffMemberForm(forms.ModelForm):
                 attrs={
                     "class": "form-control",
                     "placeholder": "Пример значений: 08:00:00, "
-                    "09:00:00... (24-часовой формат)",
+                                   "09:00:00... (24-часовой формат)",
                 }
             ),
             "finish_time": forms.TimeInput(
                 attrs={
                     "class": "form-control",
                     "placeholder": "Пример значений: 17:00:00, "
-                    "18:00:00... (24-часовой формат)",
+                                   "18:00:00... (24-часовой формат)",
                 }
             ),
             "appointment_buffer_time": forms.NumberInput(
@@ -197,7 +172,7 @@ class StaffAppointmentInformationForm(forms.ModelForm):
             "lead_time": "Время начала работы:",
             "finish_time": "Время окончания работы:",
             "appointment_buffer_time": "Через сколько будет разрешена запись"
-            " с начала рабочего времени:",
+                                       " с начала рабочего времени:",
         }
         widgets = {
             "service_offered": forms.Select(attrs={"class": "form-control"}),

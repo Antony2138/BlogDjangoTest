@@ -176,6 +176,14 @@ a {
     font-weight: bold;
 }
 
+.djangoAppt_date_look{
+    margin-left: 5px;
+    padding-left: 5px;
+    font-size: 18px;
+    color: #333;
+    font-weight: bold;
+}
+
 .djangoAppt_btn-request-next-slot {
     margin-left: 10px;
     padding: 8px !important;

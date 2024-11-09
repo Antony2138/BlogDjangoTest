@@ -44,6 +44,11 @@ body {
     margin-top: 20px;
 }
 
+
+.profile-section i{
+    font-size: 1.25rem;
+}
+
 .profile-section h2 {
     margin-bottom: 20px; /* Space between the title and content */
 }

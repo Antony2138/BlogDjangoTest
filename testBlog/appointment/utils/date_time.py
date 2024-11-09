@@ -93,3 +93,63 @@ def convert_12_hour_time_to_24_hour_time(time_to_convert) -> str:
         raise ValueError(
             f"Unsupported data type for time conversion: {type(time_to_convert)}"
         )
+
+
+def convert_str_to_time(time_str: str) -> datetime.time:
+    """Convert a string representation of time to a Python `time` object.
+
+    The function tries both 12-hour and 24-hour formats.
+
+    :param time_str: A string representation of time.
+    :return: A Python `time` object.
+    """
+    formats = ["%I:%M %p", "%H:%M:%S", "%H:%M"]
+
+    for fmt in formats:
+        try:
+            return datetime.datetime.strptime(time_str.strip().upper(), fmt).time()
+        except ValueError:
+            pass
+
+    raise ValueError(
+        f"Invalid time format for '{time_str}'. Expected either a 12-hour (e.g., '10:00 AM') or 24-hour (e.g., "
+        f"'13:00:00') format.")
+
+
+def get_ar_end_time(start_time, duration) -> datetime.time:
+    """Get the end time of an appointment request based on the start time and the duration.
+
+    :param start_time: The start time of the appointment request.
+    :param duration: The duration in minutes or as timedelta of the appointment request.
+    :return: The end time of the appointment request.
+    """
+    # Check types
+    if not isinstance(start_time, (datetime.time, str)):
+        raise TypeError("start_time must be a datetime.time object or a string in 'HH:MM:SS' format.")
+
+    if not isinstance(duration, (datetime.timedelta, int, float)):
+        raise TypeError("duration must be either a datetime.timedelta or a numeric type representing minutes.")
+
+    if isinstance(duration, (int, float)) and duration < 0:
+        raise ValueError("duration cannot be negative.")
+
+    # Convert the time object to a datetime object
+    if isinstance(start_time, str):
+        start_time = convert_str_to_time(start_time)
+
+    dt_start_time = datetime.datetime.combine(datetime.datetime.today(), start_time)
+
+    # Convert duration to minutes if it's a timedelta
+    if isinstance(duration, datetime.timedelta):
+        duration_minutes = duration.total_seconds() / 60
+    else:
+        duration_minutes = int(duration)
+
+    # Add the duration
+    dt_end_time = dt_start_time + datetime.timedelta(minutes=duration_minutes)
+
+    # If end time goes past midnight, wrap it around
+    if dt_end_time.day > dt_start_time.day:
+        dt_end_time = dt_end_time - datetime.timedelta(days=1)
+
+    return dt_end_time.time()

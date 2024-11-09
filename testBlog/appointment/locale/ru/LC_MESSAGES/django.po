@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-02 14:58+0300\n"
+"POT-Creation-Date: 2024-11-06 00:05+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,132 +20,132 @@ msgstr ""
 "n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
 "(n%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: .\templates\administration\manage_day_off.html:31
-#: .\templates\administration\manage_working_hours.html:34
+#: .\appointment\templates\administration\manage_day_off.html:31
+#: .\appointment\templates\administration\manage_working_hours.html:34
 msgid "Staff Member"
-msgstr ""
+msgstr "Работник"
 
-#: .\templates\administration\manage_day_off.html:38
-#: .\templates\administration\user_profile.html:120
+#: .\appointment\templates\administration\manage_day_off.html:38
+#: .\appointment\templates\administration\user_profile.html:120
 msgid "Start date"
-msgstr ""
+msgstr "С"
 
-#: .\templates\administration\manage_day_off.html:52
-#: .\templates\administration\user_profile.html:121
+#: .\appointment\templates\administration\manage_day_off.html:52
+#: .\appointment\templates\administration\user_profile.html:121
 msgid "End date"
-msgstr ""
+msgstr "До"
 
-#: .\templates\administration\manage_day_off.html:66
-#: .\templates\administration\user_profile.html:122
+#: .\appointment\templates\administration\manage_day_off.html:66
+#: .\appointment\templates\administration\user_profile.html:122
 msgid "Description"
-msgstr ""
+msgstr "Описание"
 
-#: .\templates\administration\manage_staff_personal_info.html:13
+#: .\appointment\templates\administration\manage_staff_personal_info.html:13
 msgid "Персональная информация"
 msgstr ""
 
-#: .\templates\administration\manage_working_hours.html:24
+#: .\appointment\templates\administration\manage_working_hours.html:24
 msgid "Manage Working Hours"
-msgstr ""
+msgstr "Управления рабочими часами"
 
-#: .\templates\administration\manage_working_hours.html:40
+#: .\appointment\templates\administration\manage_working_hours.html:40
 msgid "Day of Week"
-msgstr ""
+msgstr "День недели"
 
-#: .\templates\administration\manage_working_hours.html:45
+#: .\appointment\templates\administration\manage_working_hours.html:45
 msgid "Start time"
-msgstr ""
+msgstr "Время начала"
 
-#: .\templates\administration\manage_working_hours.html:59
+#: .\appointment\templates\administration\manage_working_hours.html:59
 msgid "End time"
-msgstr ""
+msgstr "Время конца"
 
-#: .\templates\administration\service_list.html:16
+#: .\appointment\templates\administration\service_list.html:16
 msgid "Список услуг"
 msgstr ""
 
-#: .\templates\administration\service_list.html:23
+#: .\appointment\templates\administration\service_list.html:23
 msgid "Название"
 msgstr ""
 
-#: .\templates\administration\service_list.html:24
+#: .\appointment\templates\administration\service_list.html:24
 msgid "Продолжительность"
 msgstr ""
 
-#: .\templates\administration\service_list.html:25
+#: .\appointment\templates\administration\service_list.html:25
 msgid "Цена"
 msgstr ""
 
-#: .\templates\administration\service_list.html:26
+#: .\appointment\templates\administration\service_list.html:26
 msgid "Описание"
 msgstr ""
 
-#: .\templates\administration\service_list.html:57
+#: .\appointment\templates\administration\service_list.html:57
 msgid "Услуги не добавлены"
 msgstr ""
 
-#: .\templates\administration\staff_list.html:12
+#: .\appointment\templates\administration\staff_list.html:12
 msgid "Работники"
 msgstr ""
 
-#: .\templates\administration\staff_list.html:24
+#: .\appointment\templates\administration\staff_list.html:24
 msgid "Имя"
 msgstr ""
 
-#: .\templates\administration\staff_list.html:25
-#: .\templates\appointment\appointment_client_information.html:51
+#: .\appointment\templates\administration\staff_list.html:25
+#: .\appointment\templates\appointment\appointment_client_information.html:51
 msgid "Email"
 msgstr ""
 
-#: .\templates\administration\staff_list.html:26
+#: .\appointment\templates\administration\staff_list.html:26
 msgid "Детали"
 msgstr ""
 
-#: .\templates\administration\staff_list.html:36
+#: .\appointment\templates\administration\staff_list.html:36
 msgid "Профиль"
 msgstr ""
 
-#: .\templates\administration\staff_list.html:38
+#: .\appointment\templates\administration\staff_list.html:38
 msgid "Remove"
 msgstr "Удалить"
 
-#: .\templates\administration\staff_list.html:43
+#: .\appointment\templates\administration\staff_list.html:43
 msgid "Сотрудников не добавлено"
 msgstr ""
 
-#: .\templates\administration\user_profile.html:75
+#: .\appointment\templates\administration\user_profile.html:75
 msgid "To add/modify a new service, make a request to an admin."
 msgstr ""
 
-#: .\templates\administration\user_profile.html:76
+#: .\appointment\templates\administration\user_profile.html:76
 msgid "Changes made in one service will change it for every staff member."
 msgstr ""
 
-#: .\templates\administration\user_profile.html:99
+#: .\appointment\templates\administration\user_profile.html:99
 msgid "No service offered yet"
-msgstr ""
+msgstr "Услуг не добавлено"
 
-#: .\templates\administration\user_profile.html:108
+#: .\appointment\templates\administration\user_profile.html:108
 msgid "Days Off"
-msgstr ""
+msgstr "Выходные"
 
-#: .\templates\administration\user_profile.html:123
+#: .\appointment\templates\administration\user_profile.html:123
 msgid "Action"
 msgstr ""
 
-#: .\templates\administration\user_profile.html:138
+#: .\appointment\templates\administration\user_profile.html:138
 msgid "Вы действительно хотите удалить выходные?"
 msgstr ""
 
-#: .\templates\administration\user_profile.html:190
+#: .\appointment\templates\administration\user_profile.html:190
 msgid "Вы действительно хотите удалить рабочие часы?"
 msgstr ""
 
-#: .\templates\appointment\appointment_client_information.html:8
+#: .\appointment\templates\appointment\appointment_client_information.html:8
 msgid "Client Information"
 msgstr ""
 
-#: .\templates\appointment\appointment_client_information.html:11
+#: .\appointment\templates\appointment\appointment_client_information.html:11
 #, python-format
 msgid ""
 "\n"
@@ -154,160 +154,161 @@ msgid ""
 "payment process.\n"
 msgstr ""
 
-#: .\templates\appointment\appointment_client_information.html:34
+#: .\appointment\templates\appointment\appointment_client_information.html:34
 msgid "Fill out your details"
 msgstr ""
 
-#: .\templates\appointment\appointment_client_information.html:40
+#: .\appointment\templates\appointment\appointment_client_information.html:40
 msgid "Tell us a bit about yourself"
 msgstr ""
 
-#: .\templates\appointment\appointment_client_information.html:43
+#: .\appointment\templates\appointment\appointment_client_information.html:43
 msgid "Already have an account?"
 msgstr ""
 
-#: .\templates\appointment\appointment_client_information.html:44
+#: .\appointment\templates\appointment\appointment_client_information.html:44
 msgid "Log in"
 msgstr ""
 
-#: .\templates\appointment\appointment_client_information.html:44
+#: .\appointment\templates\appointment\appointment_client_information.html:44
 msgid "for faster booking."
 msgstr ""
 
-#: .\templates\appointment\appointment_client_information.html:48
+#: .\appointment\templates\appointment\appointment_client_information.html:48
 msgid "Full Name"
 msgstr ""
 
-#: .\templates\appointment\appointment_client_information.html:59
+#: .\appointment\templates\appointment\appointment_client_information.html:59
 msgid "I want to receive an EMAIL reminder 24 hours before this session starts"
 msgstr ""
 
-#: .\templates\appointment\appointment_client_information.html:65
+#: .\appointment\templates\appointment\appointment_client_information.html:65
 msgid "Phone"
 msgstr ""
 
-#: .\templates\appointment\appointment_client_information.html:72
+#: .\appointment\templates\appointment\appointment_client_information.html:72
 msgid "City and State"
 msgstr ""
 
-#: .\templates\appointment\appointment_client_information.html:86
+#: .\appointment\templates\appointment\appointment_client_information.html:86
 msgid "Service Details"
 msgstr ""
 
-#: .\templates\appointment\appointment_client_information.html:94
+#: .\appointment\templates\appointment\appointment_client_information.html:94
 msgid "at"
 msgstr ""
 
-#: .\templates\appointment\appointment_client_information.html:103
+#: .\appointment\templates\appointment\appointment_client_information.html:103
 msgid "Payment Details"
 msgstr ""
 
-#: .\templates\appointment\appointment_client_information.html:105
+#: .\appointment\templates\appointment\appointment_client_information.html:105
 msgid "Total"
 msgstr ""
 
-#: .\templates\appointment\appointment_client_information.html:111
+#: .\appointment\templates\appointment\appointment_client_information.html:111
 msgid "Pay"
 msgstr ""
 
-#: .\templates\appointment\appointment_client_information.html:117
+#: .\appointment\templates\appointment\appointment_client_information.html:117
 msgid "Down Payment"
 msgstr ""
 
-#: .\templates\appointment\appointment_client_information.html:125
-#: .\templates\appointment\appointment_client_information.html:131
+#: .\appointment\templates\appointment\appointment_client_information.html:125
+#: .\appointment\templates\appointment\appointment_client_information.html:131
 msgid "Finish"
 msgstr ""
 
-#: .\templates\appointment\appointments.html:65
-msgid "Welcome"
-msgstr "Добро пожаловать"
+#: .\appointment\templates\appointment\appointments.html:65
+msgid "Service details"
+msgstr "Детали услуги"
 
-#: .\templates\appointment\appointments.html:118
+#: .\appointment\templates\appointment\appointments.html:118
 msgid "Request next available slot"
-msgstr ""
+msgstr "Следующий свободный слот"
 
-#: .\templates\appointment\appointments.html:119
+#: .\appointment\templates\appointment\appointments.html:119
 msgid "No staff member selected."
-msgstr ""
+msgstr "Выберите мастера"
 
-#: .\templates\appointment\appointments.html:120
+#: .\appointment\templates\appointment\appointments.html:120
 msgid "Please select a time slot before submitting the appointment request."
 msgstr ""
 
-#: .\templates\appointment\appointments.html:121
+#: .\appointment\templates\appointment\appointments.html:121
 msgid "Date is in the past."
-msgstr ""
+msgstr "Дата в прошлом"
 
-#: .\templates\appointment\appointments.html:122
+#: .\appointment\templates\appointment\appointments.html:122
 msgid "Please select a date and time"
-msgstr ""
+msgstr "Пожалуйста выберите дату и время"
 
-#: .\templates\appointment\default_thank_you.html:16
+#: .\appointment\templates\appointment\default_thank_you.html:16
 msgid "See you soon"
-msgstr ""
+msgstr "До скорой встречи"
 
-#: .\templates\appointment\default_thank_you.html:17
-msgid ""
-"We've successfully scheduled your appointment! Please check your email for "
-"all the details"
-msgstr ""
+#: .\appointment\templates\appointment\default_thank_you.html:17
+msgid "We've successfully scheduled your appointment! Please check the details"
+msgstr "Время для вас успешно забронированно. Пожалуйста, проверьте детали"
 
-#: .\templates\appointment\default_thank_you.html:18
+#: .\appointment\templates\appointment\default_thank_you.html:18
 msgid "Appointment details"
-msgstr ""
+msgstr "Детали встречи"
 
-#: .\templates\appointment\default_thank_you.html:20
+#: .\appointment\templates\appointment\default_thank_you.html:20
 msgid "Service"
-msgstr ""
+msgstr "Услуга"
 
-#: .\templates\appointment\default_thank_you.html:21
+#: .\appointment\templates\appointment\default_thank_you.html:21
 msgid "Appointment Date"
-msgstr ""
+msgstr "Дата встречи"
 
-#: .\templates\appointment\default_thank_you.html:22
+#: .\appointment\templates\appointment\default_thank_you.html:22
 msgid "Appointment Time"
-msgstr ""
+msgstr "Время встречи"
 
-#: .\templates\appointment\default_thank_you.html:23
+#: .\appointment\templates\appointment\default_thank_you.html:23
 msgid "Duration"
-msgstr ""
+msgstr "Длительность"
 
-#: .\templates\base_templates\base.html:7
+#: .\appointment\templates\base_templates\base.html:7
 msgid "Appointment application"
 msgstr ""
 
-#: .\templates\error_pages\403_forbidden.html:98
+#: .\appointment\templates\error_pages\403_forbidden.html:98
 msgid "You don't have permission to view this resource, and you know it"
 msgstr ""
 
-#: .\templates\error_pages\403_forbidden.html:109
+#: .\appointment\templates\error_pages\403_forbidden.html:109
 msgid "Go back"
-msgstr ""
+msgstr "Назад"
 
-#: .\templates\modal\confirm_modal.html:18
-#: .\templates\modal\error_modal.html:17
+#: .\appointment\templates\modal\confirm_modal.html:18
+#: .\appointment\templates\modal\error_modal.html:17
 msgid "Close"
-msgstr ""
+msgstr "Закрыть"
 
-#: .\templates\modal\error_modal.html:7
+#: .\appointment\templates\modal\error_modal.html:7
 msgid "Error"
-msgstr ""
+msgstr "Ошибка"
 
-#: .\utils\date_time.py:58
+#: .\appointment\utils\date_time.py:59
 #, python-format
 msgid "%(count)d час"
 msgid_plural "%(count)d часа"
 msgstr[0] ""
 msgstr[1] ""
 
-#: .\utils\date_time.py:62
+#: .\appointment\utils\date_time.py:65
 #, python-format
 msgid "%(count)d минут"
 msgid_plural "%(count)d минут"
 msgstr[0] ""
 msgstr[1] ""
 
-#: .\utils\validators.py:7
+#: .\appointment\utils\validators.py:7
 msgid "Date is in the past"
 msgstr ""
+
+#~ msgid "Welcome"
+#~ msgstr "Добро пожаловать"
