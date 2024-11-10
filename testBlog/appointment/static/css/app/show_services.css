@@ -46,8 +46,14 @@
 
 }
 
+.about p{
+    font-size: 19px;
+    color: rgb(168 62 62);
+}
+
 .type{
     margin-bottom: 70px;
+    font-size: 16px;
 }
 
 .details{

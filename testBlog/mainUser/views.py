@@ -1,35 +1,20 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-
+import json
 from .services import handle_user_registration
+from .utils.db_helpers import get_user_appointment_list
 
 # Create your views here.
 
 
 def registration(request):
     return handle_user_registration(request)
-    # form = UserRegisterForm()
-    # context = {
-    #     "today": timezone.now(),
-    #     "register_form": form
-    # }
-    # template = "mainUser/registration.html"
-    #
-    # if request.method == "POST":
-    #     register_form = UserRegisterForm(request.POST)
-    #     if register_form.is_valid():
-    #         user = register_form.save(commit=False)
-    #         user.set_password(register_form.cleaned_data["password"])
-    #         user.save()
-    #         messages.success(request, "Ваш аккаунт создан. Можно войти на сайт.")
-    #         return redirect("login")
-    #     else:
-    #         print("cheac")
-    #         return render(request, template, context)
-    # else:
-    #     return render(request, template, context)
 
 
 @login_required
 def profile(request):
-    return render(request, "mainUser/profile.html")
+    user = request.user
+    user_appointments = get_user_appointment_list(user)
+
+    context = {'appointments': user_appointments}
+    return render(request, "mainUser/profile.html", context=context)

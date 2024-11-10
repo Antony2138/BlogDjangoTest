@@ -32,21 +32,20 @@ from .utils.permissions import (check_permissions,
 def add_or_update_service(request, service_id=None):
     if service_id:
         service = get_object_or_404(Service, pk=service_id)
-        page_title = "Просмотр услуги"
-        btn_text = "Сохранить"
+        page_title = _("View service")
+        btn_text = _("Save")
     else:
         service = None
-        page_title = "Добавление услуги"
-        btn_text = "Добавить"
+        page_title = _("Adding a service")
+        btn_text = _("Add")
     if request.method == "POST":
         form = ServiceForm(request.POST, request.FILES, instance=service)
         if form.is_valid():
             form.save()
             if service:
-                messages.success(request, "Услуга успешно сохранена")
+                messages.success(request, _("Service saved successfully"))
             else:
-                messages.success(request, "Услуга успешно добавлена. Не забудьте выбрать мастера "
-                                          "предоставляющего услугу")
+                messages.success(request, _("The service has been successfully added. Don't forget to select the master providing the service"))
             return redirect("get_service_list" if service else "add_service")
     else:
         form = ServiceForm(instance=service)
@@ -76,8 +75,13 @@ def show_abilities(request):
 @require_staff_or_superuser
 def delete_service(request, service_id):
     service = get_object_or_404(Service, pk=service_id)
-    service.delete()
-    messages.success(request, "Услуга удалена")
+    try:
+        service.delete()
+        messages.success(request, _("Service removed"))
+        return redirect("get_service_list")
+    except:
+        messages.info(request, _("To delete a service, you must manually delete all records for this service"
+                                  " and remove it from the master's offered services"))
     return redirect("get_service_list")
 
 
@@ -91,7 +95,7 @@ def add_staff_member_info(request):
             user.is_staff = True
             user.save()
             form.save()
-            messages.success(request, "Работник успешно создан!")
+            messages.success(request, _("The employee has been successfully created"))
             return redirect("get_staff_list")
     else:
         form = StaffMemberForm()
@@ -270,7 +274,7 @@ def add_working_hours(request, staff_user_id=None):
 @require_user_authenticated
 @require_staff_or_superuser
 def update_working_hours(
-    request, working_hours_id, staff_user_id=None, response_type="html"
+        request, working_hours_id, staff_user_id=None, response_type="html"
 ):
     working_hours = WorkingHours.objects.get(pk=working_hours_id)
     if not working_hours:
@@ -465,3 +469,9 @@ def is_user_staff_admin(request):
         if not user.is_superuser:
             return json_response(_("User is not a staff member."), custom_data={'is_staff_admin': False})
         return json_response(_("User is a superuser."), custom_data={'is_staff_admin': True})
+
+
+def delete_appointment(request, appointment_id):
+    appointment = get_object_or_404(Appointment, pk=appointment_id)
+    appointment.delete()
+    return redirect('get_user_appointments')

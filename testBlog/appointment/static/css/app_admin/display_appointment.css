@@ -3,6 +3,11 @@
     padding: 20px 0;
 }
 
+.final{
+    margin-top: 20px;
+    text-align: center;
+}
+
 .app-content {
     max-width: 950px;
     padding: 20px;

@@ -39,6 +39,8 @@ admin_urlpatterns = [
     path('appointments/<str:response_type>/', views_admin.get_user_appointments, name='get_user_event_type'),
     path('appointments/', views_admin.get_user_appointments, name='get_user_appointments'),
     path('display-appointment/<int:appointment_id>/', views_admin.display_appointment, name='display_appointment'),
+    path('delete-appointment/<int:appointment_id>/', views_admin.delete_appointment, name='delete_appointment'),
+
 
     # add, remove, show, update service
     path("add-service/", views_admin.add_or_update_service, name="add_service"),
