@@ -18,6 +18,7 @@ from .utils.db_helpers import (check_day_off_for_staff,
                                username_in_user_model)
 from .utils.error_codes import ErrorCode
 from .utils.json_context import get_generic_context_with_extra, json_response
+from django.utils.translation import gettext_lazy as _
 
 
 # Create your views here.
@@ -54,7 +55,7 @@ def get_available_slots_ajax(request):
     days_off_exist = check_day_off_for_staff(staff_member=sm, date=selected_date)
 
     if days_off_exist:
-        message = "Выходные. Выберите другой день"
+        message = _("Day off, please select another day.")
         custom_data["available_slots"] = []
         return json_response(
             message=message,
@@ -203,7 +204,7 @@ def get_next_available_date_ajax(request, service_id):
         return json_response(message=message, custom_data=data, success=True)
     else:
         data = {"error": True}
-        message = "No staff member selected"
+        message = _("No staff member selected")
         return json_response(
             message=message,
             custom_data=data,
@@ -227,7 +228,7 @@ def appointment_request(request, service_id=None, staff_member_id=None):
     available_slots = []
     label = '"Lacky" пилка'
     if not request.user.is_authenticated:
-        messages.error(request, "Для записи вы должны быть зарегистрированны")
+        messages.error(request, _("To recording you must be registered"))
         return redirect("services")
     if service_id:
         service = get_object_or_404(Service, pk=service_id)
@@ -281,7 +282,7 @@ def appointment_request_submit(request):
             # Handle the case if the form is not valid
             messages.error(
                 request,
-                "There was an error in your submission. Please check the form and try again.",
+                _("There was an error in your submission. Please check the form and try again."),
             )
     else:
         form = AppointmentRequestForm()
