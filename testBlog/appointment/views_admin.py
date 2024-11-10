@@ -469,3 +469,9 @@ def is_user_staff_admin(request):
         if not user.is_superuser:
             return json_response(_("User is not a staff member."), custom_data={'is_staff_admin': False})
         return json_response(_("User is a superuser."), custom_data={'is_staff_admin': True})
+
+
+def delete_appointment(request, appointment_id):
+    appointment = get_object_or_404(Appointment, pk=appointment_id)
+    appointment.delete()
+    return redirect('get_user_appointments')

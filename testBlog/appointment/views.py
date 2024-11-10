@@ -94,7 +94,7 @@ def get_available_slots_ajax(request):
     ]
     if len(available_slots) == 0:
         custom_data["error"] = True
-        message = "Нет достпуных слотов"
+        message = _("There are no available slots")
         return json_response(
             message=message,
             custom_data=custom_data,

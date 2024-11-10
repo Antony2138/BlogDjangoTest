@@ -127,8 +127,11 @@ function getCalendarConfig(events) {
         dayMaxEvents: true,
         height: getCalendarHeight(),
         aspectRatio: 1.0,
+        locale: 'ru',
         themeSystem: 'bootstrap5',
         nowIndicator: true,
+        firstDay: 1,
+        weekNumberCalculation: 1,
         bootstrapFontAwesome: {
             close: 'fa-times',
             prev: 'fa-chevron-left',
@@ -241,7 +244,7 @@ function getHeaderToolbarConfig() {
     } else if (window.matchMedia('(max-width: 991px)').matches) {
         // Tablet configuration
         return {
-            left: 'prev,today,next', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            left: 'prev next', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay'
         };
     } else {
         // Desktop configuration

@@ -1,9 +1,9 @@
 {% extends 'mainController/layout.html'%}
 {% load static %}
-
+{% load i18n %}
 {% block customCSS %}
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 {% endblock %}
 {% block body %}
-<h1>Work</h1>
+<h1 style="margin: 20px;">{% trans 'You have successfully logged out.' %}</h1>
 {% endblock %}

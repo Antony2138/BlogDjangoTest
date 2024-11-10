@@ -10,20 +10,20 @@ let isRequestInProgress = false;
 const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'dayGridMonth',
     initialDate: selectedDate,
+    locale: 'ru',
+    firstDay: 1,
+    weekNumberCalculation: 1,
     timeZone: timezone,
     headerToolbar: {
         left: 'title',
-        right: 'prev,today,next',
+        right: 'prev next',
     },
     height: '400px',
-    themeSystem: 'bootstrap',
     nowIndicator: true,
     bootstrapFontAwesome: {
         close: 'fa-times',
         prev: 'fa-chevron-left',
         next: 'fa-chevron-right',
-        prevYear: 'fa-angle-double-left',
-        nextYear: 'fa-angle-double-right'
     },
     selectable: true,
     dateClick: function (info) {
@@ -67,8 +67,6 @@ const calendar = new FullCalendar.Calendar(calendarEl, {
         return [];
     },
 });
-
-calendar.setOption('locale', 'ru-RU');
 
 $(document).ready(function () {
     staffId = $('#staff_id').val() || null;

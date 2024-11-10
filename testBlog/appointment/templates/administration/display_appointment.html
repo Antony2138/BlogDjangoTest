@@ -26,15 +26,15 @@
                         </div>
                         <div class="appointment-detail hover-element">
                             <i class="fas fa-clock"></i>
-                            <strong>{% trans 'Start time' %}:</strong> {{ appointment.get_start_time|time:"g:i A" }}
-                        </div>
-                        <div class="appointment-detail hover-element">
-                            <i class="fas fa-clock"></i>
-                            <strong>{% trans 'End time' %}:</strong> {{ appointment.get_end_time|time:"g:i A" }}
+                            <strong>{% trans 'Start time' %}:</strong> {{ appointment.get_start_time|time:"H:i " }}
                         </div>
                         <div class="appointment-detail hover-element">
                             <i class="fas fa-hands-helping"></i>
                             <strong>{% trans 'Service' %}:</strong> {{ appointment.get_service_name }}
+                        </div>
+                        <div class="appointment-detail hover-element">
+                            <i class="fas fa-clock"></i>
+                            <strong>{% trans 'End time' %}:</strong> {{ appointment.get_end_time|time:"H:i " }}
                         </div>
                         <div class="appointment-detail hover-element">
                             <i class="fas fa-user"></i>
@@ -46,7 +46,7 @@
                         </div>
                         <div class="appointment-detail hover-element">
                             <i class="fas fa-phone"></i>
-                            <strong>{% trans 'Telegramm' %}:</strong> {{ appointment.client.social_link_tg|default:' Не указано ' }}
+                            <strong>{% trans 'Telegram' %}:</strong> {{ appointment.client.social_link_tg|default:' Не указано ' }}
                         </div>
                         <div class="appointment-detail hover-element">
                             <i class="fas fa-phone"></i>
@@ -57,6 +57,13 @@
                             <strong>{% trans 'Service price' %}:</strong> {{ appointment.get_service_price }}
                         </div>
                     </div>
+                </div>
+                <div class="final">
+                    <button class="btn btn-primary">
+                        <a href="{% url 'delete_appointment' appointment_id=appointment.id %}">
+                            Закончить
+                        </a>
+                    </button>
                 </div>
                 <div class="messages" style="margin: 20px 0">
                     {% if messages %}
@@ -77,10 +84,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.45/moment-timezone-with-data.min.js"
             integrity="sha512-t/mY3un180WRfsSkWy4Yi0tAxEDGcY2rAEx873hb5BrkvLA0QLk54+SjfYgFBBoCdJDV1H86M8uyZdJhAOHeyA=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.10/index.global.min.js"
-            integrity="sha512-JCQkxdym6GmQ+AFVioDUq8dWaWN6tbKRhRyHvYZPupQ6DxpXzkW106FXS1ORgo/m3gxtt5lHRMqSdm2OfPajtg=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script src="{% static 'js/js-utils.js' %}"></script>
-
 {% endblock %}
