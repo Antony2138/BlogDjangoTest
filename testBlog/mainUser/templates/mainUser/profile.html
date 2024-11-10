@@ -17,23 +17,23 @@
             <div style="max-width: 700px; margin-left:20px;">
 
                 <div class="appointment-card">
-                    <h4>{{ appointment.service_name }}</h4>
+                    <h4>{{ appointment.get_service_name }}</h4>
                     <div class="appointment-details">
                         <div class="appointment-detail hover-element">
                             <i class="fas fa-calendar-alt"></i>
-                            <strong>{% trans 'Date' %}:</strong> {{ appointment.start_time|date:"F d, Y " }}
+                            <strong>{% trans 'Date' %}:</strong> {{ appointment.get_appointment_date|date:"F d, Y " }}
                         </div>
                         <div class="appointment-detail hover-element">
                             <i class="fas fa-clock"></i>
-                            <strong>{% trans 'Start time' %}:</strong> {{ appointment.start_time }}
+                            <strong>{% trans 'Start time' %}:</strong> {{ appointment.get_start_time|time:"H:i" }}
                         </div>
                         <div class="appointment-detail hover-element">
                             <i class="fas fa-hands-helping"></i>
-                            <strong>{% trans 'Service' %}:</strong> {{ appointment.service_name }}
+                            <strong>{% trans 'Service' %}:</strong> {{ appointment.get_service_name }}
                         </div>
                         <div class="appointment-detail hover-element">
                             <i class="fas fa-clock"></i>
-                            <strong>{% trans 'End time' %}:</strong> {{ appointment.end_time}}
+                            <strong>{% trans 'End time' %}:</strong> {{ appointment.get_end_time|time:"H:i"}}
                         </div>
                     </div>
                 </div>
@@ -46,11 +46,4 @@
     </div>
 </div>
 
-{% endblock %}
-
-{% block customJS %}
-<script>
-    let user_appointments = {{ appointments|safe }};
-    console.log(user_appointments, "user_appointments")
-</script>
 {% endblock %}
