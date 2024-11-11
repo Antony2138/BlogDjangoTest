@@ -13,14 +13,19 @@ from .utils.view_helpers import generate_random_id
 # Create your models here.
 
 DAYS_OF_WEEK = (
-    (0, "Sunday"),
-    (1, "Monday"),
-    (2, "Tuesday"),
-    (3, "Wednesday"),
-    (4, "Thursday"),
-    (5, "Friday"),
-    (6, "Saturday"),
+    (0, "Воскресенье"),
+    (1, "Понедельник"),
+    (2, "Вторник"),
+    (3, "Среда"),
+    (4, "Четверг"),
+    (5, "Пятница"),
+    (6, "Суббота"),
 )
+
+
+class ImageStyle(models.Model):
+    style_image = models.ImageField(upload_to="style/", blank=True, null=True)
+    description_image = models.TextField(blank=True, null=True)
 
 
 class Service(models.Model):

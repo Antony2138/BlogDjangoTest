@@ -91,7 +91,7 @@
                         {% for service in services_offered %}
                             <tr>
                                 <td>{{ service.name }}</td>
-                                <td>{{ service.description|default:"N/A" }}</td>
+                                <td>{{ service.description|default:"Не указано" }}</td>
                                 <td>{{ service.get_duration }}</td>
                                 <td>{{ service.get_price }}</td>
                             </tr>
@@ -180,8 +180,8 @@
                         {% for working_hour in working_hours %}
                             <tr>
                                 <td>{{ working_hour.get_day_of_week_str }}</td>
-                                <td>{{ working_hour.start_time|time:"g:i A" }}</td>
-                                <td>{{ working_hour.end_time|time:"g:i A" }}</td>
+                                <td>{{ working_hour.start_time|time:"H:i" }}</td>
+                                <td>{{ working_hour.end_time|time:"H:i" }}</td>
                                 <td>
                                     <div class="buttons-container">
                                         <a href="{% url 'update_working_hours' working_hour.id %}"
