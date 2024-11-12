@@ -64,7 +64,8 @@ def get_available_slots(date, appointments, service_duration):
 
     start_time, end_time, slot_duration, buff_time = get_times_from_config(date)
     now = timezone.now()
-    buffer_time = now + buff_time if date == now.date() else now
+    moscow_now = now.astimezone(timezone.get_current_timezone())
+    buffer_time = moscow_now + buff_time if date == now.date() else moscow_now
     slots = calculate_slots(start_time, end_time, buffer_time, slot_duration)
     slots = exclude_booked_slots(appointments, slots, slot_duration, service_duration)
     return [slot.strftime("%I:%M %p") for slot in slots]
@@ -387,6 +388,8 @@ def get_working_hours_and_days_off_context(
     :return: A dictionary containing the context.
     """
     context = get_generic_context(request)
+    now = timezone.now()
+    moscow_now = now.astimezone(timezone.get_current_timezone())
     context.update(
         {
             "button_text": btn_txt,
@@ -413,7 +416,7 @@ def get_working_hours_and_days_off_context(
         )
     context.update(
         {
-            "today": timezone.now(),
+            "today": moscow_now,
         }
     )
     return context
