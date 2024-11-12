@@ -23,7 +23,7 @@ from .utils.json_context import (convert_appointment_to_json,
                                  get_generic_context,
                                  get_generic_context_with_extra,
                                  handle_unauthorized_response, json_response)
-from .utils.permissions import (check_permissions,
+from .utils.permissions import (check_extensive_permissions, check_permissions,
                                 has_permission_to_delete_appointment)
 
 
@@ -222,10 +222,6 @@ def add_day_off(request, staff_user_id=None, response_type="html"):
 @require_user_authenticated
 @require_staff_or_superuser
 def update_day_off(request, day_off_id, staff_user_id=None, response_type="html"):
-    if not check_permissions(staff_user_id=staff_user_id, user=request.user):
-        message = "Вы можете изменять только собственные выходные дни"
-        return handle_unauthorized_response(request, message, response_type)
-
     day_off = DayOff.objects.get(pk=day_off_id)
     if not day_off:
         if response_type == "json":
@@ -240,7 +236,9 @@ def update_day_off(request, day_off_id, staff_user_id=None, response_type="html"
             return render(
                 request, "error_pages/404_not_found.html", context=context, status=404
             )
-
+    if not check_extensive_permissions(request.user.id, request.user, day_off):
+        message = _("You can only update your own days off.")
+        return handle_unauthorized_response(request, message, response_type)
     staff_user_id = staff_user_id or request.user.pk
     staff_member = StaffMember.objects.get(user_id=staff_user_id)
     return handle_entity_management_request(
@@ -250,8 +248,11 @@ def update_day_off(request, day_off_id, staff_user_id=None, response_type="html"
 
 @require_user_authenticated
 @require_staff_or_superuser
-def delete_day_off(request, day_off_id):
+def delete_day_off(request, day_off_id, response_type="html"):
     day_off = get_object_or_404(DayOff, pk=day_off_id)
+    if not check_extensive_permissions(request.user.id, request.user, day_off):
+        message = _("You can only delete your own days off.")
+        return handle_unauthorized_response(request, message, response_type)
     day_off.delete()
     messages.success(request, "Выходные успешно удалены!")
     return redirect("user_profile", staff_user_id=request.user.id)
@@ -259,7 +260,11 @@ def delete_day_off(request, day_off_id):
 
 @require_user_authenticated
 @require_staff_or_superuser
-def add_working_hours(request, staff_user_id=None):
+def add_working_hours(request, staff_user_id=None, response_type="html"):
+    if not check_permissions(staff_user_id, request.user):
+        message = "Вы можете добавлять только свои собственные рабочие часы."
+        return handle_unauthorized_response(request, message, response_type)
+
     staff_user_id = staff_user_id or request.user.pk
     staff_user_id = staff_user_id if staff_user_id else request.user.pk
 
@@ -289,7 +294,9 @@ def update_working_hours(
         else:
             context = get_generic_context(request=request)
             return render(request, "error_pages/404_not_found.html", context=context)
-
+    if not check_extensive_permissions(request.user.id, request.user, working_hours):
+        message = _("You can only update your own working hours.")
+        return handle_unauthorized_response(request, message, response_type)
     staff_user_id = staff_user_id or request.user.pk
     staff_member = get_object_or_404(
         StaffMember, user_id=staff_user_id or request.user.id
@@ -307,8 +314,11 @@ def update_working_hours(
 
 @require_user_authenticated
 @require_staff_or_superuser
-def delete_working_hours(request, working_hours_id):
+def delete_working_hours(request, working_hours_id, response_type="html"):
     working_hours = get_object_or_404(WorkingHours, pk=working_hours_id)
+    if not check_extensive_permissions(request.user.id, request.user, working_hours):
+        message = _("You can only delete your own working hours.")
+        return handle_unauthorized_response(request, message, response_type)
     working_hours.delete()
     messages.success(request, "Рабочие часы успешно удалены!")
     return redirect("user_profile", staff_user_id=request.user.id)

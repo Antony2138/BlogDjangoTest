@@ -106,7 +106,7 @@
         #eventDetailsModal input {
             width: 100%;
             padding: 5px;
-            margin: 5px 0;
+            margin: 5px 5px;
             border: 1px solid #ddd;
             border-radius: 5px;
         }
@@ -166,12 +166,14 @@
         .flex-container-appt {
             display: flex;
             align-items: center;
-            margin-top: 5px;
+            margin-top: 10px;
+            font-weight:25px;
         }
 
         .flex-container-appt label {
             flex: 0 0 auto; /* Do not grow, do not shrink, and base width on content */
             margin-right: 5px;
+            font-size:20px;
             white-space: nowrap; /* Prevent label from wrapping */
         }
 
@@ -356,30 +358,27 @@
             return `
                 ${superuserInputField}
                 <div class="flex-container-appt">
-                <label>{% trans 'Service Name' %}:</label>
-                ${servicesDropdown.outerHTML}
+                    <label>Услуга:</label>
+                    ${servicesDropdown.outerHTML}
                 </div>
-                <label for="clientName">{% trans 'Client Name' %}:</label>
-                <input type="text" name="clientName" value="${appointment.client_name || ''}" ${disabledAttribute} id="clientName" placeholder="John Doe">
-
-                <label for="clientEmail">{% trans 'Client Email' %}:</label>
-                <input type="email" name="clientEmail" value="${appointment.client_email || ''}" ${disabledAttribute} id="clientEmail" placeholder="john.doe@example.com">
-                <span id="emailError" style="display:none;"></span>
-
-                <label for="clientPhone">{% trans 'Phone Number' %}:</label>
-                <input type="tel" name="clientPhone" value="${appointment.client_phone || ''}" ${disabledAttribute} id="clientPhone" placeholder="+12392350799">
-
-                <label for="clientTg">Telegram:</label>
-                <input type="text" name="clientTg" value="${appointment.social_link_tg || ''}" ${disabledAttribute} id="clientTg" placeholder="Telegram">
-
-
-                <label for="clientVk">VK:</label>
-                <input type="text" name="clientVk" value="${appointment.social_link_vk || ''}" ${disabledAttribute} id="clientVk" placeholder="VK">
-
-
                 <div class="flex-container-appt">
-                <label for="startTime">{% trans 'Start time' %}:</label>
-                <input type="time" name="startTime" value="${startTimeValue}" ${disabledAttribute}>
+                    <label for="clientName">{% trans 'Client Name' %}:</label>
+                    <input type="text" name="clientName" value="${appointment.client_name || ''}" ${disabledAttribute} id="clientName" placeholder="John Doe">
+                    <label for="clientEmail">{% trans 'Client Email' %}:</label>
+                    <input type="email" name="clientEmail" value="${appointment.client_email || ''}" ${disabledAttribute} id="clientEmail" placeholder="john.doe@example.com">
+                    <span id="emailError" style="display:none;"></span>
+                    <label for="clientPhone">{% trans 'Phone Number' %}:</label>
+                    <input type="tel" name="clientPhone" value="${appointment.client_phone || ''}" ${disabledAttribute} id="clientPhone" placeholder="+12392350799">
+                </div>
+                <div class="flex-container-appt">
+                    <label for="clientTg">Telegram:</label>
+                    <input type="text" name="clientTg" value="${appointment.social_link_tg || ''}" ${disabledAttribute} id="clientTg" placeholder="Telegram">
+                    <label for="clientVk">VK:</label>
+                    <input type="text" name="clientVk" value="${appointment.social_link_vk || ''}" ${disabledAttribute} id="clientVk" placeholder="VK">
+                </div>
+                <div class="flex-container-appt">
+                    <label for="startTime">{% trans 'Start time' %}:</label>
+                    <input type="time" name="startTime" value="${startTimeValue}" ${disabledAttribute} id="startTime">
                 </div>
             `;
         }

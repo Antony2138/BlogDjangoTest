@@ -221,14 +221,15 @@ def calculate_staff_slots(date, staff_member):
 
     # Convert the buffer duration in minutes to a timedelta object
     buffer_duration_minutes = get_staff_member_buffer_time(staff_member, date)
+    print(buffer_duration_minutes, 'buffer_duration_minutes')
     buffer_duration = datetime.timedelta(minutes=buffer_duration_minutes)
     buffer_time_init = datetime.datetime.combine(date, staff_member_start_time)
     buffer_time = buffer_time_init + buffer_duration
+    print(buffer_time, 'buffer_time')
 
     # Convert slot duration to a timedelta object
     slot_duration_minutes = get_staff_member_slot_duration(staff_member, date)
     slot_duration = datetime.timedelta(minutes=slot_duration_minutes)
-
     return calculate_slots(start_time, end_time, buffer_time, slot_duration)
 
 

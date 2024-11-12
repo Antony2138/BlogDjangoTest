@@ -20,7 +20,7 @@ class SlotForm(forms.Form):
     )
     staff_member = forms.ModelChoiceField(
         StaffMember.objects.all(),
-        error_messages={"invalid_choice": "Staff member does not exist"},
+        error_messages={"invalid_choice": "Мастер не выбран"},
     )
 
 

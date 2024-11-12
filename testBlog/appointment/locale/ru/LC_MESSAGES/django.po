@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-11 23:38+0300\n"
+"POT-Creation-Date: 2024-11-12 08:19+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,7 +20,7 @@ msgstr ""
 "n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
 "(n%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: .\services.py:222 .\views_admin.py:457
+#: .\services.py:223 .\views_admin.py:468
 #, fuzzy
 #| msgid "Appointment Date"
 msgid "Appointment updated successfully."
@@ -32,7 +32,7 @@ msgstr "Дата"
 
 #: .\templates\administration\display_appointment.html:29
 #: .\templates\administration\manage_working_hours.html:45
-#: .\templates\administration\staff_index.html:381
+#: .\templates\administration\staff_index.html:380
 msgid "Start time"
 msgstr "Время начала"
 
@@ -43,7 +43,7 @@ msgstr "Услуга"
 
 #: .\templates\administration\display_appointment.html:37
 #: .\templates\administration\manage_working_hours.html:59
-#: .\templates\administration\staff_index.html:393
+#: .\templates\administration\staff_index.html:392
 msgid "End time"
 msgstr "Время конца"
 
@@ -64,15 +64,9 @@ msgstr ""
 msgid "VK"
 msgstr ""
 
-#: .\templates\administration\display_appointment.html:57
-#, fuzzy
-#| msgid "Service"
-msgid "Service price"
-msgstr "Услуга"
-
 #: .\templates\administration\manage_day_off.html:31
 #: .\templates\administration\manage_working_hours.html:34
-#: .\templates\administration\staff_index.html:350
+#: .\templates\administration\staff_index.html:352
 msgid "Staff Member"
 msgstr "Работник"
 
@@ -125,79 +119,74 @@ msgstr ""
 msgid "Услуги не добавлены"
 msgstr ""
 
-#: .\templates\administration\staff_index.html:321
+#: .\templates\administration\staff_index.html:323
 msgid "Confirm Deletion"
 msgstr "Подтвердить удаление"
 
-#: .\templates\administration\staff_index.html:322
+#: .\templates\administration\staff_index.html:324
 msgid "Are you sure you want to delete this appointment?"
 msgstr "Вы уверены, что хотите удалить эту встречу?"
 
-#: .\templates\administration\staff_index.html:323
+#: .\templates\administration\staff_index.html:325
 #: .\templates\modal\event_details_modal.html:31
 msgid "Delete"
 msgstr "Удалить"
 
-#: .\templates\administration\staff_index.html:324
+#: .\templates\administration\staff_index.html:326
 msgid "Events on"
 msgstr "События на"
 
-#: .\templates\administration\staff_index.html:325
+#: .\templates\administration\staff_index.html:327
 msgid "No events for this day."
 msgstr "Нет событий на этот день."
 
-#: .\templates\administration\staff_index.html:326
+#: .\templates\administration\staff_index.html:328
 msgid "New Event"
 msgstr "Новая запись"
 
-#: .\templates\administration\staff_index.html:327
+#: .\templates\administration\staff_index.html:329
 msgid "Success"
 msgstr "Успешно"
 
-#: .\templates\administration\staff_index.html:328
+#: .\templates\administration\staff_index.html:330
 #: .\templates\modal\error_modal.html:7
 msgid "Error"
 msgstr "Ошибка"
 
-#: .\templates\administration\staff_index.html:329
+#: .\templates\administration\staff_index.html:331
 msgid "Error: Unable to delete appointment."
 msgstr ""
 
-#: .\templates\administration\staff_index.html:330
+#: .\templates\administration\staff_index.html:332
 #, fuzzy
 #| msgid "Appointment Date"
 msgid "Appointment not found."
 msgstr "Дата встречи"
 
-#: .\templates\administration\staff_index.html:331 .\views_admin.py:397
+#: .\templates\administration\staff_index.html:333 .\views_admin.py:408
 msgid "You're not a staff member. Can't perform this action !"
 msgstr "Вы не являетесь сотрудником. Не можете выполнить это действие!"
 
-#: .\templates\administration\staff_index.html:332
+#: .\templates\administration\staff_index.html:334
 msgid "You don't offer any service. Add new service from your profile."
 msgstr "Вы не предлагаете никаких услуг. Добавьте новую услугу из своего профиля."
 
-#: .\templates\administration\staff_index.html:333
+
+#: .\templates\administration\staff_index.html:335
 #, fuzzy
 #| msgid "No staff member selected."
 msgid "No staff members found."
 msgstr "Выберите мастера"
 
-#: .\templates\administration\staff_index.html:359
-#, fuzzy
-#| msgid "Service"
-msgid "Service Name"
-msgstr "Услуга"
-
-#: .\templates\administration\staff_index.html:362
+#: .\templates\administration\staff_index.html:365
 msgid "Client Name"
 msgstr "Имя клиента"
 
-#: .\templates\administration\staff_index.html:365
+#: .\templates\administration\staff_index.html:367
 msgid "Client Email"
 msgstr "Email"
 
-#: .\templates\administration\staff_index.html:369
+#: .\templates\administration\staff_index.html:370
 msgid "Phone Number"
 msgstr "Номер телефона"
 
@@ -394,12 +383,6 @@ msgstr "Назад"
 msgid "Close"
 msgstr "Закрыть"
 
-#: .\templates\modal\event_details_modal.html:8
-#, fuzzy
-#| msgid "Service details"
-msgid "Event Details"
-msgstr "Детали услуги"
-
 #: .\templates\modal\event_details_modal.html:17
 msgid "Begin"
 msgstr "Начать"
@@ -438,23 +421,23 @@ msgstr "Дата в прошлом"
 msgid "Day off, please select another day."
 msgstr "Выходные, выберите другой день"
 
-#: .\views.py:97
+#: .\views.py:98
 #, fuzzy
 #| msgid "Request next available slot"
 msgid "There are no available slots"
 msgstr "Нет доступных слотов"
 
-#: .\views.py:207
+#: .\views.py:208
 #, fuzzy
 #| msgid "No staff member selected."
 msgid "No staff member selected"
 msgstr "Выберите мастера"
 
-#: .\views.py:231
+#: .\views.py:232
 msgid "To recording you must be registered"
 msgstr "Чтобы записаться, вы должны быть зарегистрированы"
 
-#: .\views.py:285
+#: .\views.py:286
 msgid ""
 "There was an error in your submission. Please check the form and try again."
 msgstr "Ошибка отправки, попробуйте еще раз"
@@ -481,69 +464,111 @@ msgstr "Добавить"
 msgid "Service saved successfully"
 msgstr "Услуга успешно сохранена"
 
-#: .\views_admin.py:48
+#: .\views_admin.py:49
 msgid ""
 "The service has been successfully added. Don't forget to select the master "
 "providing the service"
-msgstr "Услуга успешно добавлена. Не забудьте выбрать мастера, предоставляющего услугу"
+msgstr ""
+"Услуга успешно добавлена. Не забудьте выбрать мастера, предоставляющего "
+"услугу"
 
-#: .\views_admin.py:80
+#: .\views_admin.py:81
 #, fuzzy
 #| msgid "Service"
 msgid "Service removed"
 msgstr "Услуга удалена"
 
-#: .\views_admin.py:83
+#: .\views_admin.py:84
 msgid ""
 "To delete a service, you must manually delete all records for this service "
 "and remove it from the master's offered services"
-msgstr "Чтобы удалить услугу, необходимо вручную удалить все записи по этой услуге и удалить ее из предлагаемых услуг мастера."
+msgstr ""
+"Чтобы удалить услугу, необходимо вручную удалить все записи по этой услуге и "
+"удалить ее из предлагаемых услуг мастера."
 
-#: .\views_admin.py:98
+#: .\views_admin.py:99
 msgid "The employee has been successfully created"
 msgstr "Мастер успешно создан"
 
-#: .\views_admin.py:363
+#: .\views_admin.py:240
+#, fuzzy
+#| msgid "You can only delete your own appointments."
+msgid "You can only update your own days off."
+msgstr "Вы можете обновлять только выходные дни"
+
+#: .\views_admin.py:254
+#, fuzzy
+#| msgid "You can only delete your own appointments."
+msgid "You can only delete your own days off."
+msgstr "Вы можете удалять только выходные дни"
+
+#: .\views_admin.py:298
+#, fuzzy
+#| msgid "You can only delete your own appointments."
+msgid "You can only update your own working hours."
+msgstr "Вы можете обновлять только свои рабочие часы"
+
+#: .\views_admin.py:320
+#, fuzzy
+#| msgid "You can only delete your own appointments."
+msgid "You can only delete your own working hours."
+msgstr "Вы можете удалять только свои рабочие часы"
+
+#: .\views_admin.py:374
 msgid "You can only delete your own appointments."
 msgstr "Вы можете удалять только свои записи"
 
-#: .\views_admin.py:366
-#, fuzzy
-#| msgid "Appointment details"
-msgid "Appointment deleted successfully."
-msgstr "Запись успешно удалена"
-
-#: .\views_admin.py:384
+#: .\views_admin.py:395
 msgid "You do not have permission to access this appointment."
 msgstr "У вас нет разрешения на доступ к этой встрече."
 
-#: .\views_admin.py:403
+#: .\views_admin.py:414
 #, fuzzy
 #| msgid "No service offered yet"
 msgid "No services offered by this staff member."
 msgstr "Услуг не добавлено"
 
-#: .\views_admin.py:405
+#: .\views_admin.py:416
 msgid "Successfully fetched services."
 msgstr ""
 
-#: .\views_admin.py:453
+#: .\views_admin.py:464
 #, fuzzy
 #| msgid "Appointment details"
 msgid "Appointment does not exist."
 msgstr "Детали встречи"
 
-#: .\views_admin.py:466
+#: .\views_admin.py:477
 msgid "User is a staff member."
 msgstr "Пользователь работник"
 
-#: .\views_admin.py:470
+#: .\views_admin.py:481
 msgid "User is not a staff member."
 msgstr "Пользователь не является работником"
 
-#: .\views_admin.py:471
+#: .\views_admin.py:482
 msgid "User is a superuser."
 msgstr ""
+
+#, fuzzy
+#~| msgid "Service"
+#~ msgid "Service price"
+#~ msgstr "Услуга"
+
+#, fuzzy
+#~| msgid "Service"
+#~ msgid "Service Name"
+#~ msgstr "Услуга"
+
+#, fuzzy
+#~| msgid "Service details"
+#~ msgid "Event Details"
+#~ msgstr "Детали услуги"
+
+#, fuzzy
+#~| msgid "Appointment details"
+#~ msgid "Appointment deleted successfully."
+#~ msgstr "Запись успешно удалена"
 
 #~ msgid "Welcome"
 #~ msgstr "Добро пожаловать"
