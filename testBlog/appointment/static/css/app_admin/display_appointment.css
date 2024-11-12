@@ -8,6 +8,10 @@
     text-align: center;
 }
 
+.media{
+    display:flex;
+}
+
 .app-content {
     max-width: 950px;
     padding: 20px;

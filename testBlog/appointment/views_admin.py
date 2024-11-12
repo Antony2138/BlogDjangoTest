@@ -45,7 +45,8 @@ def add_or_update_service(request, service_id=None):
             if service:
                 messages.success(request, _("Service saved successfully"))
             else:
-                messages.success(request, _("The service has been successfully added. Don't forget to select the master providing the service"))
+                messages.success(request,
+                                 _("The service has been successfully added. Don't forget to select the master providing the service"))
             return redirect("get_service_list" if service else "add_service")
     else:
         form = ServiceForm(instance=service)
@@ -79,9 +80,9 @@ def delete_service(request, service_id):
         service.delete()
         messages.success(request, _("Service removed"))
         return redirect("get_service_list")
-    except:
+    except Service:
         messages.info(request, _("To delete a service, you must manually delete all records for this service"
-                                  " and remove it from the master's offered services"))
+                                 " and remove it from the master's offered services"))
     return redirect("get_service_list")
 
 
@@ -363,7 +364,7 @@ def delete_appointment_ajax(request):
         message = _("You can only delete your own appointments.")
         return json_response(message, status=403, success=False, error_code=ErrorCode.NOT_AUTHORIZED)
     appointment.delete()
-    return json_response(_("Appointment deleted successfully."))
+    return json_response("Запись удалена")
 
 
 @require_user_authenticated

@@ -10,9 +10,19 @@
 {% endblock %}
 {% block body %}
 <div class="media">
-    <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
+
+    <div class="col-md-4">
+        <div class="user-info-container rounded-circle p-3">
+            <h2 class="account-heading">{{ user.username }}</h2>
+            <p class="text">Имя: {{ user.first_name }}</p>
+            <p class="text">Фамилия: {{ user.last_name }}</p>
+            <p class="text">Email: {{ user.email }}</p>
+            <p class="text">Телефон: {{ user.phone_number }}</p>
+        </div>
+    </div>
     <div class="media-body" style="display:flex; ">
         <div>
+            <h2 style="text-align:center;">Ваши записи</h2>
             {% for appointment in appointments %}
             <div style="max-width: 700px; margin-left:20px;">
 
@@ -21,25 +31,25 @@
                     <div class="appointment-details">
                         <div class="appointment-detail hover-element">
                             <i class="fas fa-calendar-alt"></i>
-                            <strong>{% trans 'Date' %}:</strong> {{ appointment.get_appointment_date|date:"F d, Y " }}
+                            <strong>Дата:</strong> {{ appointment.get_appointment_date|date:"F d, Y " }}
                         </div>
                         <div class="appointment-detail hover-element">
                             <i class="fas fa-clock"></i>
-                            <strong>{% trans 'Start time' %}:</strong> {{ appointment.get_start_time|time:"H:i" }}
+                            <strong>Время приёма:</strong> {{ appointment.get_start_time|time:"H:i" }}
                         </div>
                         <div class="appointment-detail hover-element">
                             <i class="fas fa-hands-helping"></i>
-                            <strong>{% trans 'Service' %}:</strong> {{ appointment.get_service_name }}
+                            <strong>Услуга:</strong> {{ appointment.get_service_name }}
                         </div>
                         <div class="appointment-detail hover-element">
                             <i class="fas fa-clock"></i>
-                            <strong>{% trans 'End time' %}:</strong> {{ appointment.get_end_time|time:"H:i"}}
+                            <strong>Конец приема:</strong> {{ appointment.get_end_time|time:"H:i"}}
                         </div>
                     </div>
                 </div>
             </div>
             {% empty %}
-            <h2 style="margin-left:20px;">{% trans 'No records found' %}</h2>
+            <h2 style="margin-left:20px;">Записей не найдено</h2>
             <hr>
             {% endfor %}
         </div>

@@ -1,6 +1,6 @@
 function showModal(title, body, actionText, actionUrl, actionCallback) {
     // Set the content of the modal
-    document.getElementById('modalLabel').innerText = title;
+    document.getElementById('modalLabel').innerText = "";
     document.getElementById('modalBody').innerText = body;
     const actionBtn = document.getElementById('modalActionBtn');
     actionBtn.innerText = actionText;

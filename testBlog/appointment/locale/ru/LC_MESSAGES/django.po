@@ -511,7 +511,7 @@ msgstr "Вы можете удалять только свои записи"
 #, fuzzy
 #| msgid "Appointment details"
 msgid "Appointment deleted successfully."
-msgstr "Детали встречи"
+msgstr "Запись успешно удалена"
 
 #: .\views_admin.py:384
 msgid "You do not have permission to access this appointment."
