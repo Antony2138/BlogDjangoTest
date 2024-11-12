@@ -23,11 +23,6 @@ DAYS_OF_WEEK = (
 )
 
 
-class ImageStyle(models.Model):
-    style_image = models.ImageField(upload_to="style/", blank=True, null=True)
-    description_image = models.TextField(blank=True, null=True)
-
-
 class Service(models.Model):
     name = models.CharField(max_length=100, blank=False)
     description = models.TextField(blank=True, null=True)
