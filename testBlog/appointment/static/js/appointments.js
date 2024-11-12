@@ -95,7 +95,7 @@ body.on('click', '.btn-submit-appointment', function () {
     const selectedDate = $('.djangoAppt_date_chosen').text();
     if (!selectedSlot || !selectedDate) {
         alert(selectDateAndTimeAlertTxt);
-        return;
+
     }
     if (selectedSlot && selectedDate) {
         const startTime = selectedSlot;
@@ -137,7 +137,6 @@ body.on('click', '.btn-submit-appointment', function () {
 
 $('#staff_id').on('change', function () {
     staffId = $(this).val() || null;  // If staffId is an empty string, set it to null
-    console.log(staffId)
     let currentDate = null
     if (selectedDate == null) {
         currentDate = moment.tz(timezone).format('YYYY-MM-DD');

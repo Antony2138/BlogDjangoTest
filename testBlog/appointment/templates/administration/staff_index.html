@@ -1,6 +1,7 @@
 {% extends 'mainController/layout.html'%}
 {% load i18n %}
 {% load static %}
+{% block title %} Записи {% endblock %}
 {% block customMetaTag %}
     <meta name="csrf-token" content="{{ csrf_token }}">
 {% endblock %}
@@ -254,9 +255,6 @@
             cursor: pointer;
         }
     </style>
-{% endblock %}
-{% block title %}
-    {{ page_title }}
 {% endblock %}
 {% block description %}
     {{ page_description }}
