@@ -3,6 +3,7 @@ import json
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.db.models import ProtectedError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
@@ -80,7 +81,7 @@ def delete_service(request, service_id):
         service.delete()
         messages.success(request, _("Service removed"))
         return redirect("get_service_list")
-    except Service:
+    except ProtectedError:
         messages.info(request, _("To delete a service, you must manually delete all records for this service"
                                  " and remove it from the master's offered services"))
     return redirect("get_service_list")
