@@ -71,7 +71,7 @@ const calendar = new FullCalendar.Calendar(calendarEl, {
 $(document).ready(function () {
     staffId = $('#staff_id').val() || null;
     calendar.render();
-    const currentDate = rescheduledDate || moment.tz(timezone).format('YYYY-MM-DD');
+    const currentDate = new Date().toLocaleDateString('en-CA');
     getAvailableSlots(currentDate, staffId);
 });
 
@@ -139,7 +139,7 @@ $('#staff_id').on('change', function () {
     staffId = $(this).val() || null;  // If staffId is an empty string, set it to null
     let currentDate = null
     if (selectedDate == null) {
-        currentDate = moment.tz(timezone).format('YYYY-MM-DD');
+        currentDate = new Date().toLocaleDateString('en-CA');
     } else {
         currentDate = selectedDate;
     }
@@ -295,7 +295,7 @@ function getAvailableSlots(selectedDate, staffId = null) {
                 for (let i = 0; i < uniqueSlots.length; i++) {
                     slotList.append('<li class="djangoAppt_appointment-slot">' + uniqueSlots[i] + '</li>');
                 }
-
+                $('.btn-submit-appointment').attr('disabled', 'disabled');
                 // Attach click event to the slots
                 $('.djangoAppt_appointment-slot').on('click', function () {
                     // Remove the 'selected' class from all other appointment slots
