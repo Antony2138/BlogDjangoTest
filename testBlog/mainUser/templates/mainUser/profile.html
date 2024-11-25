@@ -9,20 +9,17 @@
       crossorigin="anonymous" referrerpolicy="no-referrer"/>
 {% endblock %}
 {% block body %}
-<div class="media">
+<div class="user-media">
 
-    <div class="col-md-4">
-        <div class="user-info-container rounded-circle p-3">
-            <h2 class="account-heading">{{ user.username }}</h2>
-            <p class="text">Имя: {{ user.first_name }}</p>
-            <p class="text">Фамилия: {{ user.last_name }}</p>
-            <p class="text">Email: {{ user.email }}</p>
-            <p class="text">Телефон: {{ user.phone_number }}</p>
-        </div>
+
+    <div class="user-info">
+        <h1 class="text"> {{ user.first_name }}</h1>
+        <h1 class="text">{{ user.last_name }}</h1>
     </div>
+
     <div class="media-body" style="display:flex; ">
         <div>
-            <h2 style="text-align:center;">Ваши записи</h2>
+            <h2 style="text-align:center; font-size: 1.5rem;">Ваши записи</h2>
             {% for appointment in appointments %}
             <div style="max-width: 700px; margin-left:20px;">
 
@@ -35,7 +32,7 @@
                         </div>
                         <div class="appointment-detail hover-element">
                             <i class="fas fa-clock"></i>
-                            <strong>Время приёма:</strong> {{ appointment.get_start_time|time:"H:i" }}
+                            <strong>Начало приёма:</strong> {{ appointment.get_start_time|time:"H:i" }}
                         </div>
                         <div class="appointment-detail hover-element">
                             <i class="fas fa-hands-helping"></i>

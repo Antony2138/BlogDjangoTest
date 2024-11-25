@@ -244,10 +244,6 @@
             .fc-daygrid-event-harness {
                 width: 5px;
             }
-
-            .fc td, .fc th {
-
-            }
         }
 
         .event-list-item-appt {
@@ -366,7 +362,7 @@
                     <input type="email" name="clientEmail" value="${appointment.client_email || ''}" ${disabledAttribute} id="clientEmail" placeholder="john.doe@example.com">
                     <span id="emailError" style="display:none;"></span>
                     <label for="clientPhone">{% trans 'Phone Number' %}:</label>
-                    <input type="tel" name="clientPhone" value="${appointment.client_phone || ''}" ${disabledAttribute} id="clientPhone" placeholder="+12392350799">
+                    <input type="text" name="clientPhone" value="${appointment.client_phone || ''}" ${disabledAttribute} id="clientPhone" placeholder="+1239">
                 </div>
                 <div class="flex-container-appt">
                     <label for="clientTg">Telegram:</label>

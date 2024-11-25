@@ -624,7 +624,8 @@ async function getAppointmentData(eventId, isCreatingMode, defaultStartTime) {
         client_name: '',
         client_email: '',
         client_phone: '',
-
+        social_link_tg: '',
+        social_link_vk: '',
     };
 }
 
@@ -655,10 +656,6 @@ async function showEventModal(eventId = null, isEditMode, isCreatingMode = false
         staffDropdown = await getStaffDropdown(appointment.staff_id, isEditMode);
         attachEventListenersToDropdown(); // Attach event listener
     }
-    console.log(appointment)
-    console.log(servicesDropdown)
-    console.log(staffDropdown)
-    console.log(isEditMode)
     document.getElementById('eventModalBody').innerHTML = generateModalContent(appointment, servicesDropdown, isEditMode, staffDropdown);
     adjustModalButtonsVisibility(isEditMode, isCreatingMode);
     console.log(typeof $)
@@ -793,14 +790,6 @@ function collectFormDataFromModal(modal) {
 
     if (AppState.isCreating) {
         data["date"] = modal.querySelector('input[name="date"]').value;
-    }
-
-    // Special handling for checkbox
-    const wantReminderCheckbox = modal.querySelector('input[name="want_reminder"]');
-    if (!wantReminderCheckbox.checked) {
-        data['want_reminder'] = 'false';
-    } else {
-        data['want_reminder'] = 'true';
     }
 
     return data;

@@ -2,6 +2,7 @@ const calendarEl = document.getElementById('calendar');
 let nextAvailableDateSelector = $('.djangoAppt_next-available-date')
 const body = $('body');
 let nonWorkingDays = [];
+let dayOff = [];
 let selectedDate = rescheduledDate || null;
 let staffId = $('#staff_id').val() || null;
 let previouslySelectedCell = null;
@@ -64,10 +65,18 @@ const calendar = new FullCalendar.Calendar(calendarEl, {
         if (info.date < getDateWithoutTime(new Date())) {
             return ['disabled-day'];
         }
+        let isNonWorkingDay = dayOff.some(range => {
+            return isDateBetween(info.date, range[0], range[1]);
+        });
+        if (isNonWorkingDay) {
+            return ['disabled-day'];
+        }
         return [];
     },
 });
-
+function isDateBetween(date, startDate, endDate) {
+    return date >= new Date(startDate) && date <= new Date(endDate);
+}
 $(document).ready(function () {
     staffId = $('#staff_id').val() || null;
     calendar.render();
@@ -174,6 +183,7 @@ function fetchNonWorkingDays(staffId, callback) {
                 callback([]);
             } else {
                 nonWorkingDays = data.non_working_days;
+                dayOff = data.day_off
                 calendar.render();
                 callback(data.non_working_days);
             }

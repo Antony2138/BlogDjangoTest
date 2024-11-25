@@ -2,6 +2,16 @@
     display: flex;
     gap: 50px;
     justify-content: center;
+    flex-wrap: wrap;
+    letter-spacing: 5px;
+}
+
+.custom-wrapper a{
+    color: black;
+}
+
+.custom-wrapper h2{
+    text-align: center;
 }
 
 .service-form-wrapper{
@@ -21,15 +31,4 @@
 a:hover {
     color: #0056b3;
     text-decoration: none;
-}
-
-.btn-primary {
-    color: black;
-    background-color: white;
-    border-color: #007bff;
-    cursor: pointer;
-}
-.btn-primary:hover {
-    background-color: #0e2238;
-
 }

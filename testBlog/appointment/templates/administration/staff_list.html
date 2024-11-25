@@ -10,6 +10,9 @@
         <div class="profile-container">
             <section class="profile-section">
                 <div class="section-header">
+                     <button class="btn btn-warning" style="margin-right:10px">
+                        <a href="{% url 'show_all'%}"> Меню </a>
+                    </button>
                     <h2 class="section-header-itm">{% trans 'Работники' %}</h2>
                     <div class="buttons-container section-header-itm">
                         <a href="{% url 'add_staff_member_info' %}"
@@ -34,9 +37,9 @@
                                 <td>{{ staff_member.user.email|default:"Не указано" }}</td>
                                 <td>
                                     <a href="{% url 'user_profile' staff_member.user.id %}"
-                                       class="modify-btn button-color-blue">{% trans 'Профиль' %}</a>
+                                       class="btn btn-warning">{% trans 'Профиль' %}</a>
                                     <a href="{% url 'remove_staff_member' staff_member.user.id %}"
-                                       class="modify-btn button-color-red">{% trans 'Remove' %}</a>
+                                       class="btn btn-danger">{% trans 'Remove' %}</a>
                                 </td>
                             </tr>
                         {% empty %}

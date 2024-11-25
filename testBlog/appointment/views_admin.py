@@ -12,8 +12,9 @@ from .decorators import (require_ajax, require_staff_or_superuser,
                          require_superuser, require_user_authenticated)
 from .forms import (PersonalInformationForm, ServiceForm,
                     StaffAppointmentInformationForm, StaffMemberForm)
-from .models import Appointment, DayOff, Service, StaffMember, WorkingHours
-from .services import (fetch_user_appointments,
+from .models import (Appointment, ArchivedAppointment, DayOff, Service,
+                     StaffMember, WorkingHours)
+from .services import (arhiv_appointment, fetch_user_appointments,
                        handle_entity_management_request,
                        prepare_appointment_display_data,
                        prepare_user_profile_data, save_appt_date_time,
@@ -485,5 +486,16 @@ def is_user_staff_admin(request):
 
 def delete_appointment(request, appointment_id):
     appointment = get_object_or_404(Appointment, pk=appointment_id)
+    arhiv_appointment(appointment)
     appointment.delete()
     return redirect('get_user_appointments')
+
+
+def clients_info(request):
+    clients = get_user_model().objects.filter(is_staff=False)
+    appt = ArchivedAppointment.objects.all()
+    context = {
+        'clients': clients,
+        'appt': appt,
+    }
+    return render(request, 'administration/clients.html', context=context)

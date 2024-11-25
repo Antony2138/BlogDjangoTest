@@ -118,6 +118,11 @@ admin_urlpatterns = [
         views_admin.add_working_hours,
         name="add_working_hours",
     ),
+    path(
+        "clients-info/",
+        views_admin.clients_info,
+        name="clients_info",
+    ),
 ]
 
 urlpatterns = [
@@ -131,6 +136,11 @@ urlpatterns = [
         "request-submit/",
         views.appointment_request_submit,
         name="appointment_request_submit",
+    ),
+    path(
+        "confirm-appt/<int:appointment_request_id>/",
+        views.confirm_appt,
+        name="confirm_appt",
     ),
     path(
         "thank-you/<int:appointment_id>/",
