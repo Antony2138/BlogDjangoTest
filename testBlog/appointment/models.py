@@ -236,7 +236,7 @@ class ArchivedAppointmentRequest(models.Model):
     date = models.DateField()
     start_time = models.TimeField()
     end_time = models.TimeField()
-    service = models.ForeignKey(Service, on_delete=models.PROTECT)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
     staff_member = models.ForeignKey(StaffMember, on_delete=models.SET_NULL, null=True)
     id_request = models.CharField(max_length=100, blank=True, null=True)
 

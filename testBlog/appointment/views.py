@@ -269,11 +269,7 @@ def appointment_request_submit(request):
                 messages.error(request, "Selected staff member does not exist.")
             else:
                 ar = form.save()
-                print(ar.get_start_time(), 'get_start_time')
-                # response = create_appointment(request, ar)
-                # request.session[f"appointment_completed_{ar.id_request}"] = False
                 return render(request, "appointment/confirm_appt.html", {'appointment': ar})
-                # return response
         else:
             # Handle the case if the form is not valid
             messages.error(
@@ -308,8 +304,6 @@ def get_non_working_days_ajax(request):
                 "start_date", "end_date",
             )
         )
-
-        print(day_off, 'day_off')
         custom_data = {"non_working_days": non_working_days, "day_off": list(day_off)}
         return json_response(
             message=message, custom_data=custom_data, success=not error

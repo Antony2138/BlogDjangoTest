@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-19 02:40+0300\n"
+"POT-Creation-Date: 2024-11-30 21:08+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,7 +20,7 @@ msgstr ""
 "n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
 "(n%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: .\services.py:222 .\views_admin.py:469
+#: .\services.py:224 .\views_admin.py:470
 #, fuzzy
 #| msgid "Appointment Date"
 msgid "Appointment updated successfully."
@@ -45,6 +45,16 @@ msgstr "Фамилия"
 #: .\templates\administration\clients.html:27
 msgid "Contacts"
 msgstr "Контакты"
+
+#: .\templates\administration\clients.html:28
+#: .\templates\administration\display_appointment.html:53
+msgid "VK"
+msgstr ""
+
+#: .\templates\administration\clients.html:29
+#: .\templates\administration\display_appointment.html:49
+msgid "Telegram"
+msgstr ""
 
 #: .\templates\administration\display_appointment.html:25
 msgid "Date"
@@ -77,14 +87,6 @@ msgstr "Клиент"
 msgid "Phone"
 msgstr "Телефон"
 
-#: .\templates\administration\display_appointment.html:49
-msgid "Telegram"
-msgstr ""
-
-#: .\templates\administration\display_appointment.html:53
-msgid "VK"
-msgstr ""
-
 #: .\templates\administration\manage_day_off.html:32
 #: .\templates\administration\manage_working_hours.html:34
 #: .\templates\administration\staff_index.html:346
@@ -102,7 +104,7 @@ msgid "End date"
 msgstr "До"
 
 #: .\templates\administration\manage_day_off.html:67
-#: .\templates\administration\service_list.html:27
+#: .\templates\administration\service_list.html:29
 #: .\templates\administration\user_profile.html:124
 msgid "Description"
 msgstr "Описание"
@@ -119,25 +121,25 @@ msgstr "Управления рабочими часами"
 msgid "Day of Week"
 msgstr "День недели"
 
-#: .\templates\administration\service_list.html:17
+#: .\templates\administration\service_list.html:19
 msgid "List of services"
 msgstr "Список услуг"
 
-#: .\templates\administration\service_list.html:24
+#: .\templates\administration\service_list.html:26
 msgid "Name"
 msgstr "Название"
 
-#: .\templates\administration\service_list.html:25
+#: .\templates\administration\service_list.html:27
 #: .\templates\appointment\confirm_appt.html:17
 #: .\templates\appointment\default_thank_you.html:21
 msgid "Duration"
 msgstr "Длительность"
 
-#: .\templates\administration\service_list.html:26
+#: .\templates\administration\service_list.html:28
 msgid "Price"
 msgstr "Стоимость"
 
-#: .\templates\administration\service_list.html:58
+#: .\templates\administration\service_list.html:60
 msgid "Услуги не добавлены"
 msgstr ""
 
@@ -185,7 +187,7 @@ msgstr ""
 msgid "Appointment not found."
 msgstr "Дата встречи"
 
-#: .\templates\administration\staff_index.html:327 .\views_admin.py:409
+#: .\templates\administration\staff_index.html:327 .\views_admin.py:410
 msgid "You're not a staff member. Can't perform this action !"
 msgstr "Вы не являетесь сотрудником. Не можете выполнить это действие!"
 
@@ -212,32 +214,32 @@ msgstr "Email"
 msgid "Phone Number"
 msgstr "Номер телефона"
 
-#: .\templates\administration\staff_list.html:13
+#: .\templates\administration\staff_list.html:16
 msgid "Работники"
 msgstr ""
 
-#: .\templates\administration\staff_list.html:25
+#: .\templates\administration\staff_list.html:28
 msgid "Имя"
 msgstr ""
 
-#: .\templates\administration\staff_list.html:26
+#: .\templates\administration\staff_list.html:29
 #: .\templates\appointment\appointment_client_information.html:51
 msgid "Email"
 msgstr ""
 
-#: .\templates\administration\staff_list.html:27
+#: .\templates\administration\staff_list.html:30
 msgid "Детали"
 msgstr ""
 
-#: .\templates\administration\staff_list.html:37
+#: .\templates\administration\staff_list.html:40
 msgid "Профиль"
 msgstr ""
 
-#: .\templates\administration\staff_list.html:39
+#: .\templates\administration\staff_list.html:42
 msgid "Remove"
 msgstr "Удалить"
 
-#: .\templates\administration\staff_list.html:44
+#: .\templates\administration\staff_list.html:47
 msgid "Сотрудников не добавлено"
 msgstr ""
 
@@ -450,48 +452,46 @@ msgstr[1] ""
 msgid "Date is in the past"
 msgstr "Дата в прошлом"
 
-#: .\views.py:58
+#: .\views.py:57
 msgid "Day off, please select another day."
 msgstr "Выходные, выберите другой день"
 
-#: .\views.py:202
+#: .\views.py:201
 #, fuzzy
 #| msgid "No staff member selected."
 msgid "No staff member selected"
 msgstr "Выберите мастера"
 
-#: .\views.py:226
+#: .\views.py:225
 msgid "To recording you must be registered"
 msgstr "Чтобы записаться, вы должны быть зарегистрированы"
 
-#: .\views.py:282
+#: .\views.py:281
 msgid ""
 "There was an error in your submission. Please check the form and try again."
 msgstr "Ошибка отправки, попробуйте еще раз"
 
-#: .\views_admin.py:36
-#, fuzzy
-#| msgid "Service"
+#: .\views_admin.py:37
 msgid "View service"
 msgstr "Услуга"
 
-#: .\views_admin.py:37
+#: .\views_admin.py:38
 msgid "Save"
 msgstr "Сохранить"
 
-#: .\views_admin.py:40
+#: .\views_admin.py:41
 msgid "Adding a service"
 msgstr "Добавление услуги"
 
-#: .\views_admin.py:41
+#: .\views_admin.py:42
 msgid "Add"
 msgstr "Добавить"
 
-#: .\views_admin.py:47
+#: .\views_admin.py:48
 msgid "Service saved successfully"
 msgstr "Услуга успешно сохранена"
 
-#: .\views_admin.py:50
+#: .\views_admin.py:51
 msgid ""
 "The service has been successfully added. Don't forget to select the master "
 "providing the service"
@@ -499,13 +499,11 @@ msgstr ""
 "Услуга успешно добавлена. Не забудьте выбрать мастера, предоставляющего "
 "услугу"
 
-#: .\views_admin.py:82
-#, fuzzy
-#| msgid "Service"
+#: .\views_admin.py:83
 msgid "Service removed"
 msgstr "Услуга удалена"
 
-#: .\views_admin.py:85
+#: .\views_admin.py:86
 msgid ""
 "To delete a service, you must manually delete all records for this service "
 "and remove it from the master's offered services"
@@ -513,67 +511,67 @@ msgstr ""
 "Чтобы удалить услугу, необходимо вручную удалить все записи по этой услуге и "
 "удалить ее из предлагаемых услуг мастера."
 
-#: .\views_admin.py:100
+#: .\views_admin.py:101
 msgid "The employee has been successfully created"
 msgstr "Мастер успешно создан"
 
-#: .\views_admin.py:241
+#: .\views_admin.py:242
 #, fuzzy
 #| msgid "You can only delete your own appointments."
 msgid "You can only update your own days off."
 msgstr "Вы можете обновлять только выходные дни"
 
-#: .\views_admin.py:255
+#: .\views_admin.py:256
 #, fuzzy
 #| msgid "You can only delete your own appointments."
 msgid "You can only delete your own days off."
 msgstr "Вы можете удалять только выходные дни"
 
-#: .\views_admin.py:299
+#: .\views_admin.py:300
 #, fuzzy
 #| msgid "You can only delete your own appointments."
 msgid "You can only update your own working hours."
 msgstr "Вы можете обновлять только свои рабочие часы"
 
-#: .\views_admin.py:321
+#: .\views_admin.py:322
 #, fuzzy
 #| msgid "You can only delete your own appointments."
 msgid "You can only delete your own working hours."
 msgstr "Вы можете удалять только свои рабочие часы"
 
-#: .\views_admin.py:375
+#: .\views_admin.py:376
 msgid "You can only delete your own appointments."
 msgstr "Вы можете удалять только свои записи"
 
-#: .\views_admin.py:396
+#: .\views_admin.py:397
 msgid "You do not have permission to access this appointment."
 msgstr "У вас нет разрешения на доступ к этой встрече."
 
-#: .\views_admin.py:415
+#: .\views_admin.py:416
 #, fuzzy
 #| msgid "No service offered yet"
 msgid "No services offered by this staff member."
 msgstr "Услуг не добавлено"
 
-#: .\views_admin.py:417
+#: .\views_admin.py:418
 msgid "Successfully fetched services."
 msgstr ""
 
-#: .\views_admin.py:465
+#: .\views_admin.py:466
 #, fuzzy
 #| msgid "Appointment details"
 msgid "Appointment does not exist."
 msgstr "Детали встречи"
 
-#: .\views_admin.py:478
+#: .\views_admin.py:479
 msgid "User is a staff member."
 msgstr "Пользователь работник"
 
-#: .\views_admin.py:482
+#: .\views_admin.py:483
 msgid "User is not a staff member."
 msgstr "Пользователь не является работником"
 
-#: .\views_admin.py:483
+#: .\views_admin.py:484
 msgid "User is a superuser."
 msgstr ""
 
