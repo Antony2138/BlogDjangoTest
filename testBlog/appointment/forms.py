@@ -96,7 +96,7 @@ class StaffMemberForm(forms.ModelForm):
             "slot_duration": forms.NumberInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "Пример значений: 30, 60, 90, 120... (в минутах)",
+                    "placeholder": "15, 30, 60... (в минутах). Pекомендуемое 30",
                 }
             ),
             "lead_time": forms.TimeInput(

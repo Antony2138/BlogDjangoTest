@@ -23,7 +23,7 @@ def handle_user_registration(request):
             user.save()
 
             # Отправляем сообщение об успешной регистрации
-            messages.success(request, "Ваш аккаунт создан. Вы успешно вошли на сайт.")
+            messages.success(request, "Ваш аккаунт создан. Вы можете войти на сайт.")
             return redirect('login')  # Перенаправляем на страницу входа
         else:
             # Если форма невалидна, возвращаем ее с ошибками

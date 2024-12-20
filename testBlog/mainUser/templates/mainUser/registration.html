@@ -20,36 +20,77 @@
 </div>
 {% endfor %}
 {% endif %}
-
-<form method="POST" style="width: 40%; margin: 0 auto; margin-top: 50px;" action="">
+<div>
+    <h2 style="text-align:center;">Регистрация</h2>
+    <form method="POST" style="width: 40%; margin: 0 auto; margin-top: 50px;" action="">
     {% csrf_token %}
-    {{form.username.label}}
-    {{form.username}}<br>
-    {{form.first_name.label}}
-    {{form.first_name}}<br>
-    {{form.last_name.label}}
-    {{form.last_name}}<br>
-    {{form.email.label}}
-    {{form.email}}<br>
-    {{form.password.label}}
-    {{form.password}}<br>
-    <div class="form-group">
-        {{ form.social_link_tg.label }}
-        {{ form.social_link_tg }}
-        <small>{{ form.social_link_tg.errors }}</small>
+        {{ form.username.label_tag }} {{ form.username }}
+        {% if form.username.errors %}
+            <div class="alert alert-danger">
+                {{ form.username.errors|join:", " }}
+            </div>
+        {% endif %}
 
-    </div>
-    <div class="form-group">
-        {{ form.social_link_vk.label }}
-        {{ form.social_link_vk }}
-        <small>{{ form.social_link_vk.errors }}</small>
+        {{ form.first_name.label_tag }} {{ form.first_name }}
+        {% if form.first_name.errors %}
+            <div class="alert alert-danger">
+                {{ form.first_name.errors|join:", " }}
+            </div>
+        {% endif %}
 
-    </div>
-    {{form.phone_number.label}}
-    {{form.phone_number}}
+        {{ form.last_name.label_tag }} {{ form.last_name }}
+        {% if form.last_name.errors %}
+            <div class="alert alert-danger">
+                {{ form.last_name.errors|join:", " }}
+            </div>
+        {% endif %}
+
+        {{ form.email.label_tag }} {{ form.email }}
+        {% if form.email.errors %}
+            <div class="alert alert-danger">
+                {{ form.email.errors|join:", " }}
+            </div>
+        {% endif %}
+
+        {{ form.password.label_tag }} {{ form.password }}
+        {% if form.password.errors %}
+            <div class="alert alert-danger">
+                {{ form.password.errors|join:", " }}
+            </div>
+        {% endif %}
+
+        {{ form.password2.label_tag }} {{ form.password2 }}
+        {% if form.password2.errors %}
+            <div class="alert alert-danger">
+                {{ form.password2.errors|join:", " }}
+            </div>
+        {% endif %}
+
+        {{ form.social_link_tg.label_tag }} {{ form.social_link_tg }}
+        {% if form.social_link_tg.errors %}
+            <div class="alert alert-danger">
+                {{ form.social_link_tg.errors|join:", " }}
+            </div>
+        {% endif %}
+
+        {{ form.social_link_vk.label_tag }} {{ form.social_link_vk }}
+        {% if form.social_link_vk.errors %}
+            <div class="alert alert-danger">
+                {{ form.social_link_vk.errors|join:", " }}
+            </div>
+        {% endif %}
+
+        {{ form.phone_number.label_tag }} {{ form.phone_number }}
+        {% if form.phone_number.errors %}
+            <div class="alert alert-danger">
+                {{ form.phone_number.errors|join:", " }}
+            </div>
+        {% endif %}
     <br>
     <button type="submit" class="btn btn-warning">Зарегистрироваться</button>
 </form>
+</div>
+
 
 <div class="messages" style="margin: 20px 0">
     {% if messages %}

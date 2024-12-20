@@ -89,6 +89,7 @@ function initializeCalendar() {
 }
 
 function formatAppointmentsForCalendar(appointments) {
+
     return appointments.map(appointment => ({
         id: appointment.id,
         title: appointment.service_name,
@@ -203,7 +204,7 @@ function getCalendarConfig(events) {
 }
 
 function displayEventList(events, date) {
-    let eventListHtml = '<h3 style="font-size: 16px; font-weight: bold;">' + eventsOnTxt + ' ' + moment(date).format('MMMM Do, YYYY') + '</h3>';
+    let eventListHtml = '<h3 style="font-size: 16px; font-weight: bold;">' + eventsOnTxt + ' ' + '</h3>';
     eventListHtml += '<hr>';
 
     events.forEach(function (event) {
