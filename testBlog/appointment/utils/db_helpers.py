@@ -7,7 +7,7 @@ from django.core.cache import cache
 from django.core.exceptions import FieldDoesNotExist
 from django.shortcuts import get_object_or_404
 
-from ..models import DayOff
+from ..models import AppointmentRequest, DayOff
 from ..settings import (APPOINTMENT_BUFFER_TIME, APPOINTMENT_FINISH_TIME,
                         APPOINTMENT_LEAD_TIME, APPOINTMENT_SLOT_DURATION)
 from .date_time import get_weekday_num
@@ -228,7 +228,6 @@ def calculate_staff_slots(date, staff_member):
     # Convert slot duration to a timedelta object
     slot_duration_minutes = get_staff_member_slot_duration(staff_member, date)
     slot_duration = datetime.timedelta(minutes=slot_duration_minutes)
-
     return calculate_slots(start_time, end_time, buffer_time, slot_duration)
 
 
@@ -285,7 +284,8 @@ def create_and_save_appointment(ar, request):
     """
 
     user = get_object_or_404(get_user_model(), pk=request.user.id)
-    appointment = Appointment.objects.create(client=user, appointment_request=ar)
+    appointment_request = get_object_or_404(AppointmentRequest, pk=ar)
+    appointment = Appointment.objects.create(client=user, appointment_request=appointment_request)
     appointment.save()
 
     return appointment

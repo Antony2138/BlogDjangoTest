@@ -2,6 +2,7 @@ const calendarEl = document.getElementById('calendar');
 let nextAvailableDateSelector = $('.djangoAppt_next-available-date')
 const body = $('body');
 let nonWorkingDays = [];
+let dayOff = [];
 let selectedDate = rescheduledDate || null;
 let staffId = $('#staff_id').val() || null;
 let previouslySelectedCell = null;
@@ -64,14 +65,22 @@ const calendar = new FullCalendar.Calendar(calendarEl, {
         if (info.date < getDateWithoutTime(new Date())) {
             return ['disabled-day'];
         }
+        let isNonWorkingDay = dayOff.some(range => {
+            return isDateBetween(info.date, range[0], range[1]);
+        });
+        if (isNonWorkingDay) {
+            return ['disabled-day'];
+        }
         return [];
     },
 });
-
+function isDateBetween(date, startDate, endDate) {
+    return date >= new Date(startDate) && date <= new Date(endDate);
+}
 $(document).ready(function () {
     staffId = $('#staff_id').val() || null;
     calendar.render();
-    const currentDate = rescheduledDate || moment.tz(timezone).format('YYYY-MM-DD');
+    const currentDate = new Date().toLocaleDateString('en-CA');
     getAvailableSlots(currentDate, staffId);
 });
 
@@ -95,7 +104,7 @@ body.on('click', '.btn-submit-appointment', function () {
     const selectedDate = $('.djangoAppt_date_chosen').text();
     if (!selectedSlot || !selectedDate) {
         alert(selectDateAndTimeAlertTxt);
-        return;
+
     }
     if (selectedSlot && selectedDate) {
         const startTime = selectedSlot;
@@ -137,10 +146,9 @@ body.on('click', '.btn-submit-appointment', function () {
 
 $('#staff_id').on('change', function () {
     staffId = $(this).val() || null;  // If staffId is an empty string, set it to null
-    console.log(staffId)
     let currentDate = null
     if (selectedDate == null) {
-        currentDate = moment.tz(timezone).format('YYYY-MM-DD');
+        currentDate = new Date().toLocaleDateString('en-CA');
     } else {
         currentDate = selectedDate;
     }
@@ -175,6 +183,7 @@ function fetchNonWorkingDays(staffId, callback) {
                 callback([]);
             } else {
                 nonWorkingDays = data.non_working_days;
+                dayOff = data.day_off
                 calendar.render();
                 callback(data.non_working_days);
             }
@@ -296,7 +305,7 @@ function getAvailableSlots(selectedDate, staffId = null) {
                 for (let i = 0; i < uniqueSlots.length; i++) {
                     slotList.append('<li class="djangoAppt_appointment-slot">' + uniqueSlots[i] + '</li>');
                 }
-
+                $('.btn-submit-appointment').attr('disabled', 'disabled');
                 // Attach click event to the slots
                 $('.djangoAppt_appointment-slot').on('click', function () {
                     // Remove the 'selected' class from all other appointment slots

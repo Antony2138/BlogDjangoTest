@@ -2,15 +2,8 @@
         display:flex;
     }
 
-    .btn-primary {
+    .section-header a{
         color: black;
-        background-color: white;
-        border-color: #007bff;
-        cursor: pointer;
-    }
-    .btn-primary:hover {
-        background-color: #0e2238;
-
     }
 
     .profile-section table {

@@ -1,23 +1,33 @@
 {% extends 'mainController/layout.html'%}
-
+{% block title %} Администрирование {% endblock %}
 {% block body %}
 <div class="custom-wrapper">
     <div>
-        <h2>Управление услугами</h2>
-        <button class="btn btn-primary"><a href="{% url 'add_service'%}"> Добавить услугу</a></button>
-        <button class="btn btn-primary"><a href="{% url 'get_service_list'%}"> Список услуг</a></button>
+        <h2>Услуги</h2>
+        <a href="{% url 'add_service'%}" class="icon-link">
+            <button class="btn btn-warning">Добавить услугу</button>
+        </a>
+        <a href="{% url 'get_service_list'%}" class="icon-link">
+            <button class="btn btn-warning">Список услуг</button>
+        </a>
+
 
     </div>
     <div>
-        <h2>Управление работниками</h2>
-        <button class="btn btn-primary"><a href="{% url 'add_staff_member_info'%}"> Добавить работника </a></button>
-        <button class="btn btn-primary"><a href="{% url 'get_staff_list'%}"> Список работников </a></button>
+        <h2>Работники</h2>
+        <a href="{% url 'add_staff_member_info'%}" class="icon-link">
+            <button class="btn btn-warning">Добавить работника </button>
+        </a>
+        <a href="{% url 'get_staff_list'%}" class="icon-link">
+            <button class="btn btn-warning">Список работников</button>
+        </a>
 
     </div>
     <div>
-        <h2>Управление Записями</h2>
-        <button class="btn btn-primary"><a href="{% url 'get_user_appointments'%}"> Календарь записей </a></button>
-
+        <h2>Записи</h2>
+        <a href="{% url 'get_user_appointments'%}" class="icon-link">
+            <button class="btn btn-warning">Календарь записей</button>
+        </a>
     </div>
 </div>
 

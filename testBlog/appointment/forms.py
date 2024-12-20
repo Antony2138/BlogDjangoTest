@@ -20,7 +20,7 @@ class SlotForm(forms.Form):
     )
     staff_member = forms.ModelChoiceField(
         StaffMember.objects.all(),
-        error_messages={"invalid_choice": "Staff member does not exist"},
+        error_messages={"invalid_choice": "Мастер не выбран"},
     )
 
 
@@ -96,7 +96,7 @@ class StaffMemberForm(forms.ModelForm):
             "slot_duration": forms.NumberInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "Пример значений: 30, 60, 90, 120... (в минутах)",
+                    "placeholder": "15, 30, 60... (в минутах). Pекомендуемое 30",
                 }
             ),
             "lead_time": forms.TimeInput(

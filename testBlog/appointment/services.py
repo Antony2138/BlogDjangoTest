@@ -10,7 +10,9 @@ from django.utils.translation import gettext as _
 
 from .forms import (PersonalInformationForm, ServiceForm, StaffDaysOffForm,
                     StaffWorkingHoursForm)
-from .models import Appointment, Service, StaffMember, WorkingHours
+from .models import (Appointment, ArchivedAppointment,
+                     ArchivedAppointmentRequest, Service, StaffMember,
+                     WorkingHours)
 from .utils.date_time import convert_str_to_time, get_ar_end_time
 from .utils.db_helpers import (calculate_slots, calculate_staff_slots,
                                day_off_exists_for_date_range,
@@ -64,7 +66,8 @@ def get_available_slots(date, appointments, service_duration):
 
     start_time, end_time, slot_duration, buff_time = get_times_from_config(date)
     now = timezone.now()
-    buffer_time = now + buff_time if date == now.date() else now
+    moscow_now = now.astimezone(timezone.get_current_timezone())
+    buffer_time = moscow_now + buff_time if date == now.date() else moscow_now
     slots = calculate_slots(start_time, end_time, buffer_time, slot_duration)
     slots = exclude_booked_slots(appointments, slots, slot_duration, service_duration)
     return [slot.strftime("%I:%M %p") for slot in slots]
@@ -213,7 +216,6 @@ def update_existing_appointment(data, request):
             phone_number=data.get("client_phone"),
             service_id=data.get("service_id"),
             staff_member_id=staff_id,
-            request=request,
         )
         if not appt:
             return json_response("Service not offered by staff member.", status=400, success=False,
@@ -230,7 +232,7 @@ def update_existing_appointment(data, request):
         return json_response(str(e.args[0]), status=400, success=False)
 
 
-def save_appointment(appt, client_name, client_email, start_time, phone_number, client_address, service_id, request,
+def save_appointment(appt, client_name, client_email, start_time, phone_number, service_id,
                      staff_member_id=None):
     """Save an appointment's details.
     :return: The modified appointment.
@@ -264,7 +266,6 @@ def save_appointment(appt, client_name, client_email, start_time, phone_number, 
 
     # Modify and save appointment details
     appt.phone = phone_number
-    appt.address = client_address
     appt.save()
     return appt
 
@@ -387,6 +388,8 @@ def get_working_hours_and_days_off_context(
     :return: A dictionary containing the context.
     """
     context = get_generic_context(request)
+    now = timezone.now()
+    moscow_now = now.astimezone(timezone.get_current_timezone())
     context.update(
         {
             "button_text": btn_txt,
@@ -413,7 +416,7 @@ def get_working_hours_and_days_off_context(
         )
     context.update(
         {
-            "today": timezone.now(),
+            "today": moscow_now,
         }
     )
     return context
@@ -491,7 +494,6 @@ def handle_working_hours_form(
             start_time=start_time,
             end_time=end_time,
         )
-        print(wk)
     else:
         # Ensure working_hours_id is provided
         if not wh_id:
@@ -528,3 +530,21 @@ def handle_working_hours_form(
     return json_response(
         "Working hours saved successfully.", custom_data={"redirect_url": redirect_url}
     )
+
+
+def arhiv_appointment(appt):
+
+    archived_appointment_request = ArchivedAppointmentRequest()
+
+    for field in appt.appointment_request._meta.fields:
+        setattr(archived_appointment_request, field.name, getattr(appt.appointment_request, field.name))
+    archived_appointment_request.pk = None
+    archived_appointment_request.save()
+
+    archived_appointment = ArchivedAppointment()
+    for field in appt._meta.fields:
+        if field.name != 'appointment_request':
+            setattr(archived_appointment, field.name, getattr(appt, field.name))
+    archived_appointment.appointment_request = archived_appointment_request
+    archived_appointment.pk = None
+    archived_appointment.save()

@@ -8,6 +8,7 @@
           crossorigin="anonymous" referrerpolicy="no-referrer"/>
     <link rel="stylesheet" type="text/css" href="{% static 'css/app_admin/user_profile.css' %}"/>
 {% endblock %}
+{% block title %} Профиль {% endblock %}
 
 {% block css %}
 .section-content{
@@ -35,7 +36,7 @@
                     <p><strong>Фамилия :</strong> {{ user.last_name|default:"Не указано" }}</p>
                     <p><strong>Email:</strong> {{ user.email|default:"Не указано" }}</p>
                 </div>
-                <a href="{% url 'update_user_info' user.id %}"
+                <a href="{% url 'update_user_info' staff_member.user.id %}"
                    class="section-content-button modify-btn button-color-blue">
                     <i class="fas fa-pen"></i>
                 </a>
@@ -62,7 +63,7 @@
                         </p>
 
                     </div>
-                    <a href="{% url 'update_staff_other_info' request.user.id %}"
+                    <a href="{% url 'update_staff_other_info' staff_member.user.id %}"
                        class="section-content-button modify-btn button-color-blue">
                         <i class="fas fa-pen"></i>
                     </a>
@@ -91,7 +92,7 @@
                         {% for service in services_offered %}
                             <tr>
                                 <td>{{ service.name }}</td>
-                                <td>{{ service.description|default:"N/A" }}</td>
+                                <td>{{ service.description|default:"Не указано" }}</td>
                                 <td>{{ service.get_duration }}</td>
                                 <td>{{ service.get_price }}</td>
                             </tr>
@@ -107,7 +108,7 @@
 
             <section class="profile-section">
                 <h2>{% trans 'Days Off' %}</h2>
-                <a href="{% url 'add_day_off' request.user.id %}"
+                <a href="{% url 'add_day_off' staff_member.user.id %}"
                    class="section-content-button modify-btn button-color-green">
                     <i class="fa-solid fa-circle-plus"></i>
                 </a>
@@ -158,7 +159,7 @@
             <!-- Working Hours Information Section -->
             <section class="profile-section">
                 <h2>Рабочие часы</h2>
-                <a href="{% url 'add_working_hours' request.user.id %}"
+                <a href="{% url 'add_working_hours' staff_member.user.id %}"
                    class="section-content-button modify-btn button-color-green">
                     <i class="fa-solid fa-circle-plus"></i>
                 </a>
@@ -180,8 +181,8 @@
                         {% for working_hour in working_hours %}
                             <tr>
                                 <td>{{ working_hour.get_day_of_week_str }}</td>
-                                <td>{{ working_hour.start_time|time:"g:i A" }}</td>
-                                <td>{{ working_hour.end_time|time:"g:i A" }}</td>
+                                <td>{{ working_hour.start_time|time:"H:i" }}</td>
+                                <td>{{ working_hour.end_time|time:"H:i" }}</td>
                                 <td>
                                     <div class="buttons-container">
                                         <a href="{% url 'update_working_hours' working_hour.id %}"

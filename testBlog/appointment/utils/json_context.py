@@ -63,7 +63,6 @@ def handle_unauthorized_response(request, message, response_type):
 
 def convert_appointment_to_json(request, appointments: list) -> list:
     """Convert a queryset of Appointment objects to a JSON serializable format."""
-    su = request.user.is_superuser
     return [{
         "id": appt.id,
         "client": appt.client.username if username_in_user_model() else "",
@@ -71,7 +70,7 @@ def convert_appointment_to_json(request, appointments: list) -> list:
         "end_time": appt.get_end_time().isoformat(),
         "client_name": appt.get_client_name(),
         "url": appt.get_absolute_url(request),
-        "service_name": appt.get_service_name() if not su else f"{appt.get_service_name()} ({appt.get_staff_member_name()})",
+        "service_name": appt.get_service_name(),
         "client_email": appt.client.email,
         "client_phone": str(appt.client.phone_number),
         "social_link_tg": appt.client.social_link_tg if tg_in_user_model() else "",

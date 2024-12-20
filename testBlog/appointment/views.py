@@ -6,6 +6,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from .decorators import require_ajax
 from .forms import AppointmentRequestForm, SlotForm
@@ -14,11 +15,9 @@ from .services import get_appointments_and_slots, get_available_slots_for_staff
 from .utils.db_helpers import (check_day_off_for_staff,
                                create_and_save_appointment,
                                get_non_working_days_for_staff,
-                               get_weekday_num_from_date, is_working_day,
-                               username_in_user_model)
+                               get_weekday_num_from_date, is_working_day)
 from .utils.error_codes import ErrorCode
 from .utils.json_context import get_generic_context_with_extra, json_response
-from django.utils.translation import gettext_lazy as _
 
 
 # Create your views here.
@@ -84,9 +83,10 @@ def get_available_slots_ajax(request):
 
     # Check if the selected_date is today and filter out past slots
     if selected_date == date.today():
-        current_time = timezone.now().time()
+        current_time = timezone.now()
+        moscow_now = current_time.astimezone(timezone.get_current_timezone())
         available_slots = [
-            slot for slot in available_slots if slot.time() > current_time
+            slot for slot in available_slots if slot.time() > moscow_now.time()
         ]
 
     custom_data["available_slots"] = [
@@ -94,7 +94,7 @@ def get_available_slots_ajax(request):
     ]
     if len(available_slots) == 0:
         custom_data["error"] = True
-        message = _("There are no available slots")
+        message = "Нет доступных слотов на этот день"
         return json_response(
             message=message,
             custom_data=custom_data,
@@ -109,14 +109,14 @@ def get_available_slots_ajax(request):
     )
 
 
-def create_appointment(request, appointment_request_obj):
+def create_appointment(request, appointment_request_id):
     """This function creates a new appointment and redirects to the payment page or the thank-you page.
 
     :param request: The request instance.
-    :param appointment_request_obj: The AppointmentRequest instance.
+    :param appointment_request_id: The AppointmentRequest instance.
     :return: The redirect response.
     """
-    appointment = create_and_save_appointment(appointment_request_obj, request)
+    appointment = create_and_save_appointment(appointment_request_id, request)
     return redirect_to_payment_or_thank_you_page(appointment)
 
 
@@ -128,12 +128,6 @@ def default_thank_you(request, appointment_id):
     :return: The rendered HTML page.
     """
     appointment = get_object_or_404(Appointment, pk=appointment_id)
-    email = appointment.client.email
-    account_details = {
-        "Email address": email,
-    }
-    if username_in_user_model():
-        account_details["Username"] = appointment.client.username
     extra_context = {
         "appointment": appointment,
     }
@@ -275,9 +269,7 @@ def appointment_request_submit(request):
                 messages.error(request, "Selected staff member does not exist.")
             else:
                 ar = form.save()
-                response = create_appointment(request, ar)
-                request.session[f"appointment_completed_{ar.id_request}"] = False
-                return response
+                return render(request, "appointment/confirm_appt.html", {'appointment': ar})
         else:
             # Handle the case if the form is not valid
             messages.error(
@@ -291,6 +283,10 @@ def appointment_request_submit(request):
     return render(request, "appointment/appointments.html", context=context)
 
 
+def confirm_appt(request, appointment_request_id):
+    return create_appointment(request, appointment_request_id)
+
+
 def get_non_working_days_ajax(request):
     staff_id = request.GET.get("staff_member")
     error = False
@@ -302,7 +298,13 @@ def get_non_working_days_ajax(request):
         error = True
     else:
         non_working_days = get_non_working_days_for_staff(staff_id)
-        custom_data = {"non_working_days": non_working_days}
+        staff_member = StaffMember.objects.get(id=staff_id)
+        day_off = set(
+            DayOff.objects.filter(staff_member=staff_member).values_list(
+                "start_date", "end_date",
+            )
+        )
+        custom_data = {"non_working_days": non_working_days, "day_off": list(day_off)}
         return json_response(
             message=message, custom_data=custom_data, success=not error
         )

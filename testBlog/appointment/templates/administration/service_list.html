@@ -1,6 +1,7 @@
 {% extends 'mainController/layout.html'%}
 {% load i18n %}
 {% load static %}
+{% block title %} Услуги {% endblock %}
 {% block customCSS %}
 <link rel="stylesheet" href="{%static 'css/app_admin/staff_list.css'%}">
 {% endblock %}
@@ -11,7 +12,9 @@
     <div class="service-container">
         <section class="profile-section">
             <div class="section-header">
-                <button class="btn btn-primary" style="margin-right:10px"><a href="{% url 'show_all'%}"> Меню </a></button>
+                <button class="btn btn-warning" style="margin-right:10px">
+                    <a href="{% url 'show_all'%}"> Меню </a>
+                </button>
 
                 <h2 class="section-header-itm">{% trans 'List of services' %}</h2>
             </div>

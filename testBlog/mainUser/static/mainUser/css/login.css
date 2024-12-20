@@ -4,7 +4,7 @@
             padding: 90px 60px; /* Wider padding */
             border-radius: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            width: 400px;
+            width: 600px;
             text-align: center;/* Adjust width as needed */
         }
 
@@ -36,7 +36,7 @@
             box-shadow: 0 0 0 2px #ffc107; /* Focus outline in yellow */
         }
 
-        .btn-warning {
+        login btn-warning {
             background-color: #40b74f;
             border: none;
             padding: 12px 30px;

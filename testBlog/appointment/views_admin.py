@@ -3,6 +3,7 @@ import json
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.db.models import ProtectedError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
@@ -11,8 +12,9 @@ from .decorators import (require_ajax, require_staff_or_superuser,
                          require_superuser, require_user_authenticated)
 from .forms import (PersonalInformationForm, ServiceForm,
                     StaffAppointmentInformationForm, StaffMemberForm)
-from .models import Appointment, DayOff, Service, StaffMember, WorkingHours
-from .services import (fetch_user_appointments,
+from .models import (Appointment, ArchivedAppointment, DayOff, Service,
+                     StaffMember, WorkingHours)
+from .services import (arhiv_appointment, fetch_user_appointments,
                        handle_entity_management_request,
                        prepare_appointment_display_data,
                        prepare_user_profile_data, save_appt_date_time,
@@ -23,7 +25,7 @@ from .utils.json_context import (convert_appointment_to_json,
                                  get_generic_context,
                                  get_generic_context_with_extra,
                                  handle_unauthorized_response, json_response)
-from .utils.permissions import (check_permissions,
+from .utils.permissions import (check_extensive_permissions, check_permissions,
                                 has_permission_to_delete_appointment)
 
 
@@ -45,7 +47,8 @@ def add_or_update_service(request, service_id=None):
             if service:
                 messages.success(request, _("Service saved successfully"))
             else:
-                messages.success(request, _("The service has been successfully added. Don't forget to select the master providing the service"))
+                messages.success(request,
+                                 _("The service has been successfully added. Don't forget to select the master providing the service"))
             return redirect("get_service_list" if service else "add_service")
     else:
         form = ServiceForm(instance=service)
@@ -79,9 +82,9 @@ def delete_service(request, service_id):
         service.delete()
         messages.success(request, _("Service removed"))
         return redirect("get_service_list")
-    except:
+    except ProtectedError:
         messages.info(request, _("To delete a service, you must manually delete all records for this service"
-                                  " and remove it from the master's offered services"))
+                                 " and remove it from the master's offered services"))
     return redirect("get_service_list")
 
 
@@ -221,10 +224,6 @@ def add_day_off(request, staff_user_id=None, response_type="html"):
 @require_user_authenticated
 @require_staff_or_superuser
 def update_day_off(request, day_off_id, staff_user_id=None, response_type="html"):
-    if not check_permissions(staff_user_id=staff_user_id, user=request.user):
-        message = "Вы можете изменять только собственные выходные дни"
-        return handle_unauthorized_response(request, message, response_type)
-
     day_off = DayOff.objects.get(pk=day_off_id)
     if not day_off:
         if response_type == "json":
@@ -239,7 +238,9 @@ def update_day_off(request, day_off_id, staff_user_id=None, response_type="html"
             return render(
                 request, "error_pages/404_not_found.html", context=context, status=404
             )
-
+    if not check_extensive_permissions(request.user.id, request.user, day_off):
+        message = _("You can only update your own days off.")
+        return handle_unauthorized_response(request, message, response_type)
     staff_user_id = staff_user_id or request.user.pk
     staff_member = StaffMember.objects.get(user_id=staff_user_id)
     return handle_entity_management_request(
@@ -249,8 +250,11 @@ def update_day_off(request, day_off_id, staff_user_id=None, response_type="html"
 
 @require_user_authenticated
 @require_staff_or_superuser
-def delete_day_off(request, day_off_id):
+def delete_day_off(request, day_off_id, response_type="html"):
     day_off = get_object_or_404(DayOff, pk=day_off_id)
+    if not check_extensive_permissions(request.user.id, request.user, day_off):
+        message = _("You can only delete your own days off.")
+        return handle_unauthorized_response(request, message, response_type)
     day_off.delete()
     messages.success(request, "Выходные успешно удалены!")
     return redirect("user_profile", staff_user_id=request.user.id)
@@ -258,7 +262,11 @@ def delete_day_off(request, day_off_id):
 
 @require_user_authenticated
 @require_staff_or_superuser
-def add_working_hours(request, staff_user_id=None):
+def add_working_hours(request, staff_user_id=None, response_type="html"):
+    if not check_permissions(staff_user_id, request.user):
+        message = "Вы можете добавлять только свои собственные рабочие часы."
+        return handle_unauthorized_response(request, message, response_type)
+
     staff_user_id = staff_user_id or request.user.pk
     staff_user_id = staff_user_id if staff_user_id else request.user.pk
 
@@ -288,7 +296,9 @@ def update_working_hours(
         else:
             context = get_generic_context(request=request)
             return render(request, "error_pages/404_not_found.html", context=context)
-
+    if not check_extensive_permissions(request.user.id, request.user, working_hours):
+        message = _("You can only update your own working hours.")
+        return handle_unauthorized_response(request, message, response_type)
     staff_user_id = staff_user_id or request.user.pk
     staff_member = get_object_or_404(
         StaffMember, user_id=staff_user_id or request.user.id
@@ -306,8 +316,11 @@ def update_working_hours(
 
 @require_user_authenticated
 @require_staff_or_superuser
-def delete_working_hours(request, working_hours_id):
+def delete_working_hours(request, working_hours_id, response_type="html"):
     working_hours = get_object_or_404(WorkingHours, pk=working_hours_id)
+    if not check_extensive_permissions(request.user.id, request.user, working_hours):
+        message = _("You can only delete your own working hours.")
+        return handle_unauthorized_response(request, message, response_type)
     working_hours.delete()
     messages.success(request, "Рабочие часы успешно удалены!")
     return redirect("user_profile", staff_user_id=request.user.id)
@@ -362,8 +375,8 @@ def delete_appointment_ajax(request):
     if not has_permission_to_delete_appointment(request.user, appointment):
         message = _("You can only delete your own appointments.")
         return json_response(message, status=403, success=False, error_code=ErrorCode.NOT_AUTHORIZED)
-    appointment.delete()
-    return json_response(_("Appointment deleted successfully."))
+    appointment.appointment_request.delete()
+    return json_response("Запись удалена")
 
 
 @require_user_authenticated
@@ -473,5 +486,16 @@ def is_user_staff_admin(request):
 
 def delete_appointment(request, appointment_id):
     appointment = get_object_or_404(Appointment, pk=appointment_id)
-    appointment.delete()
+    arhiv_appointment(appointment)
+    appointment.appointment_request.delete()
     return redirect('get_user_appointments')
+
+
+def clients_info(request):
+    clients = get_user_model().objects.filter(is_staff=False)
+    appt = ArchivedAppointment.objects.all()
+    context = {
+        'clients': clients,
+        'appt': appt,
+    }
+    return render(request, 'administration/clients.html', context=context)
