@@ -15,4 +15,5 @@ ARG USE_DJANGO_Q=False
 RUN if [ "$USE_DJANGO_Q" = True ] ; then pip install django-q2 ; fi
 
 EXPOSE 8000
+RUN ["chmod", "+x", "/app/entrypoint.sh"]
 CMD ["/app/entrypoint.sh"]
