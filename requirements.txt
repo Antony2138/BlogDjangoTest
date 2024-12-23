@@ -12,6 +12,7 @@ nodeenv==1.9.1
 packaging==24.2
 pillow==11.0.0
 platformdirs==4.3.6
+utils
 pre_commit==4.0.1
 pycodestyle==2.12.1
 pyflakes==3.2.0
