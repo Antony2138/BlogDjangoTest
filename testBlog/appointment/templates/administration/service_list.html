@@ -26,7 +26,7 @@
                         <th>{% trans 'Name' %}</th>
                         <th>{% trans 'Duration' %}</th>
                         <th>{% trans 'Price' %}</th>
-                        <th>{% trans 'Description' %}</th>
+                        <th>{% trans 'Details' %}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -36,20 +36,13 @@
                         <td>{{ service.name }}</td>
                         <td>{{ service.get_duration }}</td>
                         <td>{{ service.get_price}}</td>
-                        <td>{{ service.get_description}}</td>
                         <td>
                             <div class="buttons-container">
                                 {% if user.is_superuser %}
                                 <a href="{% url 'update_service' service_id=service.id %}"
-                                   class="modify-btn button-color-blue">
-                                    <i class="fa-solid fa-gear" style="margin-right:10px;"></i>
-
-                                </a>
-                                <br>
+                                   class="btn btn-warning">{% trans 'Edit' %}</a>
                                 <a href="{% url 'delete_service' service_id=service.id %}"
-                                   class="modify-btn button-color-red">
-                                    <i class="fas fa-trash"></i>
-                                </a>
+                                   class="btn btn-danger">{% trans 'Remove' %}</a>
                                 {% endif %}
                             </div>
                         </td>
