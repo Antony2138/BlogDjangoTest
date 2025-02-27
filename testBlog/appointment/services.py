@@ -215,6 +215,9 @@ def update_existing_appointment(data, request):
             start_time=data.get("start_time"),
             phone_number=data.get("client_phone"),
             service_id=data.get("service_id"),
+            not_come=data.get("not_come"),
+            social_link_tg=data.get("social_link_tg"),
+            social_link_vk=data.get("social_link_vk"),
             staff_member_id=staff_id,
         )
         if not appt:
@@ -232,7 +235,8 @@ def update_existing_appointment(data, request):
         return json_response(str(e.args[0]), status=400, success=False)
 
 
-def save_appointment(appt, client_name, client_email, start_time, phone_number, service_id,
+def save_appointment(appt, client_name, client_email, start_time, phone_number, service_id, not_come, social_link_tg,
+                     social_link_vk,
                      staff_member_id=None):
     """Save an appointment's details.
     :return: The modified appointment.
@@ -247,6 +251,8 @@ def save_appointment(appt, client_name, client_email, start_time, phone_number, 
     client = appt.client
     client.first_name = first_name
     client.last_name = last_name
+    client.social_link_tg = social_link_tg
+    client.social_link_vk = social_link_vk
     client.email = client_email
     client.save()
     # convert start time to a time object if it is a string
@@ -266,6 +272,7 @@ def save_appointment(appt, client_name, client_email, start_time, phone_number, 
 
     # Modify and save appointment details
     appt.phone = phone_number
+    appt.not_come = not_come
     appt.save()
     return appt
 
@@ -533,7 +540,6 @@ def handle_working_hours_form(
 
 
 def arhiv_appointment(appt):
-
     archived_appointment_request = ArchivedAppointmentRequest()
 
     for field in appt.appointment_request._meta.fields:

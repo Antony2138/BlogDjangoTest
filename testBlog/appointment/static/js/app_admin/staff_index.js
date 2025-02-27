@@ -305,6 +305,10 @@ function handleCalendarRightClick(event, date) {
 function goToEvent() {
     // Get the event URL
     const event = appointments.find(app => Number(app.id) === Number(AppState.eventIdSelected));
+    if (event.not_come) {
+        confirmDeleteAppointment(event.id);
+        return;
+    }
     if (event && event.url) {
         closeModal()
         window.location.href = event.url;
@@ -318,13 +322,12 @@ function closeModal() {
     const editButton = document.getElementById("eventEditBtn");
     const submitButton = document.getElementById("eventSubmitBtn");
     const closeButton = modal.querySelector(".btn-secondary[data-dismiss='modal']");
-    const cancelButton = document.getElementById("eventCancelBtn");
+
 
     // Reset the modal buttons to their default state
     editButton.style.display = "";
-    closeButton.style.display = "";
     submitButton.style.display = "none";
-    cancelButton.style.display = "none";
+
 
     // Reset the editing flag
     AppStateProxy.isEditingAppointment = false;
@@ -597,7 +600,6 @@ async function showCreateAppointmentModal(defaultStartTime, formattedDate) {
 
 function adjustCreateAppointmentModalButtons() {
     document.getElementById("eventSubmitBtn").style.display = "";
-    document.getElementById("eventCancelBtn").style.display = "none";
     document.getElementById("eventEditBtn").style.display = "none";
     document.getElementById("eventDeleteBtn").style.display = "none";
     document.getElementById("eventGoBtn").style.display = "none";
@@ -659,7 +661,6 @@ async function showEventModal(eventId = null, isEditMode, isCreatingMode = false
     }
     document.getElementById('eventModalBody').innerHTML = generateModalContent(appointment, servicesDropdown, isEditMode, staffDropdown);
     adjustModalButtonsVisibility(isEditMode, isCreatingMode);
-    console.log(typeof $)
     $('#eventDetailsModal').modal('show');
 
 }
@@ -701,8 +702,7 @@ function updateModalUIForEditMode(modal, isEditingAppointment) {
     const servicesDropdown = document.getElementById("serviceSelect");
     const editButton = document.getElementById("eventEditBtn");
     const submitButton = document.getElementById("eventSubmitBtn");
-    const closeButton = modal.querySelector(".btn-secondary[data-dismiss='modal']");
-    const cancelButton = document.getElementById("eventCancelBtn");
+    const closeButton = modal.querySelector(".button-container[data-dismiss='modal']");
     const deleteButton = document.getElementById("eventDeleteBtn");
     const goButton = document.getElementById("eventGoBtn");
     const endTimeLabel = modal.querySelector("label[for='endTime']");
@@ -783,7 +783,9 @@ function collectFormDataFromModal(modal) {
     }
 
     inputs.forEach(input => {
-        if (input.name !== "date") {
+        if (input.type === "checkbox") {
+            data[input.name] = input.checked; // ОТдельно обрабатывем check-box передавая true или false
+        } else if (input.name !== "date") {
             let key = input.name.replace(/([A-Z])/g, '_$1').toLowerCase();
             data[key] = input.value;
         }
