@@ -220,7 +220,7 @@ def appointment_request(request, service_id=None, staff_member_id=None):
     staff_member = None
     all_staff_members = None
     available_slots = []
-    label = '"Lacky" пилка'
+    label = '"Lucky" пилка'
     if not request.user.is_authenticated:
         messages.error(request, _("To recording you must be registered"))
         return redirect("services")
@@ -269,7 +269,7 @@ def appointment_request_submit(request):
                 messages.error(request, "Selected staff member does not exist.")
             else:
                 ar = form.save()
-                return render(request, "appointment/confirm_appt.html", {'appointment': ar})
+                return render(request, "appointment/confirm_appt.html", {'appointment_request': ar})
         else:
             # Handle the case if the form is not valid
             messages.error(

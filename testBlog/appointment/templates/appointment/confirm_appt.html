@@ -11,10 +11,10 @@
 <p class="thank-you-message">{% trans "Almost ready, please check the details" %}.</p>
 <p class="appointment-details-title">{% trans "Appointment details" %}:</p>
 <ul class="appointment-details">
-    <li>{% trans 'Service' %}: {{ appointment.get_service_name }}</li>
-    <li>{% trans 'Appointment Date' %}: {{ appointment.get_ar_date }}</li>
-    <li>{% trans 'Appointment Time' %}: {{ appointment.get_start_time }}</li>
-    <li>{% trans 'Duration' %}: {{ appointment.get_service_duration }}</li>
+    <li>{% trans 'Service' %}: {{ appointment_request.get_service_name }}</li>
+    <li>{% trans 'Appointment Date' %}: {{ appointment_request.get_ar_date }}</li>
+    <li>{% trans 'Appointment Time' %}: {{ appointment_request.get_start_time }}</li>
+    <li>{% trans 'Duration' %}: {{ appointment_request.get_service_duration }}</li>
 </ul>
 {% if messages %}
 {% for message in messages %}
@@ -25,7 +25,7 @@
 {% endif %}
 <div class="bottom">
     <button class="btn btn-warning" style="margin-right:10px">
-        <a href="{% url 'confirm_appt' appointment.id %}"> Подтвердить </a>
+        <a href="{% url 'confirm_appt' appointment_request.id %}"> Подтвердить </a>
     </button>
 </div>
 
