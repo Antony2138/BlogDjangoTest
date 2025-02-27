@@ -82,7 +82,7 @@ class StaffMember(models.Model):
         null=True,
         blank=True,
         help_text="(Количество слотов доступных для записи к данному работнику, день будет разбит на промежутки по"
-        " установленному количеству минут)",
+                  " установленному количеству минут)",
     )
     lead_time = models.TimeField(
         null=True, blank=True, help_text="Время начала рабочего дня"
@@ -274,7 +274,7 @@ class Appointment(models.Model):
         AppointmentRequest, on_delete=models.CASCADE
     )
     id_request = models.CharField(max_length=100, blank=True, null=True)
-
+    not_come = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -291,7 +291,7 @@ class Appointment(models.Model):
 
     def get_client_name(self):
         if hasattr(self.client, "get_full_name") and callable(
-            getattr(self.client, "get_full_name")
+                getattr(self.client, "get_full_name")
         ):
             name = self.client.get_full_name()
         else:
@@ -377,7 +377,7 @@ class ArchivedAppointment(models.Model):
 
     def get_client_name(self):
         if hasattr(self.client, "get_full_name") and callable(
-            getattr(self.client, "get_full_name")
+                getattr(self.client, "get_full_name")
         ):
             name = self.client.get_full_name()
         else:

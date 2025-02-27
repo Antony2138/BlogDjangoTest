@@ -375,8 +375,10 @@ def delete_appointment_ajax(request):
     if not has_permission_to_delete_appointment(request.user, appointment):
         message = _("You can only delete your own appointments.")
         return json_response(message, status=403, success=False, error_code=ErrorCode.NOT_AUTHORIZED)
+    arhiv_appointment(appointment)
     appointment.appointment_request.delete()
-    return json_response("Запись удалена")
+    appointment.delete()
+    return json_response("Запись отправлена в архив")
 
 
 @require_user_authenticated
@@ -484,10 +486,13 @@ def is_user_staff_admin(request):
         return json_response(_("User is a superuser."), custom_data={'is_staff_admin': True})
 
 
+@require_user_authenticated
+@require_staff_or_superuser
 def delete_appointment(request, appointment_id):
     appointment = get_object_or_404(Appointment, pk=appointment_id)
     arhiv_appointment(appointment)
     appointment.appointment_request.delete()
+    appointment.delete()
     return redirect('get_user_appointments')
 
 

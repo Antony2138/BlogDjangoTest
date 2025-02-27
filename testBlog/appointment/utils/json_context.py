@@ -21,7 +21,7 @@ def get_generic_context(request, admin=True):
 
 
 def json_response(
-    message=None, status=200, success=True, custom_data=None, error_code=None, **kwargs
+        message=None, status=200, success=True, custom_data=None, error_code=None, **kwargs
 ):
     """Return a generic JSON response."""
     response_data = {"message": message, "success": success}
@@ -72,9 +72,10 @@ def convert_appointment_to_json(request, appointments: list) -> list:
         "url": appt.get_absolute_url(request),
         "service_name": appt.get_service_name(),
         "client_email": appt.client.email,
-        "client_phone": str(appt.client.phone_number),
+        "client_phone": str(appt.client.phone_number) if appt.client.phone_number else "",
         "social_link_tg": appt.client.social_link_tg if tg_in_user_model() else "",
         "social_link_vk": appt.client.social_link_vk if vk_in_user_model() else "",
+        "not_come": appt.not_come,
         "service_id": appt.get_service().id,
         "staff_id": appt.appointment_request.staff_member.id,
     } for appt in appointments]
