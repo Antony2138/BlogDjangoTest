@@ -118,7 +118,7 @@
         margin-right: 10px;
     }
 
-    #serviceSelect, #staffSelect {
+    #serviceSelect, #staffSelect, #userSelect {
         width: 100%;
         padding: 8px 12px;
         border: 1px solid #ccc;
@@ -313,6 +313,7 @@
     const serviceDuration = parseInt("{{ service.duration.total_seconds }}") / 60;
     let appointments = {{ appointments|safe }};
     const fetchServiceListForStaffURL = "{% url 'fetch_service_list_for_staff' %}";
+    const fetchUserList = "{% url 'fetch_user_list'%}"
     const fetchStaffListURL = "{% url 'fetch_staff_list' %}";
     const updateApptMinInfoURL = "{% url 'update_appt_min_info' %}";
     const updateApptDateURL = "{% url 'update_appt_date_time' %}";
@@ -341,7 +342,7 @@
 <script src="{% static 'js/js-utils.js' %}"></script>
 
 <script>
-    function createCommonInputFields(appointment, servicesDropdown, isEditMode, defaultStartTime, staffDropdown) {
+    function createCommonInputFields(appointment, servicesDropdown, isEditMode, defaultStartTime, staffDropdown, userDropdown) {
         const startTimeValue = isEditMode ? moment(appointment.start_time).format('HH:mm:ss') : defaultStartTime;
         const disabledAttribute = isEditMode ? '' : 'disabled';
 
@@ -365,10 +366,10 @@
                 <label for="clientName">{% trans 'Client Name' %}:</label>
                 <input type="text" name="clientName" value="${appointment.client_name || ''}" ${disabledAttribute} id="clientName" placeholder="John Doe">
                 <label for="clientEmail">{% trans 'Client Email' %}:</label>
-                <input type="email" name="clientEmail" value="${appointment.client_email || ''}" ${disabledAttribute} id="clientEmail" placeholder="john.doe@example.com">
+                <input type="email" name="clientEmail" value="${appointment.client_email || ''}" ${disabledAttribute} id="client_email" placeholder="john.doe@example.com">
                 <span id="emailError" style="display:none;"></span>
                 <label for="clientPhone">{% trans 'Phone Number' %}:</label>
-                <input type="text" name="clientPhone" value="${appointment.client_phone || ''}" ${disabledAttribute} id="clientPhone" placeholder="+79...">
+                <input type="text" name="clientPhone" value="${appointment.client_phone || ''}" ${disabledAttribute} id="client_phone" placeholder="+79...">
             </div>
             <div class="flex-container-appt">
                 <label for="clientTg">Telegram:</label>
@@ -378,7 +379,7 @@
             </div>
             <div class="flex-container-appt">
                 <label for="startTime">{% trans 'Start time' %}:</label>
-                <input type="time" name="startTime" value="${startTimeValue}" ${disabledAttribute} id="startTime">
+                <input type="time" name="startTime" value="${startTimeValue}" ${disabledAttribute} id="start_time">
             </div>
         `;
     }
@@ -402,10 +403,38 @@
         `;
     }
 
-    function prepareCreateAppointmentModalContent(servicesDropdown, staffDropdown, defaultStartTime, formattedDate) {
-        const appointment = {client_name: '', client_email: '', client_phone: ''};
-        const commonInputs = createCommonInputFields(appointment, servicesDropdown, true, defaultStartTime, staffDropdown);
+     function createAppointmentInputFields(servicesDropdown, isEditMode, defaultStartTime, staffDropdown, userDropdown) {
+        const startTimeValue = defaultStartTime;
 
+        let superuserInputField = '';
+        if (isUserSuperUser) {
+            superuserInputField = `
+                <div class="flex-container-appt">
+                <label>{% trans 'Staff Member' %}:</label>
+                ${staffDropdown.outerHTML}
+                </div>
+            `;
+        }
+
+        return `
+            ${superuserInputField}
+            <div class="flex-container-appt">
+                <label>Услуга:</label>
+                ${servicesDropdown.outerHTML}
+            </div>
+             <div class="flex-container-appt">
+                <label>Услуга:</label>
+                ${userDropdown.outerHTML}
+            </div>
+            <div class="flex-container-appt">
+                <label for="startTime">{% trans 'Start time' %}:</label>
+                <input type="time" name="startTime" value="${startTimeValue}"  id="start_time">
+            </div>
+        `;
+    }
+
+    function prepareCreateAppointmentModalContent(servicesDropdown, staffDropdown, defaultStartTime, formattedDate, userDropdown) {
+        const commonInputs = createAppointmentInputFields(servicesDropdown, true, defaultStartTime, staffDropdown, userDropdown);
         return `
             ${commonInputs}
             <label for="date" style="display: none"></label>

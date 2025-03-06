@@ -23,7 +23,7 @@ ajax_urlpatterns = [
     path('fetch_service_list_for_staff/',
          views_admin.fetch_service_list_for_staff,
          name='fetch_service_list_for_staff'),
-
+    path('fetch_user_list/', views_admin.fetch_user_list, name="fetch_user_list"),
     path('fetch_staff_list/', views_admin.fetch_staff_list, name='fetch_staff_list'),
 
     path('update_appt_min_info/', views_admin.update_appt_min_info, name="update_appt_min_info"),

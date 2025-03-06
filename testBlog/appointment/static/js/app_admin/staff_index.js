@@ -419,6 +419,14 @@ function fetchServices(isEditMode = false) {
         .catch(error => console.error("Error fetching services: ", error));
 }
 
+function fetchUsers(isEditMode = false) {
+    let url = fetchUserList;
+    return fetch(url)
+        .then(response => response.json())
+        .then(data => data.user_list)
+        .catch(error => console.error("Error fetching users: ", error));
+}
+
 function fetchStaffMembers(isEditMode = false) {
     let url = isEditMode && AppState.eventIdSelected ? `${fetchStaffListURL}?appointmentId=${AppState.eventIdSelected}` : fetchStaffListURL;
     return fetch(url)
@@ -439,6 +447,25 @@ async function populateServices(selectedServiceId, isEditMode = false) {
         option.value = service.id;  // Accessing the id
         option.textContent = service.name;  // Accessing the name
         if (service.id === selectedServiceId) {
+            option.defaultSelected = true;
+        }
+        selectElement.appendChild(option);
+    });
+    return selectElement;
+}
+
+async function populateUsers(selectedUserId, isEditMode = false) {
+    const users = await fetchUsers(isEditMode);
+    if (!users) {
+        showErrorModal(noServiceOfferedTxt)
+    }
+    console.log(users)
+    const selectElement = document.createElement('select');
+    users.forEach(user => {
+        const option = document.createElement('option');
+        option.value = user.id;  // Accessing the id
+        option.textContent = user.name;  // Accessing the name
+        if (user.id === selectedUserId) {
             option.defaultSelected = true;
         }
         selectElement.appendChild(option);
@@ -582,6 +609,10 @@ function createNewAppointment(dateInput) {
 async function showCreateAppointmentModal(defaultStartTime, formattedDate) {
     const servicesDropdown = await populateServices(null, false);
     let staffDropdown = null;
+    let userDropdown = null;
+    userDropdown = await populateUsers(null, false)
+    userDropdown.id = "userSelect";
+    userDropdown.disabled = false;
     if (isUserSuperUser) {
         staffDropdown = await populateStaffMembers(null, false);
         staffDropdown.id = "staffSelect";
@@ -591,7 +622,7 @@ async function showCreateAppointmentModal(defaultStartTime, formattedDate) {
     servicesDropdown.id = "serviceSelect";
     servicesDropdown.disabled = false; // Enable dropdown
 
-    document.getElementById('eventModalBody').innerHTML = prepareCreateAppointmentModalContent(servicesDropdown, staffDropdown, defaultStartTime, formattedDate);
+    document.getElementById('eventModalBody').innerHTML = prepareCreateAppointmentModalContent(servicesDropdown, staffDropdown, defaultStartTime, formattedDate, userDropdown);
 
     adjustCreateAppointmentModalButtons();
     AppStateProxy.isCreating = true;
@@ -613,6 +644,7 @@ function adjustCreateAppointmentModalButtons() {
 async function getAppointmentData(eventId, isCreatingMode, defaultStartTime) {
     if (eventId && !isCreatingMode) {
         const appointment = appointments.find(app => Number(app.id) === Number(eventId));
+        console.log(appointment, "appointment")
         if (!appointment) {
             showErrorModal(apptNotFoundTxt, errorTxt);
             return null;
@@ -716,7 +748,6 @@ function updateModalUIForEditMode(modal, isEditingAppointment) {
     // Toggle visibility of UI elements
     toggleElementVisibility(editButton, !isEditingAppointment);
     toggleElementVisibility(submitButton, isEditingAppointment);
-    toggleElementVisibility(cancelButton, isEditingAppointment);
     toggleElementVisibility(deleteButton, !isEditingAppointment);
     toggleElementVisibility(closeButton, !isEditingAppointment);
     toggleElementVisibility(endTimeLabel, !isEditingAppointment);  // Show end time in view mode
@@ -738,7 +769,7 @@ async function submitChanges() {
     const modal = document.getElementById("eventDetailsModal");
     const formData = collectFormDataFromModal(modal);
 
-    if (!validateFormData(formData)) return;
+    if (!AppState.isCreating && !validateFormData(formData)) return;
 
     const response = await sendAppointmentData(formData);
     if (response.ok) {
@@ -762,6 +793,7 @@ async function submitChanges() {
 function collectFormDataFromModal(modal) {
     const inputs = modal.querySelectorAll("input");
     const serviceId = modal.querySelector("#serviceSelect").value;
+    const userId = AppState.isCreating ? modal.querySelector("#userSelect").value : null;
     let staffId = null;
 
     if (isUserSuperUser) {
@@ -775,6 +807,7 @@ function collectFormDataFromModal(modal) {
     const data = {
         isCreating: AppState.isCreating,
         service_id: serviceId,
+        user_id: userId,
         appointment_id: AppState.eventIdSelected
     };
 

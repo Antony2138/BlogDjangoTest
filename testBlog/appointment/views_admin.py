@@ -14,7 +14,8 @@ from .forms import (PersonalInformationForm, ServiceForm,
                     StaffAppointmentInformationForm, StaffMemberForm)
 from .models import (Appointment, ArchivedAppointment, DayOff, Service,
                      StaffMember, WorkingHours)
-from .services import (arhiv_appointment, fetch_user_appointments,
+from .services import (arhiv_appointment, create_new_appt_from_calender_modal,
+                       fetch_user_appointments,
                        handle_entity_management_request,
                        prepare_appointment_display_data,
                        prepare_user_profile_data, save_appt_date_time,
@@ -435,6 +436,19 @@ def fetch_staff_list(request):
 
 @require_user_authenticated
 @require_staff_or_superuser
+def fetch_user_list(request):
+    user_list = get_user_model().objects.filter(is_staff=False)
+    user_data = []
+    for user in user_list:
+        user_data.append({
+            'id': user.id,
+            'name': user.get_full_name(),
+        })
+    return json_response("Successfully fetched users.", custom_data={'user_list': user_data}, safe=False)
+
+
+@require_user_authenticated
+@require_staff_or_superuser
 @require_ajax
 @require_POST
 def update_appt_min_info(request):
@@ -443,7 +457,7 @@ def update_appt_min_info(request):
 
     if is_creating:
         # Logic for creating a new appointment
-        return print("yt yflj")
+        return create_new_appt_from_calender_modal(data, request)
     else:
         # Logic for updating an existing appointment
         return update_existing_appointment(data, request)
