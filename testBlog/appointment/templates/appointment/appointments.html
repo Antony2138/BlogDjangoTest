@@ -8,10 +8,6 @@
 {% endblock %}
 {% block body %}
 <style>
-    .container *
-    {
-        font-family: 'Calistoga', serif;
-    }
     .fc-toolbar-title{
         font-size: 25px;
     }
@@ -60,9 +56,9 @@
                         {% csrf_token %}
                         <div class="staff-members-list">
                             <label class="djangoAppt_item-name" for="staff_id"><h3>{{ label }}</h3></label>
-                            <select name="staff_member" id="staff_id">
+                            <select name="staff_member" id="staff_id" required>
                                 {% if not staff_member %}
-                                <option value="none"
+                                <option value=""
                                         selected>Выберите мастера >>>
                                 </option>
                                 {% endif %}
@@ -124,6 +120,7 @@
     const availableSlotsAjaxURL = "{% url 'available_slots_ajax' %}";
     const requestNextAvailableSlotURLTemplate = "{% url 'request_next_available_slot' service_id=0 %}";
     const getNonWorkingDaysURL = "{% url 'get_non_working_days_ajax' %}";
+    const getCalenderSettingsForStaff = "{% url 'get_calender_settings_for_staff_ajax' %}";
     const serviceId = "{{ service.id }}";
     const serviceDuration = parseInt("{{ service.duration.total_seconds }}") / 60;
     const rescheduledDate = "{{ rescheduled_date }}";

@@ -36,66 +36,67 @@
 <body>
 <div class="wrapper">
     <aside id="sidebar">
-        <div class="d-flex">
-            <button class="toggle-btn" type="button">
-                <i class="fa-solid fa-grip"></i>
-            </button>
-            <div class="sidebar-logo">
-                <a href="{% url 'home' %}">"LUCKY" ПИЛКА</a>
-            </div>
+    <div class="sidebar-container">
+        <div class="sidebar-logo">
+            <a href="{% url 'home' %}">"LUCKY" ПИЛКА</a>
         </div>
-        <ul class="sidebar-nav">
-            <li class="sidebar-item">
-                <a href="{% url 'home' %}" class="sidebar-link">
-                    <i class="fa-solid fa-house"></i>
-                    <span>Главная</span>
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="{% url 'services' %}" class="sidebar-link">
-                    <i class="fa-solid fa-paintbrush"></i>
-                    <span>Записаться</span>
-                </a>
-            </li>
-        </ul>
-
-        <div class="sidebar-footer">
-
-            {% if user.is_authenticated %}
-            {% if superuser or user.is_staff%}
-            <a href="{% url 'show_all' %}" class="sidebar-link">
-                <i class="fa-solid fa-crown"></i>
-                <span>Управление</span>
-            </a>
-            {% endif %}
-            <div class="sidebar-footer">
-                {% if user.is_staff %}
-                <a href="{% url 'user_profile'%}" class="sidebar-link">
-                    <i class="fa-solid fa-user"></i>
-                    <span>Профиль</span>
-                </a>
+        <div class="sidebar-menu">
+            <ul class="sidebar-nav">
+                <li class="sidebar-item">
+                    <a href="{% url 'home' %}" class="sidebar-link">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Главная</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{% url 'services' %}" class="sidebar-link">
+                        <i class="fa-solid fa-paintbrush"></i>
+                        <span>Записаться</span>
+                    </a>
+                </li>
+                {% if user.is_authenticated %}
+                    {% if superuser or user.is_staff %}
+                        <li class="sidebar-item">
+                            <a href="{% url 'show_all' %}" class="sidebar-link">
+                                <i class="fa-solid fa-crown"></i>
+                                <span>Управление</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                    <li class="sidebar-item">
+                        {% if user.is_staff %}
+                            <a href="{% url 'user_profile' %}" class="sidebar-link">
+                                <i class="fa-solid fa-user"></i>
+                                <span>Профиль</span>
+                            </a>
+                        {% else %}
+                            <a href="{% url 'profile' %}" class="sidebar-link">
+                                <i class="fa-solid fa-user"></i>
+                                <span>Профиль</span>
+                            </a>
+                        {% endif %}
+                    </li>
+                    <li class="sidebar-item">
+                        <form method="POST" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="logout-btn">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                                Выйти
+                            </button>
+                        </form>
+                    </li>
                 {% else %}
-                <a href="{% url 'profile' %}" class="sidebar-link">
-                    <i class="fa-solid fa-user"></i>
-                    <span>Профиль</span>
-                </a>
+                    <li class="sidebar-item">
+                        <a href="{% url 'login' %}" class="logout-btn">
+                            <i class="fa-solid fa-right-to-bracket"></i>
+                            <span>Вход</span>
+                        </a>
+                    </li>
                 {% endif %}
-                <form method="POST" action="{% url 'logout' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="out">Выйти</button>
-                </form>
-            </div>
-            {% else %}
-            <div class="sidebar-footer">
-                <a href="{% url 'login' %}" class="sidebar-link">
-                    <i class="fa-solid fa-right-to-bracket"></i>
-                    <span>Вход</span>
-                </a>
-            </div>
-            {% endif %}
-
+            </ul>
         </div>
-    </aside>
+    </div>
+</aside>
     <main class="main-content">
         {% block body %}
 

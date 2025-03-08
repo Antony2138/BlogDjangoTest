@@ -1,4 +1,5 @@
 import datetime
+from datetime import date, timedelta
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -494,3 +495,24 @@ class DayOff(models.Model):
 
     def is_owner(self, user_id):
         return self.staff_member.user.id == user_id
+
+
+class CalendarSettings(models.Model):
+    DURATION_CHOICES = [
+        (7, "1 неделя"),
+        (14, "2 недели"),
+        (21, "3 недели"),
+        (30, "1 месяц"),
+        (45, "1.5 месяца"),
+        (60, "2 месяца"),
+    ]
+    staff_member = models.OneToOneField(StaffMember, on_delete=models.PROTECT)
+    start_date = models.DateField(default=date.today)
+    duration = models.IntegerField(choices=DURATION_CHOICES, default=30)
+
+    def get_end_date(self):
+        """Вычисляет конечную дату на основе выбранной длительности"""
+        return self.start_date + timedelta(days=self.duration)
+
+    def __str__(self):
+        return f"Календарь: {self.start_date} - {self.get_end_date()}"

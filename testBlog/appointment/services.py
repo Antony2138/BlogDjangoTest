@@ -1,4 +1,5 @@
 import datetime
+from datetime import date
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -11,8 +12,8 @@ from django.utils.translation import gettext as _
 from .forms import (PersonalInformationForm, ServiceForm, StaffDaysOffForm,
                     StaffWorkingHoursForm)
 from .models import (Appointment, AppointmentRequest, ArchivedAppointment,
-                     ArchivedAppointmentRequest, Service, StaffMember,
-                     WorkingHours)
+                     ArchivedAppointmentRequest, CalendarSettings, Service,
+                     StaffMember, WorkingHours)
 from .utils.date_time import convert_str_to_time, get_ar_end_time
 from .utils.db_helpers import (calculate_slots, calculate_staff_slots,
                                day_off_exists_for_date_range,
@@ -118,6 +119,9 @@ def prepare_user_profile_data(user, staff_user_id):
     bt_help = StaffMember._meta.get_field("appointment_buffer_time")
     bt_help_text = bt_help.help_text
 
+    settings, created = CalendarSettings.objects.get_or_create(staff_member=staff_member,
+                                                               defaults={"start_date": date.today()})
+
     sd_help = StaffMember._meta.get_field("slot_duration")
     sd_help_text = sd_help.help_text
     service_msg = "Здесь вы можете добавлять/удалять предлагаемые вами услуги, изменяя этот раздел."
@@ -139,9 +143,17 @@ def prepare_user_profile_data(user, staff_user_id):
             "buffer_time_help_text": bt_help_text,
             "slot_duration_help_text": sd_help_text,
             "service_msg": service_msg,
+            "settings": settings,
         },
     }
     return data
+
+
+def check_exists_calander_settings(request):
+    staff_member = StaffMember.objects.get(id=request.user.id)
+    settings, created = CalendarSettings.objects.get_or_create(staff_member=staff_member,
+                                                               defaults={"start_date": date.today()})
+    return staff_member, settings
 
 
 def update_personal_info_service(staff_user_id, post_data, current_user):

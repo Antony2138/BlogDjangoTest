@@ -8,9 +8,21 @@ let staffId = $('#staff_id').val() || null;
 let previouslySelectedCell = null;
 let isRequestInProgress = false;
 
+let calenderStartDate = null;
+let calenderEndDate = null;
+
+const numberOfMonths = 1;
+const now = new Date();
+const after = new Date(now);
+after.setMonth(now.getMonth() + numberOfMonths);
+
 const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'dayGridMonth',
     initialDate: selectedDate,
+     validRange: {
+        start:  now,
+        end:  after
+    },
     locale: 'ru',
     firstDay: 1,
     weekNumberCalculation: 1,
@@ -80,6 +92,7 @@ function isDateBetween(date, startDate, endDate) {
 $(document).ready(function () {
     staffId = $('#staff_id').val() || null;
     calendar.render();
+    fetchCalenderSettingsForStaff(staffId);
     const currentDate = new Date().toLocaleDateString('en-CA');
     getAvailableSlots(currentDate, staffId);
 });
@@ -116,7 +129,6 @@ body.on('click', '.btn-submit-appointment', function () {
 
 
         const date = formattedDate.toISOString().slice(0, 10);
-        console.log(date)
         const endTimeDate = new Date(formattedDate.getTime() + serviceDuration * 60000);
         const endTime = formatTime(endTimeDate);
         const reasonForRescheduling = $('#reason_for_rescheduling').val();
@@ -152,6 +164,7 @@ $('#staff_id').on('change', function () {
     } else {
         currentDate = selectedDate;
     }
+    fetchCalenderSettingsForStaff(staffId);
     fetchNonWorkingDays(staffId, function (newNonWorkingDays) {
         nonWorkingDays = newNonWorkingDays;  // Update the nonWorkingDays array
         calendar.render();  // Re-render the calendar to apply changes
@@ -186,6 +199,36 @@ function fetchNonWorkingDays(staffId, callback) {
                 dayOff = data.day_off
                 calendar.render();
                 callback(data.non_working_days);
+            }
+        }
+    });
+}
+
+function fetchCalenderSettingsForStaff(staffId) {
+    if (!staffId || staffId === 'none') {
+        callback([]);
+        return;
+    }
+    let ajaxData = {
+        'staff_member': staffId,
+    };
+
+    $.ajax({
+        url: getCalenderSettingsForStaff,
+        data: ajaxData,
+        dataType: 'json',
+        success: function (data) {
+            if (data.error) {
+                console.error('Error fetching non-working days:', data.message);
+                callback([]);
+            }else {
+                calenderStartDate = data.calender_start_date;
+                calenderEndDate = data.calender_end_date
+                calendar.render();
+                calendar.setOption("validRange", {
+                                start: calenderStartDate,
+                                end: calenderEndDate
+                            });
             }
         }
     });

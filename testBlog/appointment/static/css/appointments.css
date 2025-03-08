@@ -53,3 +53,11 @@ h1 {
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+
+#staff_id {
+    background: linear-gradient(103deg, #ff7e5f, #ff4e50); /* По умолчанию красный */
+}
+
+#staff_id:valid {
+    background: linear-gradient(103deg, #42e695, #3bb78f); /* Если выбран id, цвет зелёный */
+}

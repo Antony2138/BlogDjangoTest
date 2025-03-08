@@ -10,11 +10,12 @@ from django.views.decorators.http import require_POST
 
 from .decorators import (require_ajax, require_staff_or_superuser,
                          require_superuser, require_user_authenticated)
-from .forms import (PersonalInformationForm, ServiceForm,
+from .forms import (CalendarSettingsForm, PersonalInformationForm, ServiceForm,
                     StaffAppointmentInformationForm, StaffMemberForm)
 from .models import (Appointment, ArchivedAppointment, DayOff, Service,
                      StaffMember, WorkingHours)
-from .services import (arhiv_appointment, create_new_appt_from_calender_modal,
+from .services import (arhiv_appointment, check_exists_calander_settings,
+                       create_new_appt_from_calender_modal,
                        fetch_user_appointments,
                        handle_entity_management_request,
                        prepare_appointment_display_data,
@@ -518,3 +519,22 @@ def clients_info(request):
         'appt': appt,
     }
     return render(request, 'administration/clients.html', context=context)
+
+
+@require_user_authenticated
+@require_staff_or_superuser
+def edit_calendar_settings(request):
+    staff_member, settings = check_exists_calander_settings(request)
+
+    if request.method == "POST":
+        form = CalendarSettingsForm(request.POST, instance=settings)
+        if form.is_valid():
+            form.save()
+            return redirect("edit_calendar_settings")
+    else:
+        form = CalendarSettingsForm(instance=settings)
+
+    start_date = settings.start_date
+    end_date = settings.get_end_date() if settings else None
+
+    return render(request, "administration/calendar_settings_form.html", {"form": form, "start_date": start_date, "end_date": end_date})
