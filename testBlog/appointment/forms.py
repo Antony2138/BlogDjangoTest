@@ -239,8 +239,7 @@ class StaffWorkingHoursForm(forms.ModelForm):
 class CalendarSettingsForm(forms.ModelForm):
     class Meta:
         model = CalendarSettings
-        fields = ["start_date", "duration"]
+        fields = ["duration"]
         widgets = {
-            "start_date": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
             "duration": forms.Select(attrs={"class": "form-control"}),
         }

@@ -151,8 +151,7 @@ def prepare_user_profile_data(user, staff_user_id):
 
 def check_exists_calander_settings(request):
     staff_member = StaffMember.objects.get(id=request.user.id)
-    settings, created = CalendarSettings.objects.get_or_create(staff_member=staff_member,
-                                                               defaults={"start_date": date.today()})
+    settings, created = CalendarSettings.objects.get_or_create(staff_member=staff_member)
     return staff_member, settings
 
 

@@ -1,4 +1,5 @@
 import json
+from datetime import date
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -524,7 +525,7 @@ def clients_info(request):
 @require_user_authenticated
 @require_staff_or_superuser
 def edit_calendar_settings(request):
-    staff_member, settings = check_exists_calander_settings(request)
+    _, settings = check_exists_calander_settings(request)
 
     if request.method == "POST":
         form = CalendarSettingsForm(request.POST, instance=settings)
@@ -534,7 +535,8 @@ def edit_calendar_settings(request):
     else:
         form = CalendarSettingsForm(instance=settings)
 
-    start_date = settings.start_date
+    start_date = date.today()
     end_date = settings.get_end_date() if settings else None
 
-    return render(request, "administration/calendar_settings_form.html", {"form": form, "start_date": start_date, "end_date": end_date})
+    return render(request, "administration/calendar_settings_form.html", {"form": form, "start_date": start_date,
+                                                                          "end_date": end_date})

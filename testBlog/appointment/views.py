@@ -326,8 +326,7 @@ def show_services(request):
 
 def get_calender_settings_for_staff_ajax(request):
     staff_id = request.GET.get("staff_member")
-    calender_settings, created = CalendarSettings.objects.get_or_create(staff_member=staff_id,
-                                                                        defaults={"start_date": date.today()})
+    calender_settings, created = CalendarSettings.objects.get_or_create(staff_member=staff_id)
     error = False
     message = "Successfully retrieved staff settings"
     if not staff_id or staff_id == "none":
@@ -335,7 +334,7 @@ def get_calender_settings_for_staff_ajax(request):
         error_code = ErrorCode.STAFF_ID_REQUIRED
         error = True
     else:
-        calender_start_date = calender_settings.start_date
+        calender_start_date = date.today()
         calender_end_date = calender_settings.get_end_date()
         custom_data = {"calender_start_date": calender_start_date, "calender_end_date": calender_end_date}
 

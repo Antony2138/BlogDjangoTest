@@ -506,13 +506,12 @@ class CalendarSettings(models.Model):
         (45, "1.5 месяца"),
         (60, "2 месяца"),
     ]
-    staff_member = models.OneToOneField(StaffMember, on_delete=models.PROTECT)
-    start_date = models.DateField(default=date.today)
+    staff_member = models.OneToOneField(StaffMember, on_delete=models.CASCADE)
     duration = models.IntegerField(choices=DURATION_CHOICES, default=30)
 
     def get_end_date(self):
         """Вычисляет конечную дату на основе выбранной длительности"""
-        return self.start_date + timedelta(days=self.duration)
+        return date.today() + timedelta(days=self.duration)
 
     def __str__(self):
-        return f"Календарь: {self.start_date} - {self.get_end_date()}"
+        return f"Календарь: {date.today()} - {self.get_end_date()}"
