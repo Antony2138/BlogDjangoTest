@@ -101,6 +101,15 @@
         {% block body %}
 
         {% endblock %}
+
+        <div id="chat-button">
+        {% if request.user.is_superuser %}
+            <a href="{% url 'admin_chat' %}"> <img src="{% static 'mainController/img/chat_img.png' %}" alt="Chat"></a>
+        {% else %}
+            <a href="{% url 'start_chat' %}"> <img src="{% static 'mainController/img/chat_img.png' %}" alt="Chat"></a>
+        {% endif %}
+
+        </div>
     </main>
 </div>
 

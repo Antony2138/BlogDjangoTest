@@ -144,6 +144,7 @@ def prepare_user_profile_data(user, staff_user_id):
             "slot_duration_help_text": sd_help_text,
             "service_msg": service_msg,
             "settings": settings,
+            "start_date": date.today(),
         },
     }
     return data
