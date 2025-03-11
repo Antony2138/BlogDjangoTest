@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .decorators import require_ajax
 from .forms import AppointmentRequestForm, SlotForm
-from .models import Appointment, DayOff, Service, StaffMember
+from .models import Appointment, CalendarSettings, DayOff, Service, StaffMember
 from .services import get_appointments_and_slots, get_available_slots_for_staff
 from .utils.db_helpers import (check_day_off_for_staff,
                                create_and_save_appointment,
@@ -322,3 +322,30 @@ def show_services(request):
     services = Service.objects.all()
     context = {"services": services}
     return render(request, "appointment/show_services.html", context)
+
+
+def get_calender_settings_for_staff_ajax(request):
+    staff_id = request.GET.get("staff_member")
+    calender_settings, created = CalendarSettings.objects.get_or_create(staff_member=staff_id)
+    error = False
+    message = "Successfully retrieved staff settings"
+    if not staff_id or staff_id == "none":
+        message = "No staff member selected"
+        error_code = ErrorCode.STAFF_ID_REQUIRED
+        error = True
+    else:
+        calender_start_date = date.today()
+        calender_end_date = calender_settings.get_end_date()
+        custom_data = {"calender_start_date": calender_start_date, "calender_end_date": calender_end_date}
+
+        return json_response(
+            message=message, custom_data=custom_data, success=not error
+        )
+
+    custom_data = {"error": error}
+    return json_response(
+        message=message,
+        custom_data=custom_data,
+        success=not error,
+        error_code=error_code,
+    )

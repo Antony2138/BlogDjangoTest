@@ -16,6 +16,11 @@ ajax_urlpatterns = [
         views.get_non_working_days_ajax,
         name="get_non_working_days_ajax",
     ),
+    path(
+        "request_staff_settings/",
+        views.get_calender_settings_for_staff_ajax,
+        name="get_calender_settings_for_staff_ajax",
+    ),
     path('delete_appointment/',
          views_admin.delete_appointment_ajax,
          name="delete_appointment_ajax"),
@@ -23,7 +28,7 @@ ajax_urlpatterns = [
     path('fetch_service_list_for_staff/',
          views_admin.fetch_service_list_for_staff,
          name='fetch_service_list_for_staff'),
-
+    path('fetch_user_list/', views_admin.fetch_user_list, name="fetch_user_list"),
     path('fetch_staff_list/', views_admin.fetch_staff_list, name='fetch_staff_list'),
 
     path('update_appt_min_info/', views_admin.update_appt_min_info, name="update_appt_min_info"),
@@ -123,6 +128,11 @@ admin_urlpatterns = [
         views_admin.clients_info,
         name="clients_info",
     ),
+    path(
+        "edit_calendar_settings/",
+        views_admin.edit_calendar_settings,
+        name="edit_calendar_settings",
+    )
 ]
 
 urlpatterns = [

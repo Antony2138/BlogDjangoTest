@@ -1,34 +1,35 @@
-body {
-    font-family: 'Arial', sans-serif;
+.profile-container {
+    display: flex;
+    flex-wrap: wrap;  /* Разрешаем перенос элементов */
+    justify-content: space-evenly; /* Равномерное распределение */
+    gap: 20px; /* Отступ между секциями */
+    margin: 5px auto;
+    padding: 10px;
+    max-width: 1450px; /* Опционально для центрирования */
 }
 
-.profile-container {
-    margin: 5px auto;
+.profile-section {
+    flex: 1 1 calc(50% - 20px); /* 50% ширины с учётом gap */
+    max-width: calc(50% - 20px); /* Максимальная ширина для двух колонок */
+    border: 1px solid #e0e0e0;
+    padding: 20px;
+    margin: 0 auto 30px auto;
     background-color: #fff;
-    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+    border-radius: 6px;
+}
+
+@media (max-width: 768px) {
+    .profile-section {
+        flex: 1 1 100%; /* На узких экранах 1 колонка */
+        max-width: 100%;
+    }
 }
 
 .service-container {
     margin: 5px auto;
     border-radius: 8px;
 }
-
-.main-content {
-    margin-top: 0px;
-}
-
-.profile-section {
-    border: 1px solid #e0e0e0;
-    max-width: 1000px;
-    padding: 20px;
-    margin: 0 auto 30px auto;
-    position: relative;
-    background-color: #fff;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
-    border-radius: 6px;
-    transition: all 0.3s;
-}
-
 .profile-section:hover {
     transform: translateY(-5px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
@@ -130,31 +131,6 @@ table tbody tr:hover {
         transform: translateX(0);
         opacity: 1;
     }
-}
-
-.profile-section {
-    animation: slideInFromLeft 0.6s forwards;
-}
-
-/* Staggered animation delays for each section for a sequential load-in */
-.profile-section:nth-child(1) {
-    animation-delay: 0.2s;
-}
-
-.profile-section:nth-child(2) {
-    animation-delay: 0.4s;
-}
-
-.profile-section:nth-child(3) {
-    animation-delay: 0.6s;
-}
-
-.profile-section:nth-child(4) {
-    animation-delay: 0.8s;
-}
-
-.profile-section:nth-child(5) {
-    animation-delay: 1.0s;
 }
 
 /* Consider adding this for a smoother feel when scrolling */

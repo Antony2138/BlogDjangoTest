@@ -1,0 +1,28 @@
+{% extends 'mainController/layout.html'%}
+{% load i18n %}
+{% load static %}
+{% block title %} Чат {% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+
+    <div class="card">
+        <div class="card-header bg-secondary text-black text-center">
+            <h1 class="text-center">Чат с {{ other_user.get_full_name }}</h1>
+        </div>
+        <div id="chat_container" class="card-body overflow-auto" style="height: 400px;">
+            <ul id="chat_messages" class="list-unstyled">
+                {% for message in chat_messages  %}
+                {% include 'parts/chat_message.html' %}
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="card-footer">
+            <form id="chat_message_form" method="POST">
+                    {% csrf_token%}
+                    {{ form }}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

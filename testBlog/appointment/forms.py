@@ -1,8 +1,8 @@
 from django import forms
 from django.contrib.auth import get_user_model
 
-from .models import (AppointmentRequest, DayOff, Service, StaffMember,
-                     WorkingHours)
+from .models import (AppointmentRequest, CalendarSettings, DayOff, Service,
+                     StaffMember, WorkingHours)
 from .utils.validators import not_in_the_past
 
 
@@ -234,3 +234,12 @@ class StaffWorkingHoursForm(forms.ModelForm):
     class Meta:
         model = WorkingHours
         fields = ["day_of_week", "start_time", "end_time"]
+
+
+class CalendarSettingsForm(forms.ModelForm):
+    class Meta:
+        model = CalendarSettings
+        fields = ["duration"]
+        widgets = {
+            "duration": forms.Select(attrs={"class": "form-control"}),
+        }

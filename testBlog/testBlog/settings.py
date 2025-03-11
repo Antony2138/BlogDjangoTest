@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "appointment",
     "mainController",
     "mainUser",
+    "r_t_chat",
     "crispy_forms",
     "django.contrib.admin",
     "django.contrib.auth",

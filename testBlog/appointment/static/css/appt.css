@@ -6,9 +6,7 @@
     border-radius: 5px;
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
 }
-.main-content{
-    margin-top: 20px;
-}
+
 .djangoAppt_body-container {
     margin: 0 auto;
     max-width: 1120px;
@@ -256,10 +254,6 @@ a {
     transition: background-color 0.3s;
     position: relative;
     font-size: 17px;
-}
-
-#staff_id:hover {
-    background-color: #f6c6c6;
 }
 
 #staff_id:focus {

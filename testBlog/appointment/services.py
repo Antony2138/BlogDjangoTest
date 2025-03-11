@@ -1,18 +1,19 @@
 import datetime
+from datetime import date
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from .forms import (PersonalInformationForm, ServiceForm, StaffDaysOffForm,
                     StaffWorkingHoursForm)
-from .models import (Appointment, ArchivedAppointment,
-                     ArchivedAppointmentRequest, Service, StaffMember,
-                     WorkingHours)
+from .models import (Appointment, AppointmentRequest, ArchivedAppointment,
+                     ArchivedAppointmentRequest, CalendarSettings, Service,
+                     StaffMember, WorkingHours)
 from .utils.date_time import convert_str_to_time, get_ar_end_time
 from .utils.db_helpers import (calculate_slots, calculate_staff_slots,
                                day_off_exists_for_date_range,
@@ -118,6 +119,9 @@ def prepare_user_profile_data(user, staff_user_id):
     bt_help = StaffMember._meta.get_field("appointment_buffer_time")
     bt_help_text = bt_help.help_text
 
+    settings, created = CalendarSettings.objects.get_or_create(staff_member=staff_member,
+                                                               defaults={"start_date": date.today()})
+
     sd_help = StaffMember._meta.get_field("slot_duration")
     sd_help_text = sd_help.help_text
     service_msg = "Здесь вы можете добавлять/удалять предлагаемые вами услуги, изменяя этот раздел."
@@ -139,9 +143,17 @@ def prepare_user_profile_data(user, staff_user_id):
             "buffer_time_help_text": bt_help_text,
             "slot_duration_help_text": sd_help_text,
             "service_msg": service_msg,
+            "settings": settings,
+            "start_date": date.today(),
         },
     }
     return data
+
+
+def check_exists_calander_settings(request):
+    staff_member = StaffMember.objects.get(id=request.user.id)
+    settings, created = CalendarSettings.objects.get_or_create(staff_member=staff_member)
+    return staff_member, settings
 
 
 def update_personal_info_service(staff_user_id, post_data, current_user):
@@ -204,6 +216,41 @@ def prepare_appointment_display_data(user, appointment_id):
     return appointment, page_title, None, 200
 
 
+def create_new_appt_from_calender_modal(data, request):
+    service = Service.objects.get(id=data.get("service_id"))
+    staff_id = data.get("staff_member")
+    if staff_id:
+        staff_member = StaffMember.objects.get(id=staff_id)
+    else:
+        staff_member = StaffMember.objects.get(user=request.user)
+
+    client_id = data.get("user_id")
+    date = data.get("date")
+    start_time = data.get("start_time")
+    date_object = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+    time_object = datetime.datetime.strptime(start_time, "%H:%M").time()
+    start_datetime = datetime.datetime.combine(date_object, time_object)
+
+    appointment_request = AppointmentRequest(
+        date=start_datetime.date(),
+        start_time=start_datetime.time(),
+        end_time=(start_datetime + service.duration).time(),
+        service=service,
+        staff_member=staff_member,
+    )
+    appointment_request.full_clean()  # Validates the model
+    appointment_request.save()
+
+    user = get_object_or_404(get_user_model(), pk=client_id)
+    appointment = Appointment.objects.create(
+        client=user, appointment_request=appointment_request
+    )
+    appointment.save()
+    appointment_list = convert_appointment_to_json(request, [appointment])
+
+    return json_response("Appointment created successfully.", custom_data={'appt': appointment_list})
+
+
 def update_existing_appointment(data, request):
     try:
         appt = Appointment.objects.get(id=data.get("appointment_id"))
@@ -215,6 +262,9 @@ def update_existing_appointment(data, request):
             start_time=data.get("start_time"),
             phone_number=data.get("client_phone"),
             service_id=data.get("service_id"),
+            not_come=data.get("not_come"),
+            social_link_tg=data.get("social_link_tg"),
+            social_link_vk=data.get("social_link_vk"),
             staff_member_id=staff_id,
         )
         if not appt:
@@ -232,7 +282,8 @@ def update_existing_appointment(data, request):
         return json_response(str(e.args[0]), status=400, success=False)
 
 
-def save_appointment(appt, client_name, client_email, start_time, phone_number, service_id,
+def save_appointment(appt, client_name, client_email, start_time, phone_number, service_id, not_come, social_link_tg,
+                     social_link_vk,
                      staff_member_id=None):
     """Save an appointment's details.
     :return: The modified appointment.
@@ -242,13 +293,18 @@ def save_appointment(appt, client_name, client_email, start_time, phone_number, 
         staff_member = StaffMember.objects.get(id=staff_member_id)
         if not staff_member.get_service_is_offered(service_id):
             return None
+
     # Modify and save client details
     first_name, last_name = parse_name(client_name)
     client = appt.client
     client.first_name = first_name
     client.last_name = last_name
+    client.social_link_tg = social_link_tg
+    client.social_link_vk = social_link_vk
     client.email = client_email
+    client.phone_number = phone_number
     client.save()
+
     # convert start time to a time object if it is a string
     if isinstance(start_time, str):
         start_time = convert_str_to_time(start_time)
@@ -265,7 +321,7 @@ def save_appointment(appt, client_name, client_email, start_time, phone_number, 
     appt_request.save()
 
     # Modify and save appointment details
-    appt.phone = phone_number
+    appt.not_come = not_come
     appt.save()
     return appt
 
@@ -533,7 +589,6 @@ def handle_working_hours_form(
 
 
 def arhiv_appointment(appt):
-
     archived_appointment_request = ArchivedAppointmentRequest()
 
     for field in appt.appointment_request._meta.fields:

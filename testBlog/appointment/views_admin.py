@@ -1,4 +1,5 @@
 import json
+from datetime import date
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -10,11 +11,13 @@ from django.views.decorators.http import require_POST
 
 from .decorators import (require_ajax, require_staff_or_superuser,
                          require_superuser, require_user_authenticated)
-from .forms import (PersonalInformationForm, ServiceForm,
+from .forms import (CalendarSettingsForm, PersonalInformationForm, ServiceForm,
                     StaffAppointmentInformationForm, StaffMemberForm)
 from .models import (Appointment, ArchivedAppointment, DayOff, Service,
                      StaffMember, WorkingHours)
-from .services import (arhiv_appointment, fetch_user_appointments,
+from .services import (arhiv_appointment, check_exists_calander_settings,
+                       create_new_appt_from_calender_modal,
+                       fetch_user_appointments,
                        handle_entity_management_request,
                        prepare_appointment_display_data,
                        prepare_user_profile_data, save_appt_date_time,
@@ -375,8 +378,10 @@ def delete_appointment_ajax(request):
     if not has_permission_to_delete_appointment(request.user, appointment):
         message = _("You can only delete your own appointments.")
         return json_response(message, status=403, success=False, error_code=ErrorCode.NOT_AUTHORIZED)
+    arhiv_appointment(appointment)
     appointment.appointment_request.delete()
-    return json_response("Запись удалена")
+    appointment.delete()
+    return json_response("Запись отправлена в архив")
 
 
 @require_user_authenticated
@@ -433,6 +438,19 @@ def fetch_staff_list(request):
 
 @require_user_authenticated
 @require_staff_or_superuser
+def fetch_user_list(request):
+    user_list = get_user_model().objects.filter(is_staff=False)
+    user_data = []
+    for user in user_list:
+        user_data.append({
+            'id': user.id,
+            'name': user.get_full_name(),
+        })
+    return json_response("Successfully fetched users.", custom_data={'user_list': user_data}, safe=False)
+
+
+@require_user_authenticated
+@require_staff_or_superuser
 @require_ajax
 @require_POST
 def update_appt_min_info(request):
@@ -441,7 +459,7 @@ def update_appt_min_info(request):
 
     if is_creating:
         # Logic for creating a new appointment
-        return print("yt yflj")
+        return create_new_appt_from_calender_modal(data, request)
     else:
         # Logic for updating an existing appointment
         return update_existing_appointment(data, request)
@@ -484,10 +502,13 @@ def is_user_staff_admin(request):
         return json_response(_("User is a superuser."), custom_data={'is_staff_admin': True})
 
 
+@require_user_authenticated
+@require_staff_or_superuser
 def delete_appointment(request, appointment_id):
     appointment = get_object_or_404(Appointment, pk=appointment_id)
     arhiv_appointment(appointment)
     appointment.appointment_request.delete()
+    appointment.delete()
     return redirect('get_user_appointments')
 
 
@@ -499,3 +520,23 @@ def clients_info(request):
         'appt': appt,
     }
     return render(request, 'administration/clients.html', context=context)
+
+
+@require_user_authenticated
+@require_staff_or_superuser
+def edit_calendar_settings(request):
+    _, settings = check_exists_calander_settings(request)
+
+    if request.method == "POST":
+        form = CalendarSettingsForm(request.POST, instance=settings)
+        if form.is_valid():
+            form.save()
+            return redirect("edit_calendar_settings")
+    else:
+        form = CalendarSettingsForm(instance=settings)
+
+    start_date = date.today()
+    end_date = settings.get_end_date() if settings else None
+
+    return render(request, "administration/calendar_settings_form.html", {"form": form, "start_date": start_date,
+                                                                          "end_date": end_date})

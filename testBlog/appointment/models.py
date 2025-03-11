@@ -1,4 +1,5 @@
 import datetime
+from datetime import date, timedelta
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -82,7 +83,7 @@ class StaffMember(models.Model):
         null=True,
         blank=True,
         help_text="(Количество слотов доступных для записи к данному работнику, день будет разбит на промежутки по"
-        " установленному количеству минут)",
+                  " установленному количеству минут)",
     )
     lead_time = models.TimeField(
         null=True, blank=True, help_text="Время начала рабочего дня"
@@ -189,8 +190,6 @@ class AppointmentRequest(models.Model):
         if self.start_time == self.end_time:
             raise ValidationError("Start time and end time cannot be the same")
         # date should not be in the past
-        if self.date < datetime.date.today():
-            raise ValidationError("Date cannot be in the past")
         # duration should not exceed the service duration
         return super().save(*args, **kwargs)
 
@@ -274,7 +273,7 @@ class Appointment(models.Model):
         AppointmentRequest, on_delete=models.CASCADE
     )
     id_request = models.CharField(max_length=100, blank=True, null=True)
-
+    not_come = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -291,7 +290,7 @@ class Appointment(models.Model):
 
     def get_client_name(self):
         if hasattr(self.client, "get_full_name") and callable(
-            getattr(self.client, "get_full_name")
+                getattr(self.client, "get_full_name")
         ):
             name = self.client.get_full_name()
         else:
@@ -377,7 +376,7 @@ class ArchivedAppointment(models.Model):
 
     def get_client_name(self):
         if hasattr(self.client, "get_full_name") and callable(
-            getattr(self.client, "get_full_name")
+                getattr(self.client, "get_full_name")
         ):
             name = self.client.get_full_name()
         else:
@@ -496,3 +495,23 @@ class DayOff(models.Model):
 
     def is_owner(self, user_id):
         return self.staff_member.user.id == user_id
+
+
+class CalendarSettings(models.Model):
+    DURATION_CHOICES = [
+        (7, "1 неделя"),
+        (14, "2 недели"),
+        (21, "3 недели"),
+        (30, "1 месяц"),
+        (45, "1.5 месяца"),
+        (60, "2 месяца"),
+    ]
+    staff_member = models.OneToOneField(StaffMember, on_delete=models.CASCADE)
+    duration = models.IntegerField(choices=DURATION_CHOICES, default=30)
+
+    def get_end_date(self):
+        """Вычисляет конечную дату на основе выбранной длительности"""
+        return date.today() + timedelta(days=self.duration)
+
+    def __str__(self):
+        return f"Календарь: {date.today()} - {self.get_end_date()}"
