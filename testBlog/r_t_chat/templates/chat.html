@@ -16,13 +16,31 @@
                 {% include 'parts/chat_message.html' %}
                 {% endfor %}
             </ul>
+
         </div>
         <div class="card-footer">
-            <form id="chat_message_form" method="POST">
-                    {% csrf_token%}
-                    {{ form }}
-            </form>
+        <form id="chat_message_form" class="w-full"
+                hx-ext="ws"
+                ws-connect="/ws/chat/{{ chatroom_name }}/"
+                ws-send="this">
+                {% csrf_token %}
+                {{ form }}
+        </form>
         </div>
     </div>
 </div>
+{% endblock %}
+{% block customJS %}
+<script>
+    function scrollToBottom(time=0) {
+    setTimeout(function() {
+        const container = document.getElementById('chat_container');
+        container.scrollTop = container.scrollHeight;
+    }, time);
+}
+    scrollToBottom()
+    document.getElementById("chat_message_form").addEventListener("htmx:wsAfterSend", function() {
+        this.reset();
+    });
+</script>
 {% endblock %}
