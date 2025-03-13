@@ -60,7 +60,6 @@ eggs/
 .eggs/
 lib/
 lib64/
-testBlog/r_t_chat/templates/partials/
 sdist/
 var/
 wheels/
