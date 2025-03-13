@@ -19,7 +19,7 @@ def admin_chat(request):
 
 @login_required
 def get_or_create_chatroom(request):
-    other_user = get_user_model().objects.get(is_superuser=True)
+    other_user = get_user_model().objects.filter(is_superuser=True).first()
 
     chat = ChatGroup.objects.filter(
         is_private=True,
