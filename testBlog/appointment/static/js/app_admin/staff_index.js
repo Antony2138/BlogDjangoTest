@@ -459,7 +459,7 @@ async function populateUsers(selectedUserId, isEditMode = false) {
     if (!users) {
         showErrorModal(noServiceOfferedTxt)
     }
-    console.log(users)
+
     const selectElement = document.createElement('select');
     users.forEach(user => {
         const option = document.createElement('option');
@@ -644,7 +644,6 @@ function adjustCreateAppointmentModalButtons() {
 async function getAppointmentData(eventId, isCreatingMode, defaultStartTime) {
     if (eventId && !isCreatingMode) {
         const appointment = appointments.find(app => Number(app.id) === Number(eventId));
-        console.log(appointment, "appointment")
         if (!appointment) {
             showErrorModal(apptNotFoundTxt, errorTxt);
             return null;
@@ -730,7 +729,6 @@ function toggleEditMode() {
 
 function updateModalUIForEditMode(modal, isEditingAppointment) {
     const inputs = modal.querySelectorAll("input");
-    const staffDropdown = document.getElementById("staffSelect");
     const servicesDropdown = document.getElementById("serviceSelect");
     const editButton = document.getElementById("eventEditBtn");
     const submitButton = document.getElementById("eventSubmitBtn");
@@ -739,10 +737,12 @@ function updateModalUIForEditMode(modal, isEditingAppointment) {
     const goButton = document.getElementById("eventGoBtn");
     const endTimeLabel = modal.querySelector("label[for='endTime']");
     const endTimeInput = modal.querySelector("input[name='endTime']");
-
+    if (isUserSuperUser) {
+        const staffDropdown = document.getElementById("staffSelect");
+        staffDropdown.disabled = !isEditingAppointment;
+    }
     // Toggle input and dropdown enable/disable state
     inputs.forEach(input => input.disabled = !isEditingAppointment);
-    staffDropdown.disabled = !isEditingAppointment;
     servicesDropdown.disabled = !isEditingAppointment;
 
     // Toggle visibility of UI elements

@@ -21,8 +21,7 @@ from .services import (arhiv_appointment, check_exists_calander_settings,
                        handle_entity_management_request,
                        prepare_appointment_display_data,
                        prepare_user_profile_data, save_appt_date_time,
-                       update_existing_appointment,
-                       update_personal_info_service)
+                       update_existing_appointment)
 from .utils.error_codes import ErrorCode
 from .utils.json_context import (convert_appointment_to_json,
                                  get_generic_context,
@@ -120,34 +119,26 @@ def update_personal_info(request, staff_user_id=None, response_type="html"):
         message = "Вы можете изменять только собственную персональную информацию"
         return handle_unauthorized_response(request, message, response_type)
 
+    user = get_user_model().objects.get(pk=staff_user_id) if staff_user_id else request.user
     if request.method == "POST":
-        user, is_valid, error_message = update_personal_info_service(
-            staff_user_id, request.POST, request.user
-        )
-        if is_valid:
-            return redirect("user_profile")
-        else:
-            messages.error(request, error_message)
-            return redirect("update_personal_info")
-
-    if staff_user_id:
-        user = get_user_model().objects.get(pk=staff_user_id)
+        form = PersonalInformationForm(request.POST, user=user)
+        if form.is_valid():
+            user.first_name = form.cleaned_data["first_name"]
+            user.last_name = form.cleaned_data["last_name"]
+            user.email = form.cleaned_data["email"]
+            user.save()
+            # Возвращаем обновленный фрагмент страницы
+            return render(request, "administration/personal_info_display.html", {"user": user})
     else:
-        user = request.user
+        form = PersonalInformationForm(user=user)
+    return render(request, "administration/personal_info_display.html", {"form": form, "user": user})
 
-    form = PersonalInformationForm(
-        initial={
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "email": user.email,
-        },
-        user=user,
-    )
 
-    context = get_generic_context_with_extra(
-        request=request, extra={"form": form, "btn_text": "Сохранить"}
-    )
-    return render(request, "administration/manage_staff_personal_info.html", context)
+def personal_info_display(request, staff_user_id):
+    """Возвращает только фрагмент с персональными данными (для кнопки отмены)"""
+    print(f"Загружается информация для пользователя {staff_user_id}")  # Отладка
+    user = get_user_model().objects.get(pk=staff_user_id)
+    return render(request, "administration/personal_info_display.html", {"user": user})
 
 
 @require_user_authenticated

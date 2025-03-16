@@ -34,11 +34,14 @@ CSRF_TRUSTED_ORIGINS = ['http://luckypilka.ru']
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
+    'channels',
     "appointment",
     "mainController",
     "mainUser",
     "r_t_chat",
     "crispy_forms",
+    "django_htmx",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -57,6 +60,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
 ]
 
 
@@ -78,8 +82,14 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "testBlog.wsgi.application"
+# WSGI_APPLICATION = "testBlog.wsgi.application"
+ASGI_APPLICATION = "testBlog.asgi.application"
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases

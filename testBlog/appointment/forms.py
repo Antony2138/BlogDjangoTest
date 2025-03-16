@@ -139,8 +139,13 @@ class PersonalInformationForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop("user", None)  # pop the user from the kwargs
+        self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
+
+        if self.user:
+            self.initial["first_name"] = self.user.first_name
+            self.initial["last_name"] = self.user.last_name
+            self.initial["email"] = self.user.email
 
     def clean_email(self):
         email = self.cleaned_data.get("email")

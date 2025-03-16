@@ -4,6 +4,7 @@ from datetime import date
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
@@ -119,8 +120,7 @@ def prepare_user_profile_data(user, staff_user_id):
     bt_help = StaffMember._meta.get_field("appointment_buffer_time")
     bt_help_text = bt_help.help_text
 
-    settings, created = CalendarSettings.objects.get_or_create(staff_member=staff_member,
-                                                               defaults={"start_date": date.today()})
+    settings, created = CalendarSettings.objects.get_or_create(staff_member=staff_member)
 
     sd_help = StaffMember._meta.get_field("slot_duration")
     sd_help_text = sd_help.help_text
@@ -238,6 +238,16 @@ def create_new_appt_from_calender_modal(data, request):
         service=service,
         staff_member=staff_member,
     )
+    check_exist_appointments = AppointmentRequest.objects.filter(
+        date=appointment_request.date,
+        start_time=appointment_request.start_time,
+        end_time=appointment_request.end_time,
+        service=appointment_request.service,
+        staff_member=appointment_request.staff_member,
+    )
+
+    if check_exist_appointments.exists():
+        return json_response("Такая запись уже есть", status=404, success=False)
     appointment_request.full_clean()  # Validates the model
     appointment_request.save()
 
@@ -255,6 +265,12 @@ def update_existing_appointment(data, request):
     try:
         appt = Appointment.objects.get(id=data.get("appointment_id"))
         staff_id = data.get("staff_member")
+        if not staff_id:
+            try:
+                staff_member = StaffMember.objects.get(user=request.user)
+                staff_id = staff_member.id  # ID работника
+            except StaffMember.DoesNotExist:
+                staff_id = None
         appt = save_appointment(
             appt,
             client_name=data.get("client_name"),
@@ -268,8 +284,8 @@ def update_existing_appointment(data, request):
             staff_member_id=staff_id,
         )
         if not appt:
-            return json_response("Service not offered by staff member.", status=400, success=False,
-                                 error_code=ErrorCode.SERVICE_NOT_FOUND)
+            return json_response("Конфликт с существующей записью", status=400, success=False,
+                                 error_code=ErrorCode.APPOINTMENT_CONFLICT)
         appointments_json = convert_appointment_to_json(request, [appt])[0]
         return json_response(_("Appointment updated successfully."), custom_data={'appt': appointments_json})
     except Appointment.DoesNotExist:
@@ -294,6 +310,23 @@ def save_appointment(appt, client_name, client_email, start_time, phone_number, 
         if not staff_member.get_service_is_offered(service_id):
             return None
 
+    # convert start time to a time object if it is a string
+    if isinstance(start_time, str):
+        start_time = convert_str_to_time(start_time)
+    # calculate end time from start time and service duration
+    end_time = get_ar_end_time(start_time, service.duration)
+
+    overlapping_appointments = Appointment.objects.filter(
+        appointment_request__staff_member_id=staff_member_id,
+        appointment_request__service_id=service_id,
+    ).exclude(id=appt.id).filter(
+        Q(appointment_request__start_time__lt=end_time,
+          appointment_request__end_time__gt=start_time)
+    )
+    print(overlapping_appointments)
+    if overlapping_appointments.exists():
+        return None
+
     # Modify and save client details
     first_name, last_name = parse_name(client_name)
     client = appt.client
@@ -304,12 +337,6 @@ def save_appointment(appt, client_name, client_email, start_time, phone_number, 
     client.email = client_email
     client.phone_number = phone_number
     client.save()
-
-    # convert start time to a time object if it is a string
-    if isinstance(start_time, str):
-        start_time = convert_str_to_time(start_time)
-    # calculate end time from start time and service duration
-    end_time = get_ar_end_time(start_time, service.duration)
 
     # Modify and save appointment request details
     appt_request = appt.appointment_request

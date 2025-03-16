@@ -1,12 +1,10 @@
-from django.contrib.auth import get_user_model
 from django.shortcuts import render
 
 # Create your views here.
 
 
 def index(request):
-    admin_user = get_user_model().objects.get(is_superuser=True)
-    return render(request, "mainController/index.html", context={"admin": admin_user})
+    return render(request, "mainController/index.html")
 
 
 def about(request):

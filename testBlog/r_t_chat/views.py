@@ -19,7 +19,7 @@ def admin_chat(request):
 
 @login_required
 def get_or_create_chatroom(request):
-    other_user = get_user_model().objects.get(is_superuser=True)
+    other_user = get_user_model().objects.filter(is_superuser=True).first()
 
     chat = ChatGroup.objects.filter(
         is_private=True,
@@ -47,14 +47,18 @@ def chat_view(request, chatroom_name):
     else:
         raise Http404()
 
-    if request.method == 'POST':
+    if request.htmx:
         form = ChatmessageCreateForm(request.POST)
         if form.is_valid():
             message = form.save(commit=False)
             message.author = request.user
             message.group = chat_group
             message.save()
-            return redirect("chatroom", chatroom_name)
+            context = {
+                'message': message,
+                'user': request.user
+            }
+            return render(request, "partials/chat_p.html", context)
 
     context = {
         'chat_messages': chat_messages,
