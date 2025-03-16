@@ -28,20 +28,10 @@ text-align: left;
             {% endfor %}
             {% endif %}
         </div>
-        <section class="profile-section">
-
-            <h2>Персональная информация</h2>
-            <!-- Display fields from PersonalInformationForm -->
-            <div class="section-content">
-                <p><strong>Имя:</strong> {{ user.first_name|default:user.username }}</p>
-                <p><strong>Фамилия :</strong> {{ user.last_name|default:"Не указано" }}</p>
-                <p><strong>Email:</strong> {{ user.email|default:"Не указано" }}</p>
-            </div>
-            <a href="{% url 'update_user_info' staff_member.user.id %}"
-               class="section-content-button modify-btn button-color-blue">
-                <i class="fas fa-pen"></i>
-            </a>
+        <section class="profile-section" id="personal-info">
+            {% include "administration/personal_info_display.html" %}
         </section>
+
 
         <!-- Appointment Information Section -->
         <section class="profile-section">
@@ -222,9 +212,6 @@ text-align: left;
             </div>
         </section>
     </div>
-    <a href="{% url 'edit_calendar_settings' %}" class="section-content-button modify-btn button-color-blue">
-        Редактировать
-    </a>
 
     {% include 'modal/confirm_modal.html' %}
 </section>

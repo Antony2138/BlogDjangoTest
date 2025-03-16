@@ -1,0 +1,42 @@
+{% load static %}
+<section id="personal-info">
+    {% if form %}
+    <div>
+        <h2>Редактирование персональной информации</h2>
+        <form hx-post="{% url 'update_user_info' user.id %}"
+              hx-target="#personal-info"
+              hx-swap="innerHTML">
+            {% csrf_token %}
+            <label>Имя:</label>
+            {{ form.first_name }}
+            <label>Фамилия:</label>
+            {{ form.last_name }}
+            <label>Email:</label>
+            {{ form.email }}
+            <hr>
+            <button type="submit" class="button-success btn btn-primary btn-sm">Сохранить</button>
+        </form>
+    </div>
+    {% else %}
+    <!-- Отображение персональной информации -->
+    <div>
+        <h2>Персональная информация</h2>
+        <div>
+            <p><strong>Имя:</strong> <span>{{ user.first_name|default:user.username }}</span></p>
+            <p><strong>Фамилия:</strong> <span>{{ user.last_name|default:"Не указано" }}</span></p>
+            <p><strong>Email:</strong> <span>{{ user.email|default:"Не указано" }}</span></p>
+        </div>
+        <a
+           class="section-content-button modify-btn button-color-blue"
+           hx-get="{% url 'update_user_info' staff_user_id=user.id %}"
+           hx-target="#personal-info"
+           hx-swap="innerHTML">
+            <i class="fas fa-pen"></i>
+        </a>
+    </div>
+    {% endif %}
+</section>
+
+{% block customJS %}
+<script src="{% static 'js/js-utils.js' %}"></script>
+{% endblock %}

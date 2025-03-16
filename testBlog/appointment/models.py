@@ -159,7 +159,7 @@ class AppointmentRequest(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     service = models.ForeignKey(Service, on_delete=models.PROTECT)
-    staff_member = models.ForeignKey(StaffMember, on_delete=models.SET_NULL, null=True)
+    staff_member = models.ForeignKey(StaffMember, on_delete=models.CASCADE, null=True)
     id_request = models.CharField(max_length=100, blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -236,7 +236,7 @@ class ArchivedAppointmentRequest(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
-    staff_member = models.ForeignKey(StaffMember, on_delete=models.SET_NULL, null=True)
+    staff_member = models.ForeignKey(StaffMember, on_delete=models.CASCADE, null=True)
     id_request = models.CharField(max_length=100, blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
