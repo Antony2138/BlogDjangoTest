@@ -21,12 +21,9 @@ services:
       - "443:443"
     restart: always
     volumes:
-      - ./nginx/conf-local.d/:/etc/nginx/conf.d
-      - ./certbot/www/:/var/www/certbot/:ro
+      - ./nginx/conf.d/:/etc/nginx/conf.d
       - static_volume:/app/staticfiles/
       - media_volume:/app/media/
-      - /etc/letsencrypt/live/luckypilka.ru/fullchain.pem:/etc/letsencrypt/live/luckypilka.ru/fullchain.pem
-      - /etc/letsencrypt/live/luckypilka.ru/privkey.pem:/etc/letsencrypt/live/luckypilka.ru/privkey.pem
   postgres:
     image: postgres:15
     env_file:
