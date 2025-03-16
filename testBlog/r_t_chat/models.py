@@ -1,14 +1,13 @@
 import shortuuid
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
 
 
 class ChatGroup(models.Model):
     group_name = models.CharField(max_length=128, unique=True, blank=True)
-    members = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='chat_groups', blank=True)
+    members = models.ManyToManyField(get_user_model(), related_name='chat_groups', blank=True)
     is_private = models.BooleanField(default=False)
-    user_online = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="online_in_groups", blank=True)
+    user_online = models.ManyToManyField(get_user_model(), related_name="online_in_groups", blank=True)
 
     def __str__(self):
         return self.group_name
