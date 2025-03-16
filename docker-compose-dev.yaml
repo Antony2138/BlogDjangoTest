@@ -20,3 +20,14 @@ services:
       - ./nginx/conf-local.d/:/etc/nginx/conf.d
       - ./testBlog/staticfiles/:/app/staticfiles/
       - ./testBlog/media/:/app/media/
+  postgres:
+      image: postgres:15
+      env_file:
+        - .env
+      volumes:
+        - pgdata:/var/lib/postgresql/data
+      ports:
+        - "5432:5432"
+
+volumes:
+  pgdata:

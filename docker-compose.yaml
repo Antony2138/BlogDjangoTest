@@ -24,7 +24,16 @@ services:
       - ./nginx/conf-local.d/:/etc/nginx/conf.d
       - static_volume:/app/staticfiles/
       - media_volume:/app/media/
+  postgres:
+    image: postgres:15
+    env_file:
+      - .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
 volumes:
   static_volume:
   media_volume:
+  pgdata:
