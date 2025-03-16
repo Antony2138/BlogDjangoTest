@@ -2,10 +2,12 @@ import json
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
+from django.apps import apps
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 
-from .models import ChatGroup, GroupMessage
+ChatGroup = apps.get_model('r_t_chat', 'ChatGroup')
+GroupMessage = apps.get_model('r_t_chat', 'GroupMessage')
 
 
 class ChatroomConsumer(WebsocketConsumer):
