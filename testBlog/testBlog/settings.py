@@ -29,7 +29,7 @@ DEBUG = True
 
 # Где размещается приложение
 ALLOWED_HOSTS = ["*"]
-CSRF_TRUSTED_ORIGINS = ['http://luckypilka.ru', 'https://luckypilka.ru']
+CSRF_TRUSTED_ORIGINS = ['http://luckypilka.ru']
 
 # Application definition
 

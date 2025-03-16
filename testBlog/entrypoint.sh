@@ -3,5 +3,5 @@
 set -e
 python3 manage.py migrate --no-input
 python3 manage.py collectstatic --no-input
-gunicorn testBlog.wsgi -b 0.0.0.0:8000 -w 2
+daphne -b 0.0.0.0 -p 8000 testBlog.asgi:application
 exec "$@"
