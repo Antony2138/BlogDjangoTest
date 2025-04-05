@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # Где размещается приложение
 ALLOWED_HOSTS = ["*"]
@@ -95,10 +95,10 @@ WS_URL = "wss://luckypilka.ru/ws/"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.get("POSTGRES_DB", "lucky-db"),
-        'USER': os.environ.get("POSTGRES_USER", "lucky-admin"),
-        'PASSWORD': os.environ.get("POSTGRES_PASSWORD", "7yezPcKV"),
-        'HOST': "localhost",
+        'NAME': os.environ.get("POSTGRES_DB"),
+        'USER': os.environ.get("POSTGRES_USER"),
+        'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
+        'HOST': os.environ.get("HOST", "postgres"),
         'PORT': '5432',
     }
 }
