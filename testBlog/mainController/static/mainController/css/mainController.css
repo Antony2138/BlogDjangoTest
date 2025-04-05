@@ -3,15 +3,12 @@ body {
   padding: 0;
 }
 
-.container {
-  height: 100vh; /* Занимает всю высоту экрана */
-}
 
 #sidebar {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
+    width: 100vw;
     height: 60px;
     background-color: #0e2238;
     display: flex;
@@ -19,6 +16,10 @@ body {
     justify-content: space-between;
     padding: 0 20px;
     z-index: 1000;
+}
+
+.index{
+    margin-top:60px;
 }
 
 #sidebar {
@@ -147,14 +148,19 @@ body {
   transform: scale(1.05);
 }
 
-
-
 .main-content {
-  flex: 1;
-  margin: 0 auto;
-  margin-top: 90px;
+    margin: 0 auto;
+    padding-top: 70px;
+    background-color: #0e2238;
+    min-height: 100vh;
 
+}
 
+.main-content h1,
+.main-content h2,
+.main-content h3,
+.main-content h4 {
+  color: white;
 }
 
 .icon-link{
@@ -175,17 +181,7 @@ body {
     color: #fff;
 }
 
-.login{
-    padding-top: 10%;
-    margin: 0 auto;
-    width: 25%;
-}
-.login h1{
-    text-align: center;
-}
-.text-center{
-    padding-top: 10px;
-}
+
 
 ::after,
 ::before {

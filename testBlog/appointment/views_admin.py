@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db.models import ProtectedError
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
@@ -77,7 +78,7 @@ def show_abilities(request):
 
 
 @require_user_authenticated
-@require_staff_or_superuser
+@require_superuser
 def delete_service(request, service_id):
     service = get_object_or_404(Service, pk=service_id)
     try:
@@ -91,7 +92,7 @@ def delete_service(request, service_id):
 
 
 @require_user_authenticated
-@require_staff_or_superuser
+@require_superuser
 def add_staff_member_info(request):
     if request.method == "POST":
         form = StaffMemberForm(request.POST)
@@ -515,19 +516,33 @@ def clients_info(request):
 
 @require_user_authenticated
 @require_staff_or_superuser
-def edit_calendar_settings(request):
-    _, settings = check_exists_calander_settings(request)
-
+def edit_calendar_settings(request, staff_user_id=None):
+    staff_member, settings = check_exists_calander_settings(request, staff_user_id)
+    if not staff_member:
+        response = HttpResponse(status=403)
+        return response
+    start_date = date.today()
+    end_date = settings.get_end_date() if settings else None
     if request.method == "POST":
         form = CalendarSettingsForm(request.POST, instance=settings)
         if form.is_valid():
             form.save()
-            return redirect("edit_calendar_settings")
+            return render(request, "administration/calendar_settings_form.html", {"start_date": start_date,
+                                                                          "settings": settings, "staff_member": staff_member})
     else:
         form = CalendarSettingsForm(instance=settings)
 
-    start_date = date.today()
-    end_date = settings.get_end_date() if settings else None
-
     return render(request, "administration/calendar_settings_form.html", {"form": form, "start_date": start_date,
-                                                                          "end_date": end_date})
+                                                                          "end_date": end_date, "staff_member": staff_member})
+
+
+@require_user_authenticated
+@require_superuser
+def search_users(request):
+    query = request.GET.get('search', '')
+    users = get_user_model().objects.filter(
+        first_name__icontains=query
+    ) | get_user_model().objects.filter(
+        last_name__icontains=query
+    )
+    return render(request, 'partials/user_options.html', {'users': users})

@@ -1,9 +1,28 @@
-.staff-form-wrapper{
-    margin: 0 auto;
-    width: 40%;
-    text-align: center;
+.card{
+    background-color: #ffffffc4;
 }
 
 .staff-form-wrapper small{
     color: gray;
+}
+
+.card-body span{
+    font-size: 1.15rem;
+
+}
+
+.highlight {
+    animation: highlight-animation 3s ease-out forwards;
+}
+
+@keyframes highlight-animation {
+    0% {
+        background-color: #e6e6fa; /* Лавандовый */
+    }
+    50% {
+        background-color: #d8c2ff4c; /* Пастельный голубой */
+    }
+    100% {
+        background-color: white;
+    }
 }

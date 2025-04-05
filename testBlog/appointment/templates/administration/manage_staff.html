@@ -6,43 +6,57 @@
 {% endblock %}
 
 {% block body %}
-<section class="content content-wrapper">
-    <div class="staff-form-wrapper" style="margin: 0 auto; width: 40%;">
-        <div class="staff-form-content">
-            <h3>{{ page_title }}</h3>
+<div class="d-flex justify-content-center align-items-center">
+    <div class="card shadow-lg p-4" style="width: 700px; border-radius: 20px;">
+        <div class="card-body text-center">
+            <h2 class="card-title text-black">{{ page_title }}</h2>
             <form method="post">
                 {% csrf_token %}
-                <div class="form-group">
-                    {{ form.user.label }}
-                    {{ form.user }}
-                </div>
+                {% if user.is_superuser%}
+                    <div class="form-group">
+                        <span>Поиск пользователя:</span>
+                        <input type="text" name="search" id="user_search" class="form-control"
+                               hx-get="{% url 'search_users' %}"
+                               hx-target="#id_user"
+                               hx-trigger="keyup changed delay:500ms"
+                               hx-on="htmx:beforeRequest: document.getElementById('id_user').classList.remove('highlight')"
 
+                               placeholder="Введите имя пользователя">
+                    </div>
+                    <div class="form-group">
+                        <span>Выберите пользователя:</span>
+                        <select name="user"  id="id_user" class="form-control" required
+                                hx-on="htmx:afterSwap: this.classList.add('highlight')">
+                            <option value="" disabled selected>---------</option>
+                            {% for user in users %}
+                                <option value="{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                {% endif %}
                 <div class="form-group">
-                    {{ form.services_offered.label }} <br> <br>
-                    {{ form.services_offered }}
-                    <br><small>Нажмите “Control” для выбора нескольких услуг</small>
+                    <span>{{ form.services_offered.label }}</span><br>
+                    {{ form.services_offered }}<br>
+                    <small>Нажмите “Control” для выбора нескольких услуг</small>
                 </div>
-
                 <div class="form-group">
-                    {{ form.slot_duration.label }}
+                    <span>{{ form.slot_duration.label }}</span>
                     {{ form.slot_duration }}
                     <small>{{ form.slot_duration.help_text }}</small>
                 </div>
 
-                <div class="form-group">
-                    {{ form.lead_time.label }}
-                    {{ form.lead_time }}
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="col-form-label me-3">{{ form.lead_time.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.lead_time }}
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    {{ form.finish_time.label }}
-                    {{ form.finish_time }}
-                </div>
-
-                <div class="form-group">
-                    {{ form.appointment_buffer_time.label_tag }}
-                    {{ form.appointment_buffer_time }}
-                    <small>{{ form.appointment_buffer_time.help_text }}</small>
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="col-form-label me-3">{{ form.finish_time.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.finish_time }}
+                    </div>
                 </div>
 
                 <button type="submit" class="btn btn-primary">{{btn_text}}</button>
@@ -58,5 +72,5 @@
             </div>
         </div>
     </div>
-</section>
+</div>
 {% endblock %}

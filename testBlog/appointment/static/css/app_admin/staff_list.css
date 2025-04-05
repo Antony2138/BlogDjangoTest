@@ -14,19 +14,23 @@
 
     .profile-section th,
     .profile-section td {
-        padding: 12px 15px;
+        padding: 10px 10px;
         text-align: left;
-        border-bottom: 1px solid #ddd; /* Subtle border for rows */
         font-size: 18px; /* Make the text size a bit bigger */
     }
 
+
     .profile-section th {
-        background-color: #f2f2f2; /* Light gray background for header */
+        background-color: #7c7070;
+        font-weight: bold;
+    }
+    .profile-section td {
+        background-color: #d5d5d5;
         font-weight: bold;
     }
 
     .profile-section tr:nth-child(even) {
-        background-color: #f9f9f9; /* Alternate row colors */
+        background-color: #f9f9f9;
     }
 
     .profile-section tr:hover {

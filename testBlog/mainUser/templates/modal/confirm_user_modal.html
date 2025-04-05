@@ -1,0 +1,63 @@
+<div class="modal-overlay" id="modal-{{ appointment.id }}">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Отмена записи</h5>
+        </div>
+        <div class="modal-body">
+            <p>Вы уверены, что хотите отменить запись на "{{ appointment.get_service_name }}"?</p>
+        </div>
+        <div class="modal-footer">
+            <button hx-POST="{% url 'reject_appointment' appointment.id %}"
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                    class="btn btn-danger">
+                Отменить
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="closeModal({{ appointment.id }})">Закрыть</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .modal-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1000;
+
+    }
+
+    .modal-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #ffc4c4;
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-body {
+        padding: 10px 0;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+</style>
+
+<script>
+    function closeModal(appointmentId) {
+        document.getElementById("modal-" + appointmentId).style.display = "none";
+    }
+</script>

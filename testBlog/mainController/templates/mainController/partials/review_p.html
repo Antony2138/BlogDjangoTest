@@ -1,0 +1,36 @@
+<div class="card" style="flex: 0 0 auto; width: 310px;">
+    <div class="card-body" style="background:linear-gradient(180deg, rgb(0 53 255 / 15%), rgba(255, 255, 255, 0));">
+        <h6 class="card-title d-flex justify-content-between fw-bold" style="white-space: normal;">{{ review.user.get_full_name }}
+            <span>
+                {{ review.rating }}
+                <span class="text-warning fw-bold">&#9733;</span>
+            </span>
+        </h6>
+        <p class="card-text" style="word-wrap: break-word; overflow-wrap: break-word; white-space: normal; height:50px;">
+            {{ review.text|truncatewords:8 }}
+        </p>
+        {% if review.text|wordcount > 8 %}
+            <button class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#reviewModal{{ review.id }}">
+                Показать весь отзыв
+            </button>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Модальное окно для полного отзыва -->
+<div class="modal fade" id="reviewModal{{ review.id }}" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">  <!-- Центрирование модального окна -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reviewModalLabel">Отзыв от {{ review.user.get_full_name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="word-wrap: break-word; overflow-wrap: break-word; white-space: normal;">
+                {{ review.text }}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>

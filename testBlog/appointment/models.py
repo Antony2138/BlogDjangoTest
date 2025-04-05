@@ -513,5 +513,8 @@ class CalendarSettings(models.Model):
         """Вычисляет конечную дату на основе выбранной длительности"""
         return date.today() + timedelta(days=self.duration)
 
+    def is_owner(self, user_id):
+        return self.staff_member.user.id == user_id
+
     def __str__(self):
         return f"Календарь: {date.today()} - {self.get_end_date()}"

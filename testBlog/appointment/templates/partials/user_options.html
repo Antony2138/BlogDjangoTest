@@ -1,0 +1,8 @@
+{% if not users %}
+    <option value="">Нет таких пользователей</option>
+{% else %}
+    <option value="" disabled selected>Выберите пользователя</option>
+    {% for user in users %}
+        <option value="{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</option>
+    {% endfor %}
+{% endif %}

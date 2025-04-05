@@ -1,6 +1,41 @@
 {% extends 'mainController/layout.html'%}
 {% block title %} Администрирование {% endblock %}
 {% block body %}
+
+<style>
+    .project-box {
+        width: 100%;
+        height: 250px;
+        background: #e0e0e0;
+        border-radius: 10px;
+    }
+    .info-section {
+        background: #1a1a1a;
+    }
+    .stack-icon {
+        width: 40px;
+        height: 40px;
+        background: white;
+        display: inline-block;
+        border-radius: 5px;
+    }
+    .review-dot {
+        width: 15px;
+        height: 15px;
+        background: white;
+        display: inline-block;
+        border-radius: 50%;
+    }
+    .custom{
+        background-color:#0e2238;
+    }
+    .avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 10px;
+    }
+</style>
+
 <div class="custom-wrapper">
     <div>
         <h2>Услуги</h2>
@@ -15,9 +50,11 @@
     </div>
     <div>
         <h2>Работники</h2>
+        {% if user.is_superuser%}
         <a href="{% url 'add_staff_member_info'%}" class="icon-link">
             <button class="btn btn-warning">Добавить работника </button>
         </a>
+        {% endif %}
         <a href="{% url 'get_staff_list'%}" class="icon-link">
             <button class="btn btn-warning">Список работников</button>
         </a>
@@ -29,6 +66,11 @@
             <button class="btn btn-warning">Календарь записей</button>
         </a>
     </div>
+    <div>
+        <h2>Фотографии</h2>
+        <a href="{% url 'upload_images'%}" class="icon-link">
+            <button class="btn btn-warning">Обновить фото</button>
+        </a>
+    </div>
 </div>
-
 {% endblock %}

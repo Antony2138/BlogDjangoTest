@@ -12,45 +12,17 @@
 {% endblock %}
 {% block body %}
 <div class="user-media">
-
-
     <div class="user-info">
         <h1 class="text"> {{ user.first_name }}</h1>
         <h1 class="text">{{ user.last_name }}</h1>
     </div>
 
-    <div class="media-body" style="display:flex; ">
-        <div>
-            <h2 style="text-align:center; font-size: 1.5rem;">Ваши записи</h2>
-            {% for appointment in appointments %}
-            <div style="max-width: 700px; margin-left:20px;">
-
-                <div class="appointment-card">
-                    <h4>{{ appointment.get_service_name }}</h4>
-                    <div class="appointment-details">
-                        <div class="appointment-detail hover-element">
-                            <i class="fas fa-calendar-alt"></i>
-                            <strong>Дата:</strong> {{ appointment.get_appointment_date|date:"F d, Y " }}
-                        </div>
-                        <div class="appointment-detail hover-element">
-                            <i class="fas fa-clock"></i>
-                            <strong>Начало приёма:</strong> {{ appointment.get_start_time|time:"H:i" }}
-                        </div>
-                        <div class="appointment-detail hover-element">
-                            <i class="fas fa-hands-helping"></i>
-                            <strong>Услуга:</strong> {{ appointment.get_service_name }}
-                        </div>
-                        <div class="appointment-detail hover-element">
-                            <i class="fas fa-clock"></i>
-                            <strong>Конец приема:</strong> {{ appointment.get_end_time|time:"H:i"}}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% empty %}
-            <h2 style="margin-left:20px;">Записей не найдено</h2>
-            <hr>
-            {% endfor %}
+    <div>
+        <h2 style="text-align:center; font-size: 1.5rem;">Ваши записи</h2>
+        <div id="appointments-container"
+            hx-trigger="load, delete-appt from:body"
+            hx-get="{% url 'get_clients_appointments' %}"
+        >
         </div>
     </div>
 </div>

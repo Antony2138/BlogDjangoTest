@@ -2,53 +2,99 @@
 {% load static %}
 {% block title %} "LUCKY" ПИЛКА {% endblock %}
 
+{% block customCSS %}
+<link rel="stylesheet" href="{%static '/mainController/css/index.css'%}">
+
+{% endblock %}
+
+
 {% block body %}
 
-<div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-body-tertiary">
-    <div class="col-md-6 p-lg-5 mx-auto my-5">
-        <h1 class="display-3 fw-bold" style="letter-spacing: 5px;"> "LUCKY" ПИЛКА </h1>
-        <h2 class="fw-normal text-muted mb-3" style="font-size: 1.8rem">Сервис для записи на маникюр</h2>
-        <div class="d-flex gap-3 justify-content-center lead fw-normal">
-            <a class="icon-link" href="{% url 'services'%}">
-                <button class="btn btn-warning"> Записаться</button>
-            </a>
+{% if carousel %}
+<div class="slider">
+    <div class="position-absolute text-center">
+        <div class="col-md-6 p-lg-5 mx-auto my-5">
+            <h1 class="display-3 fw-bold text-white" style="letter-spacing: 5px;"> "LUCKY" ПИЛКА </h1>
+            <h2 class="fw-normal text-white mb-3" style="font-size: 1.8rem">Сервис для записи на маникюр</h2>
+            <div class="d-flex gap-3 justify-content-center lead fw-normal">
+                <a class="icon-link" href="{% url 'services'%}">
+                    <button class="btn btn-warning btn-lg"> Записаться</button>
+                </a>
+            </div>
         </div>
     </div>
-    <div class="product-device shadow-sm d-none d-md-block"></div>
-    <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
+    <div class="slide-track">
+        {% for image in carousel %}
+        <div class="slide">
+            <img src="{{image.get_image_url}}" height="600" width="450" alt=""/>
+        </div>
+        {% endfor %}
+        {% for image in carousel %}
+        <div class="slide">
+            <img src="{{ image.get_image_url }}" height="600" width="450" alt=""/>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+    <div class="d-flex text-center">
+        <div class="col-md-6 p-lg-3 mx-auto my-5">
+            <h1 class="display-3 fw-bold text-white" style="letter-spacing: 5px;"> "LUCKY" ПИЛКА </h1>
+            <h2 class="fw-normal text-white mb-3" style="font-size: 1.8rem">Сервис для записи на маникюр</h2>
+            <div class="d-flex gap-3 justify-content-center lead fw-normal">
+                <a class="icon-link" href="{% url 'services'%}">
+                    <button class="btn btn-warning btn-lg"> Записаться</button>
+                </a>
+            </div>
+        </div>
+    </div>
+{% endif %}
+<div class="container mt-4">
+    <div id="review-container"
+         hx-trigger="load, add-review from:body"
+         hx-get="{% url 'update_reviews' %}"
+         hx-swap="innerHTML"
+
+    ></div>
+    {% if user.is_authenticated %}
+    <div class="d-flex justify-content-center">
+        <form id="review-form"
+              hx-post="{% url 'submit_review' %}"
+              hx-on="htmx:afterRequest:this.reset()"
+              class="w-100"
+              style="max-width: 700px;">
+            {% csrf_token %}
+            <div class="card mt-5 mb-3 shadow-lg">
+                <div class="card-body">
+                    <h5 class="card-title">{{ request.user.get_full_name }}</h5>
+                    <p class="card-text mb-1">{{ review_form.text }}</p>
+                    <div class="text-warning fs-7">
+                        <div class="star-rating">
+                            <input type="radio" id="star5" name="rating" value="5" required>
+                            <label for="star5">&#9733;</label>
+                            <input type="radio" id="star4" name="rating" value="4" required>
+                            <label for="star4">&#9733;</label>
+                            <input type="radio" id="star3" name="rating" value="3" required>
+                            <label for="star3">&#9733;</label>
+                            <input type="radio" id="star2" name="rating" value="2" required>
+                            <label for="star2">&#9733;</label>
+                            <input type="radio" id="star1" name="rating" value="1" required>
+                            <label for="star1">&#9733;</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Оставить отзыв</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% else %}
+    <span class="d-block mt-4 pb-4 text-white" style="font-size:25px;">Зарегистрируйтесь для того чтобы оставить отзыв.</span>
+    {% endif %}
 </div>
 
-    <div class="container mt-5">
-        <h2 class="mb-4">Отзывы пользователей</h2>
 
-        <div class="card mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Иван Иванов</h5>
-                <p class="card-text">Отличный сервис! Всё понравилось.</p>
-                <div class="text-warning">
-                    &#9733;&#9733;&#9733;&#9733;&#9733;
-                </div>
-            </div>
-        </div>
-
-        <div class="card mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Мария Петрова</h5>
-                <p class="card-text">Хорошее качество, но доставка была долгой.</p>
-                <div class="text-warning">
-                    &#9733;&#9733;&#9733;&#9733;&#9734;
-                </div>
-            </div>
-        </div>
-
-        <div class="card mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Алексей Смирнов</h5>
-                <p class="card-text">Средний опыт, ожидал лучшего.</p>
-                <div class="text-warning">
-                    &#9733;&#9733;&#9733;&#9734;&#9734;
-                </div>
-            </div>
-        </div>
-    </div>
+<script>
+    const carouselLength = {{ carousel|length }};
+    document.documentElement.style.setProperty('--carousel-length', carouselLength);
+</script>
 {% endblock %}

@@ -1,0 +1,107 @@
+<style>
+    #prevButton, #nextButton {
+    position: absolute;
+    background-color:#0e223847;
+    color:white;
+    top: 35%;
+    width: 44px;
+    z-index: 100;
+    border-radius: 50%;
+    border-color: white;
+    }
+    #prevButton{
+        left: -5%;
+    }
+
+    #nextButton{
+        right: -5%;
+    }
+    #nextButton:hover {
+       background-color:darkgray;
+    }
+    #prevButton:hover {
+       background-color:darkgray;
+    }
+    .card-body{
+        background-color:#ffffffc4;
+    }
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateX(-50px) scale(0.6);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0px) scale(1);
+        }
+    }
+    .new-review {
+        animation: fadeIn 1s ease-out forwards;
+    }
+</style>
+
+<div class="d-flex flex-column">
+    <div class="d-flex gap-3 justify-content-start align-items-center">
+        <h2 class="mb-3">Отзывы пользователей</h2>
+        <span class="badge bg-warning fs-5 mb-3"></span>
+    </div>
+
+    <div style="position: relative;">
+        <div id="reviews-container" class="d-flex flex-row gap-3"
+             style="overflow-x: hidden;  scroll-behavior: smooth; position: relative;">
+            {% for review in reviews %}
+                {% include "mainController/partials/review_p.html" %}
+            {% empty %}
+                <p>Пока нет отзывов.</p>
+            {% endfor %}
+        </div>
+        {% if reviews|length >= 5 %}
+            <button id="prevButton" class="btn fs-5"><</button>
+            <button id="nextButton" class="btn fs-5">></button>
+        {% endif %}
+    </div>
+</div>
+<script>
+    function initializeReviewScroll() {
+        const container = document.getElementById("reviews-container");
+        const prevButton = document.getElementById("prevButton");
+        const nextButton = document.getElementById("nextButton");
+
+        if (!container || !prevButton || !nextButton) return;
+
+        // Добавляем новые обработчики
+        prevButton.addEventListener("click", scrollLeft);
+        nextButton.addEventListener("click", scrollRight);
+        container.addEventListener("wheel", scrollWithMouse);
+    }
+
+    function scrollLeft() {
+        document.getElementById("reviews-container").scrollLeft -= 326;
+    }
+
+    function scrollRight() {
+        document.getElementById("reviews-container").scrollLeft += 326;
+    }
+
+    function scrollWithMouse(e) {
+        const container = document.getElementById("reviews-container");
+        if (e.deltaY > 0) {
+            container.scrollLeft += 326;
+        } else {
+            container.scrollLeft -= 326;
+        }
+        e.preventDefault();
+    }
+
+
+    document.addEventListener("DOMContentLoaded", initializeReviewScroll());
+
+    document.body.addEventListener("htmx:afterSwap", function (event) {
+        if (event.target.id === "review-container") {
+            let newReview = event.target.querySelector(".card:first-of-type");
+            if (newReview) {
+                newReview.classList.add("new-review");
+            }
+        }
+    });
+</script>

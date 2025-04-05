@@ -6,7 +6,7 @@ from . import views
 urlpatterns = [
     path(
         "login/",
-        auth_views.LoginView.as_view(template_name="mainUser/login.html"),
+        views.user_login,
         name="login",
     ),
     path(
@@ -14,6 +14,10 @@ urlpatterns = [
         auth_views.LogoutView.as_view(template_name="mainUser/logout.html"),
         name="logout",
     ),
-    path("registration/", views.registration, name="registration"),
     path("profile/", views.profile, name="profile"),
+    path("reject_appointment/<int:appointment_id>", views.reject_appointment, name="reject_appointment"),
+
+    # htmx_get
+    path('get_clients_appointments/', views.get_clients_appointments, name='get_clients_appointments'),
+
 ]

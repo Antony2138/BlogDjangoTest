@@ -1,8 +1,10 @@
 from django import forms
+from django.contrib.auth import authenticate
+from django.core.exceptions import ValidationError
 
 
 class UserRegisterForm(forms.Form):
-    username = forms.CharField(
+    usernamer = forms.CharField(
         label="Логин",
         widget=forms.TextInput(
             attrs={"class": "form-control", "placeholder": "Ваш логин"}
@@ -26,7 +28,7 @@ class UserRegisterForm(forms.Form):
             attrs={"class": "form-control", "placeholder": "Электронная почта"}
         )
     )
-    password = forms.CharField(
+    password1 = forms.CharField(
         label="Пароль",
         widget=forms.PasswordInput(
             attrs={"class": "form-control", "placeholder": "Введите пароль"}
@@ -38,37 +40,28 @@ class UserRegisterForm(forms.Form):
             attrs={"class": "form-control", "placeholder": "Повторите пароль"}
         )
     )
-    social_link_tg = forms.CharField(
-        label="Telegram",
-        required=False,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "Ссылка на Telegram"}
-        )
-    )
-    social_link_vk = forms.CharField(
-        label="VK",
-        required=False,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "Ссылка на VK"}
-        )
-    )
-    phone_number = forms.CharField(
-        label="Номер телефона",
-        widget=forms.NumberInput(
-            attrs={"class": "form-control", "placeholder": "Номер телефона"}
-        )
-    )
 
     def clean(self):
         cleaned_data = super().clean()
-        social_link_tg = cleaned_data.get("social_link_tg")
-        social_link_vk = cleaned_data.get("social_link_vk")
-        pswd = cleaned_data.get("password")
+        pswd = cleaned_data.get("password1")
         pswd2 = cleaned_data.get("password2")
 
-        if not social_link_tg and not social_link_vk:
-            self.add_error('social_link_vk', 'Укажите верно хотя бы одно: Telegram или VK.')
-            self.add_error('social_link_tg', 'Укажите верно хотя бы одно: Telegram или VK.')
         if pswd2 != pswd:
             self.add_error('password2', 'Введенный пароль не совпадает')
+        return cleaned_data
+
+
+class LoginForm(forms.Form):
+    username = forms.CharField(max_length=150, required=True)
+    password = forms.CharField(widget=forms.PasswordInput, required=True)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        username = cleaned_data.get("username")
+        password = cleaned_data.get("password")
+
+        if username and password:
+            user = authenticate(username=username, password=password)
+            if user is None:
+                raise ValidationError("Неверный логин или пароль.")
         return cleaned_data

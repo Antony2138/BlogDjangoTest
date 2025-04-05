@@ -1,40 +1,34 @@
-{% extends 'mainController/layout.html'%}
 {% load static %}
-{% block title %} Календарь {% endblock %}
-{% block body %}
-<div class="container mt-4">
-    <h2>Настройки отображаемого диапазона календаря</h2>
-    <form method="post" class="card p-4 shadow">
-        {% csrf_token %}
-        <p><strong>Дата начала:</strong> <span id="start_date">{{ start_date }}</span></p>
-        <div class="mb-3">
-            <label class="form-label">Длительность:</label>
-            {{ form.duration }}
+<div id="calendar-info" style="">
+        {% if form %}
+    <div style="background-color: #ffffff00;">
+        <h2>Настройки отображаемого диапазона календаря</h2>
+        <form hx-post="{% url 'edit_calendar_settings' staff_member.id %}" class=""
+              hx-swap="outerHTML"
+              hx-target="#calendar-info">
+            {% csrf_token %}
+            <p><strong>Дата начала:</strong> <span id="start_date">{{ start_date }}</span></p>
+            <div class="mb-3">
+                <label class="form-label">Длительность:</label>
+                {{ form.duration }}
+            </div>
+            <button type="submit" class="btn btn-success">Сохранить</button>
+        </form>
+    </div>
+        {% else %}
+    <div style="background-color: #ffffff00;">
+        <h2>Настройка календаря</h2>
+        <a hx-get="{% url 'edit_calendar_settings' staff_member.id %}"
+           hx-swap="outerHTML"
+           hx-target="#calendar-info"
+           class="section-content-button modify-btn button-color-green">
+            <i class="fa-solid fa-gear"></i>
+        </a>
+        <div class="section-content">
+            <p><strong>Начальная дата:</strong> {{ start_date }}</p>
+            <p><strong>Период(в днях):</strong> {{ settings.duration }} </p>
+            <p><strong>Конечная дата:</strong> {{ settings.get_end_date }}</p>
         </div>
-        <p><strong>Дата окончания:</strong> <span id="end_date">{{ end_date }}</span></p>
-        <button type="submit" class="btn btn-success">Сохранить</button>
-    </form>
+    </div>
+        {% endif %}
 </div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const startDateInput = document.querySelector("#id_start_date");
-        console.log(startDateInput, "startDateInput")
-        const durationSelect = document.querySelector("#id_duration");
-        const endDateSpan = document.querySelector("#end_date");
-
-        function updateEndDate() {
-            const startDate = new Date(startDateInput.value);
-            const duration = parseInt(durationSelect.value, 10);
-            const options = { day: "numeric", month: "long", year: "numeric" };
-            if (!isNaN(startDate.getTime()) && duration) {
-                startDate.setDate(startDate.getDate() + duration);
-                endDateSpan.textContent = startDate.toLocaleDateString("ru-RU", options); // Формат YYYY-MM-DD
-            }
-        }
-
-        startDateInput.addEventListener("change", updateEndDate);
-        durationSelect.addEventListener("change", updateEndDate);
-    });
-</script>
-{% endblock %}

@@ -8,6 +8,8 @@ services:
       - "8000:8000"
     env_file:
       - .env
+    volumes:
+      - ./testBlog:/app
   nginx:
     container_name: nginx-web
     image: nginx:alpine

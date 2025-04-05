@@ -1,0 +1,131 @@
+
+.star-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    font-size: 2rem;
+    cursor: pointer;
+}
+
+.star-rating input {
+    display: none;
+}
+
+.star-rating label {
+    color: #958080d9;
+    transition: color 0.2s;
+}
+
+.star-rating input:checked ~ label,
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: gold;
+}
+
+#review-container{
+   width: 1300px;
+}
+
+.container{
+    height: auto;
+}
+
+
+/* Скорость анимации */
+:root {
+    --animation-speed: 40s;
+    --carousel-length: 6; /* Количество изображений в карусели */
+}
+
+/* Основной стиль для карусели */
+.slider {
+    background: white;
+    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, .125);
+    height: 600px;
+    margin: auto;
+    overflow: hidden;
+    position: relative;
+    width: 1800px; /* Адаптивная ширина */
+    display: flex; /* Размещаем элементы по горизонтали */
+    align-items: center;
+    justify-content: center;
+}
+
+.slider::before,
+.slider::after {
+    content: "";
+    height: 600px;
+    position: absolute;
+    width: 450px;
+    z-index: 2;
+    background: linear-gradient(to right, rgba(14, 34, 56, 0.8) 0%, rgba(14, 34, 56, 0) 100%); /* Градиент от белого к прозрачному */
+}
+
+.slider::after {
+    right: 0;
+    top: 0;
+    transform: rotateZ(180deg); /* Инвертируем градиент справа */
+}
+
+.slider::before {
+    left: 0;
+    top: 0;
+}
+
+/* Контейнер для слайдов */
+.slide-track {
+    display: flex; /* Выстраиваем слайды по горизонтали */
+    width: calc(450px * var(--carousel-length)); /* Ширина всех слайдов */
+    animation: scroll var(--animation-speed) linear infinite; /* Запуск анимации */
+}
+
+/* Стиль для каждого слайда */
+.slide {
+    height: 600px;
+    width: 450px;
+    flex-shrink: 0; /* Слайды не должны сжиматься */
+}
+
+/* Анимация движения слайдов */
+@keyframes scroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(calc(-450px * var(--carousel-length))); /* Смещаем на длину всех слайдов */
+    }
+}
+
+
+
+
+
+
+
+.hero-section {
+    position: relative; /* Высота блока для того, чтобы текст был по центру */
+    background-color: rgba(0, 0, 0, 0.5); /* Полупрозрачный фон */
+}
+
+.position-absolute {
+    position: absolute;
+    top: 50%; /* Центрируем по вертикали */
+    left: 50%; /* Центрируем по горизонтали */
+    transform: translate(-50%, -50%); /* Смещаем элемент на половину его размера */
+    z-index: 10; /* Устанавливаем на передний план */
+    width: 100%; /* Блок занимает всю ширину родителя */
+}
+
+/* Стили для заголовков */
+h1.display-3.fw-bold {
+    color: white;
+    font-weight: bold;
+    letter-spacing: 5px;
+}
+
+/* Карусель */
+.slider {
+    position: relative;
+    top: 0; /* Карусель идет после блока с текстом */
+    z-index: 1; /* Карусель должна быть ниже */
+}

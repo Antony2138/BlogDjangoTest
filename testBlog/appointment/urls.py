@@ -129,10 +129,11 @@ admin_urlpatterns = [
         name="clients_info",
     ),
     path(
-        "edit_calendar_settings/",
+        "edit_calendar_settings/<int:staff_user_id>",
         views_admin.edit_calendar_settings,
         name="edit_calendar_settings",
-    )
+    ),
+    path('search-users/', views_admin.search_users, name='search_users'),
 ]
 
 urlpatterns = [

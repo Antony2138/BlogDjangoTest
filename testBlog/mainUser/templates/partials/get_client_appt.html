@@ -1,0 +1,37 @@
+{% for appointment in appointments %}
+<div id="appointment-{{ appointment.id }}" style="max-width: 550px;" >
+    <div class="appointment-card bg-light" >
+        <h4 class="text-black">{{ appointment.get_service_name }}</h4>
+        <div id="modal-container-{{ appointment.id }}"></div>
+        <div class="appointment-details">
+            <div class="appointment-detail hover-element">
+                <i class="fas fa-calendar-alt"></i>
+                <strong>Дата:</strong> {{ appointment.get_appointment_date|date:"F d, Y " }}
+            </div>
+            <div class="appointment-detail hover-element">
+                <i class="fas fa-clock"></i>
+                <strong>Начало приёма:</strong> {{ appointment.get_start_time|time:"H:i" }}
+            </div>
+            <div class="appointment-detail hover-element">
+                <i class="fas fa-hands-helping"></i>
+                <strong>Услуга:</strong> {{ appointment.get_service_name }}
+            </div>
+            <div class="appointment-detail hover-element">
+                <i class="fas fa-clock"></i>
+                <strong>Конец приема:</strong> {{ appointment.get_end_time|time:"H:i"}}
+            </div>
+        </div>
+        <button hx-get="{% url 'reject_appointment' appointment.id%}"
+                hx-target="#modal-container-{{ appointment.id }}"
+                hx-trigger="click"
+                hx-swap="innerHTML"
+                class="btn btn-danger">
+            Отменить запись
+        </button>
+    </div>
+</div>
+
+{% empty %}
+<h2>Записей не найдено</h2>
+<hr>
+{% endfor %}

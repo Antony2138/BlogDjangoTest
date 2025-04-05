@@ -180,7 +180,7 @@ class StaffAppointmentInformationForm(forms.ModelForm):
                                        " с начала рабочего времени:",
         }
         widgets = {
-            "service_offered": forms.Select(attrs={"class": "form-control"}),
+            "service_offered": forms.Select(attrs={"class": "form-select shadow-sm rounded"}),
             "slot_duration": forms.NumberInput(
                 attrs={
                     "class": "form-control",

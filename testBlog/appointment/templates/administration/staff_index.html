@@ -21,6 +21,9 @@
     .fc-daygrid-day-top{
         font-size: 15px;
     }
+    .fc .fc-timegrid-slot-minor {
+        border-top-style: solid !important;
+    }
     /* Mobile Styles */
     @media (max-width: 767px) {
         body {
@@ -219,6 +222,10 @@
         display: inline-block;
         margin: 2px;
     }
+    .fc-list-event{
+        background-color: #7d8abb;
+    }
+
 
     /* Hide event list container on larger screens */
     @media (min-width: 768px) {
@@ -255,6 +262,9 @@
         /* pointer hand cursor */
         cursor: pointer;
     }
+    .fc .fc-list-event:hover td {
+        background-color: #e1d2dba3;!important
+    }
 </style>
 {% endblock %}
 {% block description %}
@@ -262,7 +272,7 @@
 {% endblock %}
 {% block body %}
 <section class="content content-wrapper">
-    <div class="container">
+    <div class="container pb-3">
         <div class="calendar-wrapper">
             <div id="calendar" class="calendarbox"></div>
             <div id="event-list-container" class="event-list-container"></div>
@@ -271,7 +281,7 @@
         {% include 'modal/event_details_modal.html' %}
         {% include 'modal/error_modal.html' %}
 
-        <div class="messages" style="margin: 20px 0">
+        <div class="messages">
             {% if messages %}
             {% for message in messages %}
             <div class="alert alert-dismissible {% if message.tags %}alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}danger{% else %}{{ message.tags }}{% endif %}{% endif %}"

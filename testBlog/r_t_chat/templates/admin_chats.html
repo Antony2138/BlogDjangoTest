@@ -8,7 +8,9 @@
             {% for member in chat.members.all %}
                 {% if member != user %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <a href="{% url 'chatroom' chat.group_name %}">{{ member.get_full_name }}</a>
+                        <a href="{% url 'chatroom' chat.group_name %}" style="font-size: larger;">
+                            {{ member.get_full_name }}
+                        </a>
                     </li>
                     {% endif %}
             {% endfor %}

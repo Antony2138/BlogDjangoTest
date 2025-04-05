@@ -6,6 +6,15 @@
     border-radius: 5px;
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
 }
+.djangoAppt_main-container h1,
+.djangoAppt_main-container h2,
+.djangoAppt_main-container h3,
+.djangoAppt_main-container h4,
+.djangoAppt_main-container h5,
+.djangoAppt_main-container h6 {
+    color: black;
+
+}
 
 .djangoAppt_body-container {
     margin: 0 auto;
@@ -97,9 +106,23 @@
     height: 20px;
 }
 
-a {
-    color: #0c042c;
+calendar-wrapper a{
+   color: black;
 }
+
+
+.fc-scrollgrid-shrink-cushion{
+    color: white;
+}
+
+.fc-daygrid-day-number{
+    color: white;
+}
+
+.djangoAppt_calendar-and-slot a{
+    color:black;
+}
+
 
 .djangoAppt_slot {
     margin-left: 20px;

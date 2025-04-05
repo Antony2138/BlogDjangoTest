@@ -150,8 +150,16 @@ def prepare_user_profile_data(user, staff_user_id):
     return data
 
 
-def check_exists_calander_settings(request):
-    staff_member = StaffMember.objects.get(id=request.user.id)
+def check_exists_calander_settings(request, staff_user_id):
+    if request.user.is_superuser:
+        staff_member = StaffMember.objects.get(id=staff_user_id)
+    elif request.user.staffmember.id == staff_user_id:
+        staff_member = StaffMember.objects.get(id=request.user.staffmember.id)
+    else:
+        staff_member = None
+        settings = None
+        return staff_member, settings
+
     settings, created = CalendarSettings.objects.get_or_create(staff_member=staff_member)
     return staff_member, settings
 

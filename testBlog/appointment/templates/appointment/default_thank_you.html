@@ -11,15 +11,17 @@
 {{ page_description }}
 {% endblock %}
 {% block body %}
-<h1 class="thank-you-title">{% trans "See you soon" %} !</h1>
-<p class="thank-you-message">{% trans "We have successfully scheduled your appointment!" %}.</p>
-<p class="appointment-details-title">{% trans "Appointment details" %}:</p>
-<ul class="appointment-details">
-    <li>{% trans 'Service' %}: {{ appointment.get_service_name }}</li>
-    <li>{% trans 'Appointment Date' %}: {{ appointment.get_appointment_date }}</li>
-    <li>{% trans 'Appointment Time' %}: {{ appointment.get_start_time }}</li>
-    <li>{% trans 'Duration' %}: {{ appointment.get_service_duration }}</li>
-</ul>
+<div class="card">
+    <h1 class="thank-you-title text-black">{% trans "See you soon" %} !</h1>
+    <p class="thank-you-message">{% trans "We have successfully scheduled your appointment!" %}.</p>
+    <p class="appointment-details-title">{% trans "Appointment details" %}:</p>
+    <ul class="appointment-details">
+        <li>{% trans 'Service' %}: {{ appointment.get_service_name }}</li>
+        <li>{% trans 'Appointment Date' %}: {{ appointment.get_appointment_date }}</li>
+        <li>{% trans 'Appointment Time' %}: {{ appointment.get_start_time }}</li>
+        <li>{% trans 'Duration' %}: {{ appointment.get_service_duration }}</li>
+    </ul>
+</div>
 {% if messages %}
 {% for message in messages %}
 <div class="alert alert-dismissible {% if message.tags %}alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}danger{% else %}{{ message.tags }}{% endif %}{% endif %}"

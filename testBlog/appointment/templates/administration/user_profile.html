@@ -17,7 +17,7 @@ text-align: left;
 {% endblock %}
 
 {% block body %}
-<section class="content content-wrapper">
+<div class="content content-wrapper">
     <div class="profile-container">
         <div class="messages" style="padding: 20px 0">
             {% if messages %}
@@ -28,14 +28,14 @@ text-align: left;
             {% endfor %}
             {% endif %}
         </div>
-        <section class="profile-section" id="personal-info">
+        <section class="profile-section">
             {% include "administration/personal_info_display.html" %}
         </section>
 
 
         <!-- Appointment Information Section -->
         <section class="profile-section">
-            <h2>Ииформация о приеме</h2>
+            <h2>Информация о приеме</h2>
             <small>
                 {{ service_msg }}
             </small>
@@ -48,10 +48,6 @@ text-align: left;
                 </p>
                 <p><strong>Время начала работы:</strong> {{ staff_member.get_lead_time }}</p>
                 <p><strong>Время окончания работы:</strong> {{ staff_member.get_finish_time }}</p>
-                <p>
-                    <strong>Через сколько будет разрешена запись с начала рабочего времени:</strong> {{ staff_member.get_appointment_buffer_time_text }}
-                    <i class="fas fa-info-circle" data-toggle="tooltip" title="{{ buffer_time_help_text }}"></i>
-                </p>
 
             </div>
             <a href="{% url 'update_staff_other_info' staff_member.user.id %}"
@@ -65,8 +61,7 @@ text-align: left;
             <h2>Предоставляемый услуги</h2>
             <small>
                 {% if not superuser %}
-                {% trans "To add/modify a new service, make a request to an admin." %}
-                {% trans "Changes made in one service will change it for every staff member." %}
+                    Для изменения услуги свяжитесь с администратором
                 {% endif %}
             </small>
             <div class="responsive-table-container">
@@ -200,21 +195,12 @@ text-align: left;
             </div>
         </section>
         <section class="profile-section">
-            <h2>Настройка календаря</h2>
-            <a href="{% url 'edit_calendar_settings' %}"
-               class="section-content-button modify-btn button-color-green">
-                <i class="fa-solid fa-gear" style="margin-right:10px;"></i>
-            </a>
-            <div class="section-content">
-                <p><strong>Начальная дата:</strong> {{ start_date }}</p>
-                <p><strong>Период(в днях):</strong> {{ settings.duration }} </p>
-                <p><strong>Конечная дата:</strong> {{ settings.get_end_date }}</p>
-            </div>
+            {% include "administration/calendar_settings_form.html" with staff_member=staff_member %}
         </section>
     </div>
 
     {% include 'modal/confirm_modal.html' %}
-</section>
+</div>
 {% endblock %}
 {% block customJS %}
 <!-- Bootstrap's JS and CSS -->
