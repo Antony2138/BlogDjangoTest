@@ -11,6 +11,7 @@ services:
     volumes:
       - static_volume:/app/staticfiles/
       - media_volume:/app/media/
+
   nginx:
     container_name: nginx-web
     image: nginx:alpine
@@ -22,6 +23,7 @@ services:
     restart: always
     volumes:
       - ./nginx/conf.d/:/etc/nginx/conf.d
+      - ./certbot/www/:/var/www/certbot
       - static_volume:/app/staticfiles/
       - media_volume:/app/media/
   postgres:
