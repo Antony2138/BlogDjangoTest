@@ -83,7 +83,7 @@ def telegram_auth(request):
         return JsonResponse({"error": "Auth expired"}, status=400)
 
     if not check_telegram_auth(data):
-        return JsonResponse({"error": "Invalid auth"}, status=400)
+        return JsonResponse({"error": "Invalid auth."}, status=400)
 
     telegram_id = data["id"]
     first_name = data.get("first_name", "")
