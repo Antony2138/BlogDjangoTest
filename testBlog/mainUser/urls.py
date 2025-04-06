@@ -15,6 +15,8 @@ urlpatterns = [
         name="logout",
     ),
     path("profile/", views.profile, name="profile"),
+    path("telegram/", views.telegram_auth, name="telegram"),
+
     path("reject_appointment/<int:appointment_id>", views.reject_appointment, name="reject_appointment"),
 
     # htmx_get
