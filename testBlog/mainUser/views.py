@@ -1,7 +1,9 @@
+from datetime import time
+
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import LoginForm, UserRegisterForm
@@ -53,3 +55,46 @@ def get_clients_appointments(request):
     user_appointments = get_user_appointment_list(user)
     context = {'appointments': user_appointments}
     return render(request, "partials/get_client_appt.html", context=context)
+
+
+# def check_telegram_auth(data: dict) -> bool:
+#     """ Проверяет подпись данных от Telegram """
+#     auth_data = data.copy()
+#     auth_data.pop("hash")
+#     sorted_data = "\n".join(f"{k}={v}" for k, v in sorted(auth_data.items()))
+#     secret_key = hashwlib.sha256(TELEGRAM_BOT_TOKEN.encode()).digest()
+#     calculated_hash = hmac.new(secret_key, sorted_data.encode(), hashlib.sha256).hexdigest()
+#     print("calculated_hash", calculated_hash)
+#     print("hash", data["hash"])
+#     return calculated_hash == data["hash"]
+
+
+def telegram_auth(request):
+    """ Обрабатывает вход через Telegram """
+    data = request.GET.dict()
+    print("data", data)
+    # Проверка срока действия (например, 10 минут)
+    if int(data.get("auth_date", 0)) < time.time() - 600:
+        return JsonResponse({"error": "Auth expired"}, status=400)
+
+    # if not check_telegram_auth(data):
+    #     return JsonResponse({"error": "Invalid auth"}, status=400)
+
+    telegram_id = data["id"]
+    first_name = data.get("first_name", "")
+    last_name = data.get("last_name", "")
+    data.get("username", "")
+
+    username = f"tg_{telegram_id}"
+    user, created = get_user_model().objects.get_or_create(
+        username=username,
+        defaults={
+            "username": username,
+            "first_name": first_name,
+            "last_name": last_name,
+        })
+
+    # Авторизуем пользователя
+    login(request, user)
+
+    return JsonResponse({"success": True, "created": created, "user": {"id": user.id, "username": user.username}})
