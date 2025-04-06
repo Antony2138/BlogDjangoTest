@@ -29,7 +29,7 @@ DEBUG = os.environ.get("DEBUG", False) == "True"
 
 # Где размещается приложение
 ALLOWED_HOSTS = ["*"]
-CSRF_TRUSTED_ORIGINS = ['http://luckypilka.ru', 'https://luckypilka.ru', 'https://www.luckypilka.ru']
+CSRF_TRUSTED_ORIGINS = ['http://luckypilka.ru', 'https://luckypilka.ru', 'https://www.luckypilka.ru', 'https://telegram.org']
 
 # Application definition
 
