@@ -1,21 +1,19 @@
 import hashlib
 import hmac
-import os
 import time
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from dotenv import load_dotenv
 
 from .forms import LoginForm, UserRegisterForm
 from .services import handle_user_registration
 from .utils.db_helpers import Appointment, get_user_appointment_list
 
 # Create your views here.
-load_dotenv()
 
 
 def user_login(request):
@@ -68,7 +66,7 @@ def check_telegram_auth(data: dict) -> bool:
     auth_data = data.copy()
     auth_data.pop("hash")
     sorted_data = "\n".join(f"{k}={v}" for k, v in sorted(auth_data.items()))
-    telegram_bot_token = os.environ.get("TELEGRAM_BOT_TOKEN")
+    telegram_bot_token = settings.TELEGRAM_BOT_TOKEN
     secret_key = hashlib.sha256(telegram_bot_token.encode()).digest()
     calculated_hash = hmac.new(secret_key, sorted_data.encode(), hashlib.sha256).hexdigest()
     print("calculated_hash", calculated_hash)
