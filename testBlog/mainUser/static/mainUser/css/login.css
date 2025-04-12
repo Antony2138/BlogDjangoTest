@@ -89,7 +89,7 @@
     display: flex;
     justify-content: start;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 20px;
     width: 100%;
 }
 
@@ -102,13 +102,11 @@
 }
 
 .small-ele {
-    width: 55%;
     height: 40px;
     border: none;
     background: #f0f0f0;
     border-radius: 20px;
     padding-left: 10px;
-    font-size: 14px;
 }
 
 .clkbtn {

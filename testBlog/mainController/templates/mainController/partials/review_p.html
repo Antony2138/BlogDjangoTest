@@ -7,9 +7,9 @@
             </span>
         </h6>
         <p class="card-text" style="word-wrap: break-word; overflow-wrap: break-word; white-space: normal; height:50px;">
-            {{ review.text|truncatewords:8 }}
+            {{ review.text|truncatechars:55}}
         </p>
-        {% if review.text|wordcount > 8 %}
+        {% if review.text|length  > 55 %}
             <button class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#reviewModal{{ review.id }}">
                 Показать весь отзыв
             </button>

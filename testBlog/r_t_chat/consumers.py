@@ -24,8 +24,6 @@ class ChatroomConsumer(WebsocketConsumer):
         if self.user not in self.chatroom.user_online.all():
             self.chatroom.user_online.add(self.user)
             self.online_status_update()
-
-
         self.accept()
 
     def disconnect(self, close_code):
@@ -56,6 +54,20 @@ class ChatroomConsumer(WebsocketConsumer):
         async_to_sync(self.channel_layer.group_send)(
             self.chatroom_name, event
         )
+
+        both_online = self.chatroom.user_online.count()
+        admin_here = False
+        if both_online > 1:
+            admin_here = True
+        if not self.user.is_superuser and not admin_here:
+            admin_event = {
+                'type': 'notification_handler',
+                'message_id': message.id,
+                'chatroom_name': self.chatroom_name,
+            }
+            async_to_sync(self.channel_layer.group_send)(
+                "admin_notification", admin_event
+            )
 
     def message_handler(self, event):
         message_id = event['message_id']
@@ -89,4 +101,37 @@ class ChatroomConsumer(WebsocketConsumer):
         }
 
         html = render_to_string("partials/online_status.html", context=context)
+        self.send(text_data=html)
+
+
+class AdminNotificationConsumer(WebsocketConsumer):
+
+    def connect(self):
+        self.user = self.scope['user']
+        self.group_name = "admin_notification"
+
+        if not self.user.is_superuser:
+            return
+
+        async_to_sync(self.channel_layer.group_add)(
+            self.group_name, self.channel_name
+        )
+
+        self.accept()
+
+    def disconnect(self, close_code):
+        async_to_sync(self.channel_layer.group_discard)(
+            self.group_name, self.channel_name
+        )
+
+    def notification_handler(self, event):
+        message_id = event['message_id']
+        chatroom_name = event['chatroom_name']
+        message = GroupMessage.objects.get(id=message_id)
+        context = {
+            'message': message,
+            'user': message.author,
+            'chatroom_name': chatroom_name
+        }
+        html = render_to_string("partials/admin_notification.html", context=context)
         self.send(text_data=html)

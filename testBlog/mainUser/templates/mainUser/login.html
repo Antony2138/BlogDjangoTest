@@ -3,7 +3,7 @@
 
 {% block body %}
 <div class="d-flex justify-content-center align-items-center custom-center">
-    <div class="card shadow-lg p-2" style="width: 500px; height: 500px; border-radius: 20px; background-color: #fff7dbcf;">
+    <div class="card shadow-lg p-2" style="width: 500px; height: 540px; border-radius: 20px; background-color: #fff7dbcf;">
         <div class="card-body text-center">
             <div class="custom-container">
                 <div class="custom-btn">
@@ -13,7 +13,7 @@
                 </div>
                 <div class="form-section">
                     <div class="login-box">
-                        <form method="POST">
+                        <form method="POST" action="{% url 'login' %}">
                             {% csrf_token %}
                             <div class="d-block">
                                 <label class="pt-2 pb-2 fs-5 fw-bold"> Логин </label>
@@ -23,56 +23,48 @@
                                 <label class="pb-2 fs-5 fw-bold"> Пароль </label>
                                 <input class="ele" type="password" name="password" required="" id="id_password" placeholder="Пароль">
                             </div>
-                            <button type="submit" name="login_submit" class="clkbtn">Вход</button>
+                            <button type="submit" class="clkbtn">Вход</button>
                         </form>
                         <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="luckypilka_bot" data-size="large" data-auth-url="https://luckypilka.ru/auth/telegram" data-request-access="write"></script>
-                        {% if messages %}
-                        {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-                        {% endfor %}
-                        {% endif %}
                     </div>
 
                     <div class="signup-box">
-                        <form method="POST">
+                        <form method="POST" action="{% url 'handle_user_registration' %}">
                             {% csrf_token %}
-
                             <div class="custom-form-group pt-2">
                                 <label for="id_usernamer">Логин:</label>
                                 <input type="text" name="usernamer" id="id_usernamer" class="small-ele" required>
                             </div>
-
-                            <div class="custom-form-group">
-                                <label for="id_first_name">Имя:</label>
-                                <input type="text" name="first_name" id="id_first_name" class="small-ele" required>
-                            </div>
-
-                            <div class="custom-form-group">
-                                <label for="id_last_name">Фамилия:</label>
-                                <input type="text" name="last_name" id="id_last_name" class="small-ele" required>
-                            </div>
-
                             <div class="custom-form-group">
                                 <label for="id_email">Email:</label>
                                 <input type="email" name="email" id="id_email" class="small-ele" required>
                             </div>
-
                             <div class="custom-form-group">
                                 <label for="id_password1">Пароль:</label>
                                 <input type="password" name="password1" id="id_password1" class="small-ele" required>
                             </div>
-
                             <div class="custom-form-group">
                                 <label for="id_password2">Повторите:</label>
                                 <input type="password" name="password2" id="id_password2" class="small-ele" required>
                             </div>
-
-                            <button type="submit" name="register_submit" class="clkbtn">Зарегистрироваться</button>
+                            {% if form.password2.errors %}
+                                <div class="error-message card shadow-lg p-1 mb-1" style="background-color:#fff3cd;">
+                                    {% for error in form.password2.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <button type="submit" class="clkbtn">Зарегистрироваться</button>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
     </div>
 </div>
 <script>
@@ -90,5 +82,10 @@
         slider.classList.remove("moveslider");
         formSection.classList.remove("form-section-move");
     });
+
+    {% if show_signup %}
+        slider.classList.add("moveslider");
+        formSection.classList.add("form-section-move");
+    {% endif %}
 </script>
 {% endblock %}

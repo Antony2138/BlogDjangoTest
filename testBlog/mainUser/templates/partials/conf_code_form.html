@@ -1,0 +1,39 @@
+<form method="post" class="text-center">
+    {% csrf_token %}
+    <div class="form-group mb-3 text-start">
+        <label for="code" class="form-label text-white">Введите код подтверждения:</label>
+        <input type="text" name="code" id="code" class="form-control custom-input fs-8" placeholder="Ваш код" required>
+    </div>
+    {% if recheck %}
+    <div class="d-flex">
+        <button
+                hx-get="{% url 'resend_code'%}"
+                hx-target="#swap-form"
+                hx-select="#swap-form"
+                hx-swap="outerHTML"
+                type="button" class="btn btn-primary btn-lg w-50 m-1">
+            Отправить код повторно
+        </button>
+        <button
+                hx-get="{% url 'change_email'%}"
+                hx-target="#swap-form"
+                hx-select="#swap-form"
+                hx-swap="outerHTML"
+                type="button" class="btn btn-primary btn-lg w-50 m-1">
+            Изменить email
+        </button>
+    </div>
+    {% else %}
+    <div class="d-flex">
+        <button type="submit" class="btn btn-primary btn-lg w-50 m-1">Подтвердить</button>
+        <button
+                hx-get="{% url 'change_email'%}"
+                hx-target="#swap-form"
+                hx-select="#swap-form"
+                hx-swap="outerHTML"
+                type="button" class="btn btn-primary btn-lg w-50 m-1">
+            Изменить email
+        </button>
+    </div>
+    {% endif %}
+</form>

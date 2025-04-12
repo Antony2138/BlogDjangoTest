@@ -47,18 +47,18 @@ def chat_view(request, chatroom_name):
     else:
         raise Http404()
 
-    if request.htmx:
-        form = ChatmessageCreateForm(request.POST)
-        if form.is_valid():
-            message = form.save(commit=False)
-            message.author = request.user
-            message.group = chat_group
-            message.save()
-            context = {
-                'message': message,
-                'user': request.user
-            }
-            return render(request, "partials/chat_p.html", context)
+    # if request.htmx:
+    #     form = ChatmessageCreateForm(request.POST)
+    #     if form.is_valid():
+    #         message = form.save(commit=False)
+    #         message.author = request.user
+    #         message.group = chat_group
+    #         message.save()
+    #         context = {
+    #             'message': message,
+    #             'user': request.user
+    #         }
+    #         return render(request, "partials/chat_p.html", context)
 
     context = {
         'chat_messages': chat_messages,
@@ -67,5 +67,4 @@ def chat_view(request, chatroom_name):
         'chatroom_name': chatroom_name,
         'chat_group': chat_group
     }
-
     return render(request, "chat.html", context=context)

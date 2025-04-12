@@ -3,13 +3,26 @@
 {% load static %}
 {% block title %} Чат {% endblock %}
 
+{% block css %}
+.card-header {
+    position: relative;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+{% endblock %}
 {% block body %}
 <div class="container mt-4">
 
     <div class="card">
         <div class="card-header text-white text-center" style="background-color: #0e2238;">
-            <div id="online_status"></div>
-            <h1 class="text-center">Чат с {{ other_user.get_full_name }}</h1>
+            <div class="d-flex align-items-center justify-content-center position-relative">
+                <h1 class="text-center m-2">Чат с {{ other_user.get_full_name }}</h1>
+                <div id="online_status" class="me-2"></div>
+            </div>
         </div>
         <div id="chat_container" class="card-body overflow-auto" style="height: 400px;">
             <ul id="chat_messages" class="list-unstyled">
