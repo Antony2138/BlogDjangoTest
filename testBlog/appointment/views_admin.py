@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db.models import ProtectedError
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
@@ -545,4 +545,5 @@ def search_users(request):
     ) | get_user_model().objects.filter(
         last_name__icontains=query
     )
-    return render(request, 'partials/user_options.html', {'users': users})
+    results = list(users.values('id', 'first_name', 'last_name'))
+    return JsonResponse(results, safe=False)

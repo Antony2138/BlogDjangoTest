@@ -8,9 +8,13 @@ from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template import loader
+from django.urls import reverse
 
-from .forms import LoginForm, UserRegisterForm
-from .services import handle_user_registration
+from .forms import (ConfirmingCredentialsForm, EnterCodeForm, EnterEmailForm,
+                    LoginForm, UserRegisterForm)
+from .models import EmailVerificationCode
+from .services import send_confirmation_code
 from .utils.db_helpers import Appointment, get_user_appointment_list
 
 # Create your views here.
@@ -21,19 +25,21 @@ def user_login(request):
     login_form = LoginForm()
 
     if request.method == "POST":
-        if 'login_submit' in request.POST:
+        if request.POST:
             form = LoginForm(request.POST)
             if form.is_valid():
                 username = form.cleaned_data['username']
                 password = form.cleaned_data['password']
                 user = authenticate(request, username=username, password=password)
                 if user is not None:
+                    if not user.confirmed_credentials:
+                        request.session["confirming_credentials_check"] = True
+                    else:
+                        request.session["confirming_credentials_check"] = False
                     login(request, user)  # Вход пользователя в систему
-                    return redirect('home')  # Перенаправление после успешного входа
+                    return redirect('home')
                 else:
-                    messages.error(request, "Ошибка входа, попробуйте снова.")
-        elif 'register_submit' in request.POST:
-            handle_user_registration(request)
+                    messages.warning(request, "Ошибка входа, попробуйте снова.")
     return render(request, 'mainUser/login.html', {'login_form': login_form, "registration_form": registration_form})
 
 
@@ -69,15 +75,12 @@ def check_telegram_auth(data: dict) -> bool:
     telegram_bot_token = settings.TELEGRAM_BOT_TOKEN
     secret_key = hashlib.sha256(telegram_bot_token.encode()).digest()
     calculated_hash = hmac.new(secret_key, sorted_data.encode(), hashlib.sha256).hexdigest()
-    print("calculated_hash", calculated_hash)
-    print("hash", data["hash"])
     return calculated_hash == data["hash"]
 
 
 def telegram_auth(request):
     """ Обрабатывает вход через Telegram """
     data = request.GET.dict()
-    print("data", data)
     # Проверка срока действия (например, 10 минут)
     if int(data.get("auth_date", 0)) < time.time() - 600:
         return JsonResponse({"error": "Auth expired"}, status=400)
@@ -88,17 +91,141 @@ def telegram_auth(request):
     telegram_id = data["id"]
     first_name = data.get("first_name", "")
     last_name = data.get("last_name", "")
-    data.get("username", "")
-
-    username = f"tg_{telegram_id}"
+    username = data.get("username", "")
+    photo_url = data.get("photo_url", "")
     user, created = get_user_model().objects.get_or_create(
         username=username,
         defaults={
             "username": username,
             "first_name": first_name,
             "last_name": last_name,
+            "telegram_id": telegram_id,
+            "photo_url": photo_url
         })
-
     login(request, user)
+    if created:
+        request.session["confirming_credentials_check"] = True
 
     return redirect("home")
+
+
+@login_required
+def show_confirming_credentials_modal(request):
+    if not request.headers.get('HX-Request'):
+        return HttpResponse(status=204)
+    if request.method == "POST":
+        form = ConfirmingCredentialsForm(request.POST)
+        if form.is_valid():
+            user = request.user
+            user.first_name = form.cleaned_data['first_name']
+            user.last_name = form.cleaned_data['last_name']
+            user.confirmed_credentials = True
+            user.save()
+            request.session.pop("confirming_credentials_check", None)
+            response = HttpResponse()
+            response['HX-Redirect'] = reverse('home')
+            return response
+    form = ConfirmingCredentialsForm()
+    return render(request, "modal/confirming_credentials_modal.html", {"form": form})
+
+
+def handle_user_registration(request):
+    form = UserRegisterForm(request.POST)
+    if form.is_valid():
+        user_email = form.cleaned_data['email']
+        username = form.cleaned_data['usernamer']
+        existing_email = get_user_model().objects.filter(email=user_email)
+        existing_username = get_user_model().objects.filter(username=username)
+        if existing_username:
+            messages.warning(request, "Такой логин занят")
+            return render(request, 'mainUser/login.html', {'form': form, 'show_signup': True})
+        if existing_email:
+            messages.warning(request, "Ошибка регистрации, попробуйте снова.")
+            return redirect("login")
+
+        # Создаем пользователя
+        user = get_user_model().objects.create_user(
+            username=username,
+            email=user_email,
+            password=form.cleaned_data['password1'],
+            is_active=False,
+            confirmed_credentials=False
+        )
+        user.save()
+        request.session["email_to_verify"] = user_email
+        send_confirmation_code(user)
+        messages.success(request, f"Код подтверждения отправлен вам на: {user_email}")
+        return redirect('confirm_email_code')
+    else:
+        return render(request, 'mainUser/login.html', {'form': form, 'show_signup': True})
+
+
+def confirm_email_code(request):
+    if request.method == "POST":
+        user_email = request.session.get("email_to_verify")
+        user = get_user_model().objects.get(email=user_email)
+        verification_code = EmailVerificationCode.objects.filter(user=user).first()
+        print(verification_code, "verification_code")
+        form = EnterCodeForm(request.POST)
+        if form.is_valid():
+            entered_code = form.cleaned_data["code"]
+            print(entered_code, "entered_code")
+            if verification_code and verification_code.check_code(entered_code):
+                user.is_active = True
+                user.save()
+                verification_code.delete()
+                messages.success(request, "Ваш email подтвержден! Можете войти на сайт.")
+                request.session.pop("email_to_verify", None)
+                return redirect("login")
+            else:
+                verification_code.delete()
+                form = EnterCodeForm()
+                messages.warning(request, "Введенный код не совпадает")
+                content = loader.render_to_string(
+                    'mainUser/enter_verification_code.html',
+                    {'form': form, 'messages': messages.get_messages(request), "recheck": True, "EnterEmail": False},
+                    request=request
+                )
+                response = HttpResponse(content)
+                return response
+    else:
+        form = EnterCodeForm()
+        return render(request, 'mainUser/enter_verification_code.html', {"form": form})
+
+
+def resend_code(request):
+    user_email = request.session.get("email_to_verify")
+    user = get_user_model().objects.get(email=user_email)
+    send_confirmation_code(user)
+    messages.success(request, f"Новый код подтверждения отправлен вам на: {user_email}")
+    form = EnterCodeForm()
+    content = loader.render_to_string(
+        'mainUser/enter_verification_code.html',
+        {'form': form, 'messages': messages.get_messages(request), "recheck": False, "EnterEmail": False},
+        request=request
+    )
+    response = HttpResponse(content)
+    return response
+
+
+def change_email(request):
+    user_email = request.session.get("email_to_verify")
+    user = get_user_model().objects.get(email=user_email)
+    if request.method == "POST":
+        form = EnterEmailForm(request.POST)
+        if form.is_valid():
+            new_user_email = form.cleaned_data["new_email"]
+            user.email = new_user_email
+            user.save()
+            request.session["email_to_verify"] = new_user_email
+            return resend_code(request)
+    else:
+        form = EnterEmailForm()
+        messages.success(request, "Введите свою почту")
+        content = loader.render_to_string(
+            'mainUser/enter_verification_code.html',
+            {'form': form, 'messages': messages.get_messages(request), "EnterEmail": True},
+            request=request
+        )
+        response = HttpResponse(content)
+        return response

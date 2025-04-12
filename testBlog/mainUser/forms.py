@@ -10,18 +10,6 @@ class UserRegisterForm(forms.Form):
             attrs={"class": "form-control", "placeholder": "Ваш логин"}
         )
     )
-    first_name = forms.CharField(
-        label="Имя",
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "Имя"}
-        )
-    )
-    last_name = forms.CharField(
-        label="Фамилия",
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "Фамилия"}
-        )
-    )
     email = forms.EmailField(
         label="Электронная почта",
         widget=forms.TextInput(
@@ -65,3 +53,16 @@ class LoginForm(forms.Form):
             if user is None:
                 raise ValidationError("Неверный логин или пароль.")
         return cleaned_data
+
+
+class EnterCodeForm(forms.Form):
+    code = forms.CharField(label="", max_length=6, required=True)
+
+
+class ConfirmingCredentialsForm(forms.Form):
+    first_name = forms.CharField(label="", max_length=50, required=True)
+    last_name = forms.CharField(label="", max_length=50, required=True)
+
+
+class EnterEmailForm(forms.Form):
+    new_email = forms.EmailField(required=True)

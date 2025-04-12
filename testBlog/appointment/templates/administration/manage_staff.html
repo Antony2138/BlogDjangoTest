@@ -3,6 +3,7 @@
 {% block title %} Управление работниками {% endblock %}
 {% block customCSS %}
 <link rel="stylesheet" type="text/css" href="{%static 'css/app_admin/manage_staff.css'%}"/>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 {% endblock %}
 
 {% block body %}
@@ -13,27 +14,9 @@
             <form method="post">
                 {% csrf_token %}
                 {% if user.is_superuser%}
-                    <div class="form-group">
-                        <span>Поиск пользователя:</span>
-                        <input type="text" name="search" id="user_search" class="form-control"
-                               hx-get="{% url 'search_users' %}"
-                               hx-target="#id_user"
-                               hx-trigger="keyup changed delay:500ms"
-                               hx-on="htmx:beforeRequest: document.getElementById('id_user').classList.remove('highlight')"
-
-                               placeholder="Введите имя пользователя">
-                    </div>
-                    <div class="form-group">
-                        <span>Выберите пользователя:</span>
-                        <select name="user"  id="id_user" class="form-control" required
-                                hx-on="htmx:afterSwap: this.classList.add('highlight')">
-                            <option value="" disabled selected>---------</option>
-                            {% for user in users %}
-                                <option value="{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
+                <select id="id_user" name="user" style="width: 100%"></select>
                 {% endif %}
+
                 <div class="form-group">
                     <span>{{ form.services_offered.label }}</span><br>
                     {{ form.services_offered }}<br>
@@ -73,4 +56,34 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block customJS %}
+<script>
+    $(document).ready(function () {
+        $('#id_user').select2({
+            placeholder: 'Введите имя пользователя',
+            allowClear: true,
+            ajax: {
+                url: "{% url 'search_users' %}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        search: params.term
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.map(user => ({
+                            id: user.id,
+                            text: `${user.first_name} ${user.last_name}`
+                        }))
+                    };
+                },
+                cache: true
+            },
+        });
+    });
+</script>
 {% endblock %}
