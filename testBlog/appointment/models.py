@@ -355,6 +355,9 @@ class Appointment(models.Model):
     def is_owner(self, staff_user_id):
         return self.appointment_request.staff_member.user.id == staff_user_id
 
+    def is_client_owner(self, user_id):
+        return self.client.id == user_id
+
 
 class ArchivedAppointment(models.Model):
     client = models.ForeignKey(

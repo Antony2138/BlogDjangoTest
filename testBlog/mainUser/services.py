@@ -32,3 +32,7 @@ def send_confirmation_code(user):
         [user.email],
         fail_silently=False,
     )
+
+
+def check_permissions_to_delete(user, appointment):
+    return appointment.is_client_owner(user.id)

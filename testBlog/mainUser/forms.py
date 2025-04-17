@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 from django.core.exceptions import ValidationError
 
 
@@ -66,3 +66,33 @@ class ConfirmingCredentialsForm(forms.Form):
 
 class EnterEmailForm(forms.Form):
     new_email = forms.EmailField(required=True)
+
+
+class ClientProfileForm(forms.ModelForm):
+    first_name = forms.CharField(
+        required=True,
+        strip=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control bg-dark text-white border-secondary',
+            'placeholder': 'Имя',
+        })
+    )
+    last_name = forms.CharField(
+        required=True,
+        strip=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control bg-dark text-white border-secondary',
+            'placeholder': 'Фамилия',
+        })
+    )
+
+    class Meta:
+        model = get_user_model()
+        fields = ['first_name', 'last_name', 'avatar']
+        widgets = {
+            'avatar': forms.ClearableFileInput(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(ClientProfileForm, self).__init__(*args, **kwargs)
+        self.fields['avatar'].required = False

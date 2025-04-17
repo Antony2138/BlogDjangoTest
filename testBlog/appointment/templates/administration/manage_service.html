@@ -5,34 +5,11 @@
 
 
 {% block body %}
-
-<!--    <section class="content content-wrapper">-->
-<!--        <div class="messages" style="margin: 20px 0">-->
-<!--            {% if messages %}-->
-<!--                {% for message in messages %}-->
-<!--                    <div class="alert alert-dismissible {% if message.tags %}alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}danger{% else %}{{ message.tags }}{% endif %}{% endif %}"-->
-<!--                         role="alert">{{ message }}</div>-->
-<!--                {% endfor %}-->
-<!--            {% endif %}-->
-<!--        </div>-->
-<!--        <div class="service-form-wrapper" style="margin: 0 auto; width: 40%; text-align:center;">-->
-<!--            <div class="service-form-content">-->
-<!--                <h2>{{page_title}}</h2>-->
-<!--                <form method="post" enctype="multipart/form-data">-->
-<!--                    {% csrf_token %}-->
-<!--                    {{ form }}-->
-<!--                    <br>-->
-<!--                    <button type="submit" class="btn btn-primary">{{btn_text}}</button>-->
-<!--                </form>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </section>-->
-
 <div class="d-flex justify-content-center align-items-center">
     <div class="card shadow-lg p-4" style="width: 700px; border-radius: 20px; background-color: #ffffffc4;">
         <div class="card-body text-center">
             <h2 class="card-title text-black">{{ page_title }}</h2>
-            <form method="post">
+            <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 {{ form }}
                 <button type="submit" class="btn btn-primary">{{btn_text}}</button>

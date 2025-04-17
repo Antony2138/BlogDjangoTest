@@ -10,14 +10,12 @@
         <div class="profile-container">
             <section class="profile-section">
                 <div class="section-header">
-                     <button class="btn btn-warning" style="margin-right:10px">
-                        <a href="{% url 'show_all'%}"> Меню </a>
-                    </button>
+                    <a href="{% url 'show_all'%}" class="btn btn-warning"> Меню </a>
                     <h2 class="section-header-itm">{% trans 'Работники' %}</h2>
                     <div class="buttons-container section-header-itm">
                         <a href="{% url 'add_staff_member_info' %}"
-                           class="modify-btn button-color-green">
-                            <i class="fa-solid fa-user-plus"></i>
+                           class="btn btn-secondary">
+                            Добавить работника
                         </a>
                     </div>
                 </div>
@@ -31,22 +29,20 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for staff_member in staff_members %}
-                            <tr>
-                                <td>{{ staff_member.get_staff_member_name }}</td>
-                                <td>{{ staff_member.user.email|default:"Не указано" }}</td>
-                                <td>
-                                    <a href="{% url 'user_profile' staff_member.user.id %}"
-                                       class="btn btn-warning">{% trans 'Профиль' %}</a>
-                                    <a href="{% url 'remove_staff_member' staff_member.user.id %}"
-                                       class="btn btn-danger">{% trans 'Remove' %}</a>
-                                </td>
-                            </tr>
-                        {% empty %}
-                            <tr>
-                                <td colspan="3">{% trans 'Сотрудников не добавлено' %}.</td>
-                            </tr>
-                        {% endfor %}
+                            {% for staff_member in staff_members %}
+                                <tr>
+                                    <td data-label="Имя">{{ staff_member.get_staff_member_name }}</td>
+                                    <td data-label="Email">{{ staff_member.user.email|default:"Не указано" }}</td>
+                                    <td data-label="Детали">
+                                        <a href="{% url 'user_profile' staff_member.user.id %}" class="btn btn-warning">Профиль</a>
+                                        <a href="{% url 'remove_staff_member' staff_member.user.id %}" class="btn btn-danger">Удалить</a>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="3">Сотрудников не добавлено.</td>
+                                </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>

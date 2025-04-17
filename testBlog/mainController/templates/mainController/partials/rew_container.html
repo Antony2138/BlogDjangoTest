@@ -73,6 +73,28 @@
         prevButton.addEventListener("click", scrollLeft);
         nextButton.addEventListener("click", scrollRight);
         container.addEventListener("wheel", scrollWithMouse);
+
+        let startX = 0;
+            let scrollStart = 0;
+            let isDragging = false;
+
+            container.addEventListener("touchstart", function (e) {
+                startX = e.touches[0].clientX;
+                scrollStart = container.scrollLeft;
+                isDragging = true;
+            });
+
+            container.addEventListener("touchmove", function (e) {
+                if (!isDragging) return;
+                const x = e.touches[0].clientX;
+                const delta = startX - x;
+                container.scrollLeft = scrollStart + delta;
+                e.preventDefault();
+            }, { passive: false });
+
+            container.addEventListener("touchend", function () {
+                isDragging = false;
+            });
     }
 
     function scrollLeft() {

@@ -1,22 +1,31 @@
 {% extends 'mainController/layout.html'%}
 {% load static %}
 {% block body %}
+<style>
+.alert {
+    transition: opacity 0.5s ease-in-out;
+}
+</style>
+
 <div class="d-flex justify-content-center align-items-center">
     <div class="card bg-white p-4 rounded-3 shadow-lg" style="max-width: 600px;">
         <div class="card-title">
             <h2 class="text-center text-black mb-4 ">Загрузить изображения для карусели</h2>
             <div class="messages">
                 {% if messages %}
-                {% for message in messages %}
-                <div class="alert alert-dismissible {% if message.tags %}alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}danger{% else %}{{ message.tags }}{% endif %}{% endif %}" role="alert">
-                    {{ message }}
-                </div>
-                {% endfor %}
+                    {% for message in messages %}
+                    <div class="alert alert-dismissible {% if message.tags %}alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}danger{% else %}{{ message.tags }}{% endif %}{% endif %}" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info text-center mb-2" role="alert">
+                        Загрузите минимум 4 изображения для корректной работы карусели.
+                    </div>
                 {% endif %}
             </div>
-            <div class="alert alert-info text-center mb-4" role="alert">
-                Загрузите минимум 4 изображения для корректной работы карусели.
-            </div>
+
         </div>
 
         <form method="post" enctype="multipart/form-data">
@@ -25,9 +34,30 @@
                 {{ form.as_p }}
             </div>
             <div class="text-center">
-                <button type="submit" class="btn btn-primary btn-lg">Загрузить изображения</button>
+                <button type="submit" class="btn btn-primary">Загрузить изображения</button>
             </div>
         </form>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const alerts = document.querySelectorAll('.alert-dismissible');
+
+    alerts.forEach((alert, index) => {
+        alert.style.opacity = 0;
+        alert.style.transition = 'opacity 0.5s ease-in-out';
+        setTimeout(() => {
+            alert.style.opacity = 1;
+        }, 100 * index);
+
+        setTimeout(() => {
+            alert.style.opacity = 0;
+            setTimeout(() => {
+                alert.remove();
+            }, 500);
+        }, 5000);
+    });
+});
+</script>
 {% endblock %}

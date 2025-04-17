@@ -135,3 +135,77 @@ h1.display-3.fw-bold {
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
 
 }
+
+/* Медиа-запрос для экранов < 450px */
+@media (max-width: 450px) {
+    /* Карусель: делаем меньше */
+    .slider {
+        width: 100%;
+        height: 350px;
+    }
+
+    .slide,
+    .slide img {
+        width: 100%;
+        height: 350px;
+    }
+
+    #reviews-container {
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        cursor: grab;
+    }
+
+    #reviews-container.dragging {
+        cursor: grabbing;
+    }
+
+    .slider::before,
+    .slider::after {
+        display: none; /* убираем градиенты по бокам на маленьком экране */
+    }
+
+    /* Отзывы */
+    #review-container {
+        width: 100%;
+        padding: 0 10px;
+    }
+
+    #reviews-container {
+        flex-direction: column; /* вертикальное размещение отзывов */
+        overflow-x: unset;
+        gap: 1rem;
+    }
+
+    .card {
+        width: 100% !important;
+    }
+
+    /* Кнопки прокрутки скрываем */
+    #prevButton,
+    #nextButton {
+        display: none;
+    }
+
+    /* Текст в hero-блоке адаптируем */
+    .position-absolute h1,
+    .position-absolute h2 {
+        font-size: 1.2rem !important;
+    }
+
+    .position-absolute .btn {
+        font-size: 1rem;
+        padding: 0.5rem 1rem;
+    }
+
+    /* Размер формы отзыва */
+    #review-form {
+        max-width: 100% !important;
+        padding: 0 10px;
+    }
+
+    .card-body {
+        font-size: 0.95rem;
+    }
+}

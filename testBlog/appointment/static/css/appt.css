@@ -12,8 +12,18 @@
 .djangoAppt_main-container h4,
 .djangoAppt_main-container h5,
 .djangoAppt_main-container h6 {
-    color: black;
+    color: white;
 
+}
+
+.fc-scrollgrid{
+    background-color: gray;
+}
+.fc .fc-daygrid-body-unbalanced .fc-daygrid-day-events{
+    display: none;
+}
+.fc-toolbar-title{
+    color: white; !important
 }
 
 .djangoAppt_body-container {
@@ -56,16 +66,15 @@
 
 .djangoAppt_service-description-content {
     margin-top: 20px;
-    color: black;
 }
 
 .djangoAppt_item-name {
-    color: black;
     font-weight: bold;
-    font-size: 20px;
-    margin-bottom: 10px;
 }
 
+.bottom{
+    height: 300px;
+}
 .djangoAppt_calendar {
     flex: 3;
 }
@@ -142,11 +151,10 @@ calendar-wrapper a{
 }
 
 .djangoAppt_appointment-slot {
-    border: 1px solid #ccc;
     background-color: rgba(0, 48, 124, 0.95);
     color: #fff;
     padding: 7px;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     cursor: pointer;
     border-radius: 10px;
 }
@@ -414,7 +422,12 @@ calendar-wrapper a{
     .djangoAppt_body-container {
         padding: 3px;
     }
-
+    .fc .fc-daygrid-body-unbalanced .fc-daygrid-day-events {
+        display: none; !important
+    }
+    .bottom{
+        height: auto;
+    }
     .djangoAppt_appointment-calendar {
         flex: 1;
         padding: 5px;

@@ -16,18 +16,18 @@
         font-size: 20px !important;
     }
 </style>
-<div class="container">
-    <div class="djangoAppt_main-container">
-        <div class="djangoAppt_body-container">
-            <h1>
+<div class="container bg-dark text-light">
+    <div class="djangoAppt_main-container bg-dark">
+        <div class="djangoAppt_body-container bg-dark">
+            <h1 class="text-light">
                 {% if page_header %}{{ page_header }}{% else %}{{ service.name }}{% endif %} </h1>
-            <small class="page-description">
+            <small class="page-description text-light">
                 Проверьте доступные слоты и и забронируйте удобную для вас дату и время
             </small>
             <hr>
 
             <div class="djangoAppt_page-body">
-                <div class="djangoAppt_appointment-calendar">
+                <div class="djangoAppt_appointment-calendar bg-dark">
                     <div class="djangoAppt_appointment-calendar-title-timezone">
                         <div class="djangoAppt_title">
                             Выберите дату и время
@@ -35,22 +35,21 @@
                     </div>
                     <hr class="djangoAppt_second-part">
                     <div class="djangoAppt_calendar-and-slot">
-                        <div class="djangoAppt_calendar" id="calendar">
+                        <div class="djangoAppt_calendar bg-dark" id="calendar">
                         </div>
-                        <div class="djangoAppt_slot">
+                        <div class="djangoAppt_slot bg-dark">
                             <div class="djangoAppt_date_chosen" style="display:none;">{{ date_chosen }}</div>
-                            <div class="djangoAppt_date_look">{{ date_look }}</div>
+                            <div class="djangoAppt_date_look text-light">{{ date_look }}</div>
                             <div class="slot-container">
                                 <div class="error-message"></div>
                                 <ul id="slot-list" class="djangoAppt_slot-list">
                                     <!-- Slot list will be updated dynamically by the AJAX request -->
                                 </ul>
                             </div>
-
                         </div>
                     </div>
                 </div>
-                <div class="djangoAppt_service-description">
+                <div class="djangoAppt_service-description bg-dark">
                     <form method="post" action="{% url 'appointment_request_submit' %}"
                           class="appointment-form">
                         {% csrf_token %}
@@ -59,12 +58,12 @@
                             <select name="staff_member" id="staff_id" required>
                                 {% if not staff_member %}
                                 <option value=""
-                                        selected>Выберите мастера >>>
+                                        selected class="bg-dark text-light">Выберите мастера >>>
                                 </option>
                                 {% endif %}
                                 {% for sf in all_staff_members %}
                                 <option value="{{ sf.id }}"
-                                        {% if staff_member and staff_member.id == sf.id %}selected{% endif %}>
+                                        {% if staff_member and staff_member.id == sf.id %}selected{% endif %} class="bg-dark text-light">
                                     {{ sf.get_staff_member_first_name }}
                                 </option>
                                 {% endfor %}
@@ -74,16 +73,25 @@
 
                         <hr class="djangoAppt_second-part">
                         <div><h4>{% trans 'Service details' %}</h4></div>
-                        <div class="djangoAppt_service-description-content">
-                            <p class="djangoAppt_item-name">{{ service.name }}</p>
-                            <p id="service-datetime-chosen" class="service-datetime-chosen" style="display:none;">{{ date_chosen }}</p>
-                            <p id="service-datetime-look">{{ date_look }}</p>
-                            <p>{{ service.get_duration }}</p>
-                            <p>{{ service.get_price_text }}</p>
-                            <button type="submit"
-                                    class="btn btn-primary btn-submit-appointment"
-                                    disabled>Записаться
-                            </button>
+                        <div class="d-flex flex-column justify-content-between bottom">
+                            <div class="djangoAppt_service-description-content p-1 rounded text-light" style="background-color: rgb(7 53 94) !important;">
+                                <span class="djangoAppt_item-name text-light fs-6">{{ service.name }} {{ service.get_price }}</span>
+                                <span id="service-datetime-chosen" class="service-datetime-chosen" style="display:none;">{{ date_chosen }}</span>
+                            </div>
+
+                            <div>
+                                <hr>
+                                <p>Продолжительность:  <span>{{ service.get_duration }}</span></p>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <div>
+                                        <span id="service-datetime-look">{{ date_look }}</span>
+                                    </div>
+                                    <button type="submit"
+                                            class="btn btn-outline-light btn-sm btn-submit-appointment"
+                                            disabled>Записаться
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>
