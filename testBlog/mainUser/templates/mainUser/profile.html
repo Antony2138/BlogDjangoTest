@@ -22,11 +22,11 @@
                 <div class="d-flex flex-column align-items-start">
                     <div class="d-flex align-items-start gap-3">
                         <div class="avatar overflow-hidden rounded">
-                            {% if user.is_tg_user %}
-                            <img src="{{ user.photo_url }}" alt="Avatar"
-                                 class="img-fluid w-100 h-100 object-fit-cover">
-                            {% elif user.avatar %}
+                            {% if user.avatar %}
                             <img src="{{ user.get_avatar_url }}" alt="Avatar"
+                                 class="img-fluid w-100 h-100 object-fit-cover">
+                            {% elif user.is_tg_user %}
+                            <img src="{{ user.photo_url }}" alt="Avatar"
                                  class="img-fluid w-100 h-100 object-fit-cover">
                             {% else %}
                             <img src="{% static 'mainUser/img/avatar-d.png' %}" alt="Avatar"
