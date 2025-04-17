@@ -9,20 +9,22 @@
 
 {% block body %}
 <section class="content content-wrapper">
-    <div class="service-container">
+    <div class="profile-container">
         <section class="profile-section">
             <div class="section-header">
-                <button class="btn btn-warning" style="margin-right:10px">
-                    <a href="{% url 'show_all'%}"> Меню </a>
-                </button>
-
+                <a href="{% url 'show_all'%}" class="btn btn-warning"> Меню </a>
                 <h2 class="section-header-itm">{% trans 'List of services' %}</h2>
+                <div class="buttons-container section-header-itm">
+                    <a href="{% url 'add_service'%}"
+                       class="btn btn-secondary">
+                        Добавить услугу
+                    </a>
+                </div>
             </div>
             <div class="responsive-table-container">
                 <table>
                     <thead>
                     <tr>
-                        <th>№</th>
                         <th>{% trans 'Name' %}</th>
                         <th>{% trans 'Duration' %}</th>
                         <th>{% trans 'Price' %}</th>
@@ -32,10 +34,9 @@
                     <tbody>
                     {% for service in services %}
                     <tr>
-                        <td>{{service.id}}</td>
-                        <td>{{ service.name }}</td>
-                        <td>{{ service.get_duration }}</td>
-                        <td>{{ service.get_price}}</td>
+                        <td data-label="Название">{{ service.name }}</td>
+                        <td data-label="Продолжительность">{{ service.get_duration }}</td>
+                        <td data-label="Цена">{{ service.get_price}}</td>
                         <td>
                             <div class="buttons-container">
                                 {% if user.is_superuser %}

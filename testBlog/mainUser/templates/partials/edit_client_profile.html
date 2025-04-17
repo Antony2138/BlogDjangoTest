@@ -1,0 +1,34 @@
+<div class="card bg-dark text-white border-secondary">
+    <div class="card-header border-bottom border-secondary">
+        <h5 class="mb-0">Редактирование профиля</h5>
+    </div>
+    <div class="card-body" style="padding: 40px;">
+        <form method="post" action="{% url 'edit_client_profile' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Имя</label>
+                {{ form.first_name }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Фамилия</label>
+                {{ form.last_name }}
+            </div>
+            <div class="mb-3 input-file">
+                <div class="me-3 file">
+                    <label for="avatar" class="form-label">Фото профиля</label>
+                    <input type="file" class="form-control bg-secondary text-white border-secondary" id="avatar" name="avatar">
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-outline-danger" name="action" value="delete_avatar">
+                        Удалить фото профиля
+                    </button>
+                </div>
+            </div>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-outline-light" name="action" value="save_details">Сохранить
+                    изменения
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

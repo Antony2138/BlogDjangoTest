@@ -1,37 +1,54 @@
-{% for appointment in appointments %}
-<div id="appointment-{{ appointment.id }}" style="max-width: 550px;" >
-    <div class="appointment-card bg-light" >
-        <h4 class="text-black">{{ appointment.get_service_name }}</h4>
-        <div id="modal-container-{{ appointment.id }}"></div>
-        <div class="appointment-details">
-            <div class="appointment-detail hover-element">
-                <i class="fas fa-calendar-alt"></i>
-                <strong>Дата:</strong> {{ appointment.get_appointment_date|date:"F d, Y " }}
+<h3 class="mb-3">Ваши записи</h3>
+<div class="text-black d-flex flex-wrap gap-3">
+    {% for appointment in appointments %}
+    <div id="appointment-{{ appointment.id }}" class="appointment-wrapper position-relative rounded mb-4" style="width:300px;">
+        <div class="appointment-card text-white p-3">
+            <h4>{{ appointment.get_service_name }}</h4>
+            <div class="appointment-details">
+                <div><i class="fas fa-calendar-alt me-2"></i> <strong>Дата:</strong> {{ appointment.get_appointment_date|date:"d.m.Y" }}</div>
+                <div><i class="fas fa-clock me-2"></i> <strong>Время:</strong> {{ appointment.get_start_time|time:"H:i" }} - {{ appointment.get_end_time|time:"H:i" }}</div>
+                <div><i class="fas fa-hands-helping me-2"></i> <strong>Услуга:</strong> {{ appointment.get_service_name }}</div>
             </div>
-            <div class="appointment-detail hover-element">
-                <i class="fas fa-clock"></i>
-                <strong>Начало приёма:</strong> {{ appointment.get_start_time|time:"H:i" }}
-            </div>
-            <div class="appointment-detail hover-element">
-                <i class="fas fa-hands-helping"></i>
-                <strong>Услуга:</strong> {{ appointment.get_service_name }}
-            </div>
-            <div class="appointment-detail hover-element">
-                <i class="fas fa-clock"></i>
-                <strong>Конец приема:</strong> {{ appointment.get_end_time|time:"H:i"}}
-            </div>
-        </div>
-        <button hx-get="{% url 'reject_appointment' appointment.id%}"
-                hx-target="#modal-container-{{ appointment.id }}"
-                hx-trigger="click"
-                hx-swap="innerHTML"
-                class="btn btn-danger">
-            Отменить запись
-        </button>
-    </div>
-</div>
 
-{% empty %}
-<h2>Записей не найдено</h2>
-<hr>
-{% endfor %}
+            <button hx-get="{% url 'reject_appointment' appointment.id %}"
+                    hx-target="#modal-container-{{ appointment.id }}"
+                    hx-trigger="click"
+                    hx-swap="innerHTML"
+                    class="btn btn-outline-danger btn-sm mt-3">
+                Отменить запись
+            </button>
+
+            <div id="modal-container-{{ appointment.id }}" class="modal-local-container"></div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="appointment-box text-white text-center">
+        <h5>Записей не найдено</h5>
+    </div>
+    {% endfor %}
+</div>
+<style>
+.appointment-wrapper {
+    position: relative;
+    background-color: rgb(31 52 100);
+}
+
+.modal-local-container .local-modal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(33, 37, 41, 0.95);
+    border: 1px solid #444;
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 10;
+}
+
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+</style>

@@ -48,7 +48,7 @@
 
 .about p{
     font-size: 19px;
-    color: rgb(168 62 62);
+    color: white;
 }
 
 .type{
@@ -101,4 +101,120 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
     border-radius: 6px;
     transition: all 0.3s;
+}
+
+@media (max-width: 768px) {
+    .container-show {
+        width: 90%;
+        padding: 0 10px;
+    }
+
+    .service {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .service img {
+        width: 100%;
+        height: auto;
+        margin: 0 0 10px 0;
+        border-radius: 8px;
+    }
+
+    .about {
+        width: 100%;
+        padding-right: 0;
+    }
+
+    .details {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .text-details {
+        width: 100%;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .price, .time {
+        width: auto;
+        font-size: 14px;
+        margin-right: 0;
+    }
+
+    .book a {
+        width: 100%;
+        text-align: center;
+        display: block;
+        padding: 10px 0;
+        font-size: 14px;
+    }
+
+    .about a, .about p {
+        font-size: 17px;
+    }
+
+    .type {
+        margin-bottom: 10px;
+    }
+}
+
+@media (max-width: 450px) {
+    .service {
+        display: grid;
+        grid-template-columns: 100px 1fr;
+        grid-template-rows: auto auto auto;
+        gap: 6px 12px;
+        align-items: start;
+    }
+
+    .service img {
+        grid-row: 1 / span 3;
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 6px;
+    }
+
+    .about {
+        display: contents; /* позволяет вложенным блокам попасть в нужные ячейки сетки */
+    }
+
+    .about .title,
+    .about p {
+        grid-column: 2;
+        grid-row: 1;
+        font-size: 14px;
+        font-weight: bold;
+        color: rgb(147 101 178);
+        margin: 0;
+    }
+
+    .type {
+        grid-column: 2;
+        grid-row: 2;
+        font-size: 13px;
+        color: #666;
+    }
+
+    .price {
+        grid-column: 2;
+        grid-row: 3;
+        font-size: 13px;
+        color: rgb(47, 64, 72);
+    }
+
+    .details {
+        grid-column: 1 / span 2;
+        margin-top: 10px;
+    }
+
+    .book a {
+        width: 100%;
+        padding: 8px 0;
+        font-size: 14px;
+        border-radius: 50px;
+        text-align: center;
+    }
 }

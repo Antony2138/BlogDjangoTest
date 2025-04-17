@@ -11,10 +11,10 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.template import loader
 from django.urls import reverse
 
-from .forms import (ConfirmingCredentialsForm, EnterCodeForm, EnterEmailForm,
-                    LoginForm, UserRegisterForm)
+from .forms import (ClientProfileForm, ConfirmingCredentialsForm,
+                    EnterCodeForm, EnterEmailForm, LoginForm, UserRegisterForm)
 from .models import EmailVerificationCode
-from .services import send_confirmation_code
+from .services import check_permissions_to_delete, send_confirmation_code
 from .utils.db_helpers import Appointment, get_user_appointment_list
 
 # Create your views here.
@@ -51,6 +51,9 @@ def profile(request):
 @login_required
 def reject_appointment(request, appointment_id):
     appointment = get_object_or_404(Appointment, id=appointment_id)
+    user = request.user
+    if not check_permissions_to_delete(user, appointment):
+        return JsonResponse({"error": "You don't have permissions"}, status=403)
     if request.method == "POST":
         appointment.appointment_request.delete()
         appointment.delete()
@@ -60,6 +63,7 @@ def reject_appointment(request, appointment_id):
     return render(request, "modal/confirm_user_modal.html", {"appointment": appointment})
 
 
+@login_required
 def get_clients_appointments(request):
     user = request.user
     user_appointments = get_user_appointment_list(user)
@@ -229,3 +233,31 @@ def change_email(request):
         )
         response = HttpResponse(content)
         return response
+
+
+@login_required
+def edit_client_profile(request):
+    user = request.user
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == "save_details":
+            form = ClientProfileForm(request.POST, request.FILES, instance=user)
+            if user.avatar:
+                user.avatar.delete()
+                user.save()
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Профиль обновлён.")
+                return redirect('profile')
+        elif action == "delete_avatar":
+            if user.avatar:
+                user.avatar.delete()
+                user.save()
+                messages.success(request, "Фото удалено")
+            else:
+                messages.warning(request, "У вас нет фотографии профиля")
+            return redirect('profile')
+    else:
+        form = ClientProfileForm(instance=user)
+
+    return render(request, "partials/edit_client_profile.html", {"form": form})
