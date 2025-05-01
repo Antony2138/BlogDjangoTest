@@ -1,7 +1,8 @@
 {% load static %}
-<div id="calendar-info" style="">
+{% load i18n %}
+<div id="calendar-info" class="mb-3">
         {% if form %}
-    <div style="background-color: #ffffff00;">
+    <div class="profile-container rounded" style="background-color: #343a40;">
         <h2>Настройки отображаемого диапазона календаря</h2>
         <form hx-post="{% url 'edit_calendar_settings' staff_member.id %}" class=""
               hx-swap="outerHTML"
@@ -16,14 +17,16 @@
         </form>
     </div>
         {% else %}
-    <div style="background-color: #ffffff00;">
-        <h2>Настройка календаря</h2>
-        <a hx-get="{% url 'edit_calendar_settings' staff_member.id %}"
-           hx-swap="outerHTML"
-           hx-target="#calendar-info"
-           class="section-content-button modify-btn button-color-green">
-            <i class="fa-solid fa-gear"></i>
-        </a>
+    <div class="profile-container rounded" style="background-color: #343a40;">
+        <div class="d-flex justify-content-start gap-3">
+            <h2>Настройка календаря</h2>
+            <a hx-get="{% url 'edit_calendar_settings' staff_member.id %}?edit=true"
+               hx-swap="outerHTML"
+               hx-target="#calendar-info"
+               class="section-content-button modify-btn button-color-green">
+                <i class="fa-solid fa-gear"></i>
+            </a>
+        </div>
         <div class="section-content">
             <p><strong>Начальная дата:</strong> {{ start_date }}</p>
             <p><strong>Период(в днях):</strong> {{ settings.duration }} </p>

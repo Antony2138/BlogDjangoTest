@@ -15,25 +15,20 @@
         justify-content: center;
         font-size: 20px !important;
     }
+    .fc-daygrid-day-number {
+        color: white !important;
+    }
 </style>
-<div class="container bg-dark text-light">
+<div class="container bg-dark text-light rounded mt-3">
     <div class="djangoAppt_main-container bg-dark">
         <div class="djangoAppt_body-container bg-dark">
-            <h1 class="text-light">
-                {% if page_header %}{{ page_header }}{% else %}{{ service.name }}{% endif %} </h1>
-            <small class="page-description text-light">
+            <p class="fs-3 text-light m-3 text-center">
                 Проверьте доступные слоты и и забронируйте удобную для вас дату и время
-            </small>
+            </p>
             <hr>
 
             <div class="djangoAppt_page-body">
                 <div class="djangoAppt_appointment-calendar bg-dark">
-                    <div class="djangoAppt_appointment-calendar-title-timezone">
-                        <div class="djangoAppt_title">
-                            Выберите дату и время
-                        </div>
-                    </div>
-                    <hr class="djangoAppt_second-part">
                     <div class="djangoAppt_calendar-and-slot">
                         <div class="djangoAppt_calendar bg-dark" id="calendar">
                         </div>
@@ -54,7 +49,7 @@
                           class="appointment-form">
                         {% csrf_token %}
                         <div class="staff-members-list">
-                            <label class="djangoAppt_item-name" for="staff_id"><h3>{{ label }}</h3></label>
+                            <label class="djangoAppt_item-name fs-4" for="staff_id">{{ label }}</label>
                             <select name="staff_member" id="staff_id" required>
                                 {% if not staff_member %}
                                 <option value=""
@@ -72,7 +67,6 @@
 
 
                         <hr class="djangoAppt_second-part">
-                        <div><h4>{% trans 'Service details' %}</h4></div>
                         <div class="d-flex flex-column justify-content-between bottom">
                             <div class="djangoAppt_service-description-content p-1 rounded text-light" style="background-color: rgb(7 53 94) !important;">
                                 <span class="djangoAppt_item-name text-light fs-6">{{ service.name }} {{ service.get_price }}</span>
@@ -97,12 +91,16 @@
                 </div>
             </div>
             {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-dismissible {% if message.tags %}alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}danger{% else %}{{ message.tags }}{% endif %}{% endif %}"
-                 role="alert">{{ message }}
+            <div class="mt-3">
+                {% for message in messages %}
+                <div class="alert alert-dismissible fade show custom-alert {{ message.tags }}">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
             {% endif %}
+
         </div>
     </div>
 </div>

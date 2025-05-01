@@ -16,9 +16,6 @@
 
 }
 
-.fc-scrollgrid{
-    background-color: gray;
-}
 .fc .fc-daygrid-body-unbalanced .fc-daygrid-day-events{
     display: none;
 }
@@ -60,12 +57,7 @@
 }
 
 .djangoAppt_calendar-and-slot {
-    margin-top: 20px;
     display: flex;
-}
-
-.djangoAppt_service-description-content {
-    margin-top: 20px;
 }
 
 .djangoAppt_item-name {
@@ -129,7 +121,7 @@ calendar-wrapper a{
 }
 
 .djangoAppt_calendar-and-slot a{
-    color:black;
+    color:white;
 }
 
 
@@ -231,8 +223,8 @@ calendar-wrapper a{
 }
 
 .disabled-day {
-    background-color: #ECECEC; /* light gray */
-    opacity: 0.5;
+    background-color: #ececec6b; /* light gray */
+    opacity: 0.6;
     pointer-events: none; /* makes it unclickable */
 }
 
@@ -492,5 +484,5 @@ calendar-wrapper a{
 }
 
 .selected-cell {
-    background-color: #aaddff; /* or any color you prefer */
+    background-color: #65aecf; /* or any color you prefer */
 }

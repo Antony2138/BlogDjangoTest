@@ -1,0 +1,35 @@
+{% load i18n %}
+{% load static %}
+<tr id="service-{{ service.id }}">
+    {% if edit_mode %}
+        <td class="edit-mode d-none">
+            <input type="checkbox" name="services" value="{{ service.id }}">
+        </td>
+    {% endif %}
+    <td data-label="Название"
+        hx-trigger="{% if user.is_superuser %}click{% endif %}"
+        hx-get="{% url 'update_service' service_id=service.id %}"
+        hx-target="#formModalContent"
+        data-bs-toggle="modal"
+        data-bs-target="#formModal"
+        class="{% if user.is_superuser %}clickable{% endif %}"
+    >
+        {{ service.name }}
+    </td>
+    <td data-label="Продолжительность">{{ service.get_duration }}</td>
+    <td data-label="Цена">{{ service.get_price }}</td>
+    <td>
+        <div class="d-flex align-items-center">
+            {% if user.is_superuser %}
+                <a hx-get="{% url 'update_service' service_id=service.id %}"
+                   hx-target="#formModalContent"
+                   data-bs-toggle="modal"
+                   data-bs-target="#formModal"
+                   class="edit-mode btn btn-outline-warning btn-sm d-none">{% trans 'Edit' %}</a>
+            {% endif %}
+            <div id="service-row-btns-{{ service.id }}" class="d-block">
+                {% include 'administration/includes/service_row_btns.html' with service=service%}
+            </div>
+        </div>
+    </td>
+</tr>

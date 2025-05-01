@@ -242,7 +242,7 @@ def edit_client_profile(request):
         action = request.POST.get('action')
         if action == "save_details":
             form = ClientProfileForm(request.POST, request.FILES, instance=user)
-            if user.avatar:
+            if user.avatar and request.FILES:
                 user.avatar.delete()
                 user.save()
             if form.is_valid():

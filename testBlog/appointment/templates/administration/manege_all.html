@@ -1,5 +1,16 @@
 {% extends 'mainController/layout.html'%}
-{% block title %} Администрирование {% endblock %}
+{% load static %}
+{% block title %} Личный кабинет {% endblock %}
+{% block customCSS %}
+<link rel="stylesheet" href="{%static 'mainUser/css/profile.css'%}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/app_admin/staff_list.css' %}"/>
+<link rel="stylesheet" type="text/css" href="{%static 'css/app_admin/manage_staff.css'%}"/>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+{% endblock %}
+
 {% block body %}
 
 <style>
@@ -36,41 +47,148 @@
     }
 </style>
 
-<div class="custom-wrapper">
-    <div>
-        <h2>Услуги</h2>
-        <a href="{% url 'add_service'%}" class="icon-link">
-            <button class="btn btn-warning">Добавить услугу</button>
-        </a>
-        <a href="{% url 'get_service_list'%}" class="icon-link">
-            <button class="btn btn-warning">Список услуг</button>
-        </a>
+<!--<div class="custom-wrapper">-->
+<!--    <div>-->
+<!--        <h2>Услуги</h2>-->
+<!--        <a href="{% url 'add_service'%}" class="icon-link">-->
+<!--            <button class="btn btn-warning">Добавить услугу</button>-->
+<!--        </a>-->
+<!--        <a href="{% url 'get_service_list'%}" class="icon-link">-->
+<!--            <button class="btn btn-warning">Список услуг</button>-->
+<!--        </a>-->
 
 
-    </div>
-    <div>
-        <h2>Работники</h2>
-        {% if user.is_superuser%}
-        <a href="{% url 'add_staff_member_info'%}" class="icon-link">
-            <button class="btn btn-warning">Добавить работника </button>
-        </a>
-        {% endif %}
-        <a href="{% url 'get_staff_list'%}" class="icon-link">
-            <button class="btn btn-warning">Список работников</button>
-        </a>
+<!--    </div>-->
+<!--    <div>-->
+<!--        <h2>Работники</h2>-->
+<!--        {% if user.is_superuser%}-->
+<!--        <a href="{% url 'add_staff_member_info'%}" class="icon-link">-->
+<!--            <button class="btn btn-warning">Добавить работника </button>-->
+<!--        </a>-->
+<!--        {% endif %}-->
+<!--        <a href="{% url 'get_staff_list'%}" class="icon-link">-->
+<!--            <button class="btn btn-warning">Список работников</button>-->
+<!--        </a>-->
 
-    </div>
-    <div>
-        <h2>Записи</h2>
-        <a href="{% url 'get_user_appointments'%}" class="icon-link">
-            <button class="btn btn-warning">Календарь записей</button>
-        </a>
-    </div>
-    <div>
-        <h2>Фотографии</h2>
-        <a href="{% url 'upload_images'%}" class="icon-link">
-            <button class="btn btn-warning">Обновить фото</button>
-        </a>
+<!--    </div>-->
+<!--    <div>-->
+<!--        <h2>Записи</h2>-->
+<!--        <a href="{% url 'get_user_appointments'%}" class="icon-link">-->
+<!--            <button class="btn btn-warning">Календарь записей</button>-->
+<!--        </a>-->
+<!--    </div>-->
+<!--    <div>-->
+<!--        <h2>Фотографии</h2>-->
+<!--        <a href="{% url 'upload_images'%}" class="icon-link">-->
+<!--            <button class="btn btn-warning">Обновить фото</button>-->
+<!--        </a>-->
+<!--    </div>-->
+<!--</div>-->
+<div class="custom-pro mx-auto text-light">
+    <div class="container-fluid p-4">
+        <div class="row">
+            <aside class="col-md-3 text-light">
+                <div class="d-flex flex-column align-items-start">
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="avatar overflow-hidden rounded">
+                            {% if not staff_member %}
+                                {% if user.avatar %}
+                                <img src="{{ user.get_avatar_url }}" alt="Avatar"
+                                     class="img-fluid w-100 h-100 object-fit-cover">
+                                {% elif user.is_tg_user %}
+                                <img src="{{ user.photo_url }}" alt="Avatar"
+                                     class="img-fluid w-100 h-100 object-fit-cover">
+                                {% else %}
+                                <img src="{% static 'mainUser/img/avatar-d.png' %}" alt="Avatar"
+                                     class="img-fluid w-100 h-100 object-fit-cover">
+                                {% endif %}
+                            {% else %}
+                                {% if staff_member.user.avatar %}
+                                    <img src="{{ staff_member.user.get_avatar_url }}" alt="Avatar"
+                                         class="img-fluid w-100 h-100 object-fit-cover">
+                                {% elif staff_member.user.is_tg_user %}
+                                    <img src="{{ staff_member.user.photo_url }}" alt="Avatar"
+                                         class="img-fluid w-100 h-100 object-fit-cover">
+                                {% else %}
+                                    <img src="{% static 'mainUser/img/avatar-d.png' %}" alt="Avatar"
+                                         class="img-fluid w-100 h-100 object-fit-cover">
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <div>
+                            {% if not staff_member%}
+                                <h4 class="mb-0">{{ user.first_name }}</h4>
+                                <p class="mb-0">{{ user.last_name }}</p>
+                            {% else %}
+                                <h4 class="mb-0">{{ staff_member.user.first_name }}</h4>
+                                <p class="mb-0">{{ staff_member.user.last_name }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if not staff_member or staff_member.user == request.user %}
+                        <p class="mt-3">Добро пожаловать в ваш личный кабинет.</p>
+                    {% endif %}
+                    <div class="d-flex flex-column gap-2 mt-2">
+<!--                        Надо сделать чтобы для каждого свое было-->
+                            <a href="#"
+                               hx-get="{% url 'staff_profile' %}"
+                               hx-target="#render-chunk"
+                               class="btn btn-outline-light">
+                                Профиль
+                            </a>
+<!--                        Блок -->
+                        {% if not staff_member %}
+                            <a href="#"
+                               hx-get="{% url 'get_service_list' %}"
+                               hx-target="#render-chunk"
+                               class="btn btn-outline-light">
+                                Список услуг
+                            </a>
+                            <a href="#"
+                               hx-get="{% url 'get_staff_list' %}"
+                               hx-target="#render-chunk"
+                               class="btn btn-outline-light">
+                                Список работников
+                            </a>
+                            {% include 'administration/includes/dropdown_staff.html' %}
+                        {% elif staff_member and request.user.is_superuser%}
+                            <a href="#"
+                               hx-get="{% url 'get_staff_list' %}"
+                               hx-target="#render-chunk"
+                               class="btn btn-outline-light">
+                                Список работников
+                            </a>
+                            {% include 'administration/includes/dropdown_staff.html' %}
+                        {% else %}
+                            <a href="#"
+                               hx-get="{% url 'service_offered' staff_member.user.id %}"
+                               hx-target="#render-chunk"
+                               class="btn btn-outline-light">
+                                Предоставляемые услуги
+                            </a>
+                        {% endif %}
+
+
+                    </div>
+                </div>
+            </aside>
+            <main class="col-md-9" id="render-chunk">
+                {% include 'administration/partials/staff_profile.html' %}
+            </main>
+<!--            Modal for load forms -->
+            <div class="modal fade" id="formModal" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content bg-dark text-white" id="formModalContent">
+                          <!-- Сюда будет загружаться содержимое через HTMX -->
+                        </div>
+                  </div>
+            </div>
+<!--            Modal for load forms -->
+        </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/ru.js"></script>
+
 {% endblock %}

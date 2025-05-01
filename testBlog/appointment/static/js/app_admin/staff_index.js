@@ -442,6 +442,15 @@ async function populateServices(selectedServiceId, isEditMode = false) {
         showErrorModal(noServiceOfferedTxt)
     }
     const selectElement = document.createElement('select');
+
+
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Выберите услугу';
+    defaultOption.selected = true;
+
+    selectElement.appendChild(defaultOption);
+
     services.forEach(service => {
         const option = document.createElement('option');
         option.value = service.id;  // Accessing the id
@@ -479,6 +488,14 @@ async function populateStaffMembers(selectedStaffId, isEditMode = false) {
         showErrorModal(noStaffMemberTxt)
     }
     const selectElement = document.createElement('select');
+
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Выберите работника';
+    defaultOption.selected = true;
+
+    selectElement.appendChild(defaultOption);
+
     staffMembers.forEach(staff => {
         const option = document.createElement('option');
         option.value = staff.id;  // Accessing the id
@@ -510,13 +527,18 @@ function updateServicesDropdown(dropdown, services) {
     // Clear existing options
     dropdown.innerHTML = '';
 
-    // Populate with new options
-    services.forEach(service => {
-        const option = new Option(service.name, service.id); // Assuming service object has id and name properties
+    if (services.length > 0) {
+        services.forEach(service => {
+            const option = new Option(service.name, service.id);
+            dropdown.add(option);
+        });
+    } else {
+        const option = new Option('Не предоставляет услуг', '');
+        option.disabled = true;
+        option.selected = true;
         dropdown.add(option);
-    });
+    }
 }
-
 function getCSRFToken() {
     const metaTag = document.querySelector('meta[name="csrf-token"]');
     if (metaTag) {
@@ -607,6 +629,12 @@ function createNewAppointment(dateInput) {
 }
 
 async function showCreateAppointmentModal(defaultStartTime, formattedDate) {
+
+    if (!has_offered_service && isUserSuperUser) {
+        showErrorModal("Работник не предоставляет никаких услуг");
+        has_offered_service = true;
+    }
+
     const servicesDropdown = await populateServices(null, false);
     let staffDropdown = null;
     let userDropdown = null;

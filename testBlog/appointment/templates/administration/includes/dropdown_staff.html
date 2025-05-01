@@ -1,0 +1,29 @@
+
+<button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown"
+        aria-expanded="false">
+    График работы
+</button>
+<ul class="dropdown-menu dropdown-menu-dark">
+    <li>
+        <a class="dropdown-item"
+           href="{% if staff_member %}{% url 'get_user_appointments' staff_member.id %}{% else %}{% url 'get_user_appointments' %}{% endif %}">
+            Календарь записей
+        </a>
+    </li>
+    <li>
+        <a class="dropdown-item"
+           hx-get="{% if staff_member %}{% url 'edit_calendar_settings' staff_member.id %}{% else %}{% url 'edit_calendar_settings' user.staffmember.id %}{% endif %}"
+           hx-target="#render-chunk"
+           href="#">
+            Настройка календаря
+        </a>
+    </li>
+    <li>
+        <a class="dropdown-item"
+           hx-get="{% if staff_member %}{% url 'get_day_off_list' staff_member.id %}{% else %}{% url 'get_day_off_list' user.staffmember.id %}{% endif %}"
+           hx-target="#render-chunk"
+           href="#">
+            Выходные
+        </a>
+    </li>
+</ul>

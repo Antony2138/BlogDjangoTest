@@ -3,10 +3,12 @@ from datetime import date
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models import ProtectedError
-from django.http import HttpResponse, JsonResponse
+from django.http import (HttpResponse, HttpResponseBadRequest,
+                         HttpResponseNotFound, JsonResponse)
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template import loader
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 
@@ -18,7 +20,7 @@ from .models import (Appointment, ArchivedAppointment, DayOff, Service,
                      StaffMember, WorkingHours)
 from .services import (arhiv_appointment, check_exists_calander_settings,
                        create_new_appt_from_calender_modal,
-                       fetch_user_appointments,
+                       fetch_user_appointments, get_day_off_list_service,
                        handle_entity_management_request,
                        prepare_appointment_display_data,
                        prepare_user_profile_data, save_appt_date_time,
@@ -46,13 +48,27 @@ def add_or_update_service(request, service_id=None):
     if request.method == "POST":
         form = ServiceForm(request.POST, request.FILES, instance=service)
         if form.is_valid():
-            form.save()
-            if service:
-                messages.success(request, _("Service saved successfully"))
+            name_service = form.cleaned_data['name']
+            existing_service = Service.objects.filter(name=name_service).exclude(pk=service.pk if service else None)
+            if not existing_service:
+                form.save()
+                if service:
+                    messages.success(request, _("Service saved successfully"))
+                else:
+                    messages.success(request,
+                                     _("The service has been successfully added. Don't forget to select the master providing the service"))
+                return redirect("get_service_list")
             else:
-                messages.success(request,
-                                 _("The service has been successfully added. Don't forget to select the master providing the service"))
-            return redirect("get_service_list" if service else "add_service")
+                messages.warning(request, "Такое название уже существует")
+                response = render(request, "administration/manage_service.html", {
+                    "page_title": page_title,
+                    "btn_text": btn_text,
+                    "form": form,
+                    "service": service,
+                    "errorForm": True
+                })
+                response["HX-Retarget"] = "#formModalContent"
+                return response
     else:
         form = ServiceForm(instance=service)
     context = {
@@ -60,21 +76,51 @@ def add_or_update_service(request, service_id=None):
         "btn_text": btn_text,
         "form": form,
     }
+    if service:
+        context["service"] = service
+    else:
+        context["service"] = None
     return render(request, "administration/manage_service.html", context)
 
 
 @require_user_authenticated
 @require_staff_or_superuser
 def get_service_list(request):
-    services = Service.objects.all()
-    context = {"services": services}
+    action = request.GET.get("action")
+    try:
+        staff_member = request.user.staffmember
+    except ObjectDoesNotExist:
+        staff_member = None
+    context = {}
+    if staff_member:
+        services = Service.objects.all()
+        if action == "offered":
+            services = staff_member.services_offered.all()
+        elif action == "un_offered":
+            services = Service.objects.exclude(id__in=staff_member.services_offered.values_list('id', flat=True))
+        context["service"] = services
+    else:
+        context["service"] = []
     return render(request, "administration/service_list.html", context=context)
 
 
 @require_user_authenticated
 @require_staff_or_superuser
-def show_abilities(request):
-    return render(request, "administration/manege_all.html")
+def show_staff_profile(request, staff_user_id=None):
+    context = {}
+    if staff_user_id == request.user.id:
+        return HttpResponseNotFound()
+    if staff_user_id:
+        staff_member = get_object_or_404(StaffMember, user=staff_user_id)
+        context['staff_member'] = staff_member
+    context['messages'] = messages.get_messages(request)
+    content = loader.render_to_string(
+        'administration/manege_all.html',
+        context=context,
+        request=request
+    )
+    response = HttpResponse(content)
+    return response
 
 
 @require_user_authenticated
@@ -94,6 +140,10 @@ def delete_service(request, service_id):
 @require_user_authenticated
 @require_superuser
 def add_staff_member_info(request):
+
+    if not request.headers.get('HX-Request') == 'true':
+        return HttpResponseNotFound()
+
     if request.method == "POST":
         form = StaffMemberForm(request.POST)
         if form.is_valid():
@@ -109,6 +159,7 @@ def add_staff_member_info(request):
         "page_title": "Создание сотрудника",
         "btn_text": "Добавить",
         "form": form,
+        "add_form": True,
     }
     return render(request, "administration/manage_staff.html", context=context)
 
@@ -145,17 +196,21 @@ def personal_info_display(request, staff_user_id):
 @require_user_authenticated
 @require_staff_or_superuser
 def get_staff_list(request):
+    if not request.headers.get('HX-Request') == 'true':
+        return HttpResponseNotFound()
     staff_members = StaffMember.objects.all()
     context = {"staff_members": staff_members}
     return render(request, "administration/staff_list.html", context=context)
 
 
 @require_user_authenticated
-@require_staff_or_superuser
-def remove_staff_member(request, staff_user_id, response_type="html"):
+@require_superuser
+def remove_staff_member(request, staff_user_id):
+    if not request.headers.get('HX-Request') == 'true':
+        return HttpResponseNotFound()
     if not check_permissions(staff_user_id, request.user):
-        message = "Вы не можете удалить чужой профиль"
-        return handle_unauthorized_response(request, message, response_type)
+        messages.warning(request, "Вы не можете удалить чужой профиль")
+        return get_staff_list(request)
 
     staff_member = get_object_or_404(StaffMember, user_id=staff_user_id)
     staff_member.delete()
@@ -163,7 +218,7 @@ def remove_staff_member(request, staff_user_id, response_type="html"):
     user.is_staff = False
     user.save()
     messages.success(request, "Работник успешно удален!")
-    return redirect("get_staff_list")
+    return get_staff_list(request)
 
 
 @require_user_authenticated
@@ -220,6 +275,7 @@ def add_day_off(request, staff_user_id=None, response_type="html"):
 @require_staff_or_superuser
 def update_day_off(request, day_off_id, staff_user_id=None, response_type="html"):
     day_off = DayOff.objects.get(pk=day_off_id)
+    print(day_off, "day_off")
     if not day_off:
         if response_type == "json":
             return json_response(
@@ -245,14 +301,15 @@ def update_day_off(request, day_off_id, staff_user_id=None, response_type="html"
 
 @require_user_authenticated
 @require_staff_or_superuser
-def delete_day_off(request, day_off_id, response_type="html"):
+@require_POST
+def delete_day_off(request, day_off_id):
     day_off = get_object_or_404(DayOff, pk=day_off_id)
     if not check_extensive_permissions(request.user.id, request.user, day_off):
-        message = _("You can only delete your own days off.")
-        return handle_unauthorized_response(request, message, response_type)
+        return HttpResponseBadRequest()
+    staff_member = int(request.POST.get("staff_member"))
     day_off.delete()
     messages.success(request, "Выходные успешно удалены!")
-    return redirect("user_profile", staff_user_id=request.user.id)
+    return get_day_off_list_service(request, staff_member)
 
 
 @require_user_authenticated
@@ -323,18 +380,32 @@ def delete_working_hours(request, working_hours_id, response_type="html"):
 
 @require_user_authenticated
 @require_staff_or_superuser
-def get_user_appointments(request, response_type='html'):
-    appointments = fetch_user_appointments(request.user)
+def get_user_appointments(request, staff_id=None, response_type='html'):
+    appointments = fetch_user_appointments(request.user, staff_id)
     appointments_json = convert_appointment_to_json(request, appointments)
 
     if response_type == 'json':
         return json_response("Successfully fetched appointments.", custom_data={'appointments': appointments_json},
                              safe=False)
 
+    if not appointments and staff_id:
+        messages.success(request, "У работника пока что нет записей")
+    elif not appointments:
+        messages.success(request, "У вас пока что нет записей")
+
+
     # Render the HTML template
     extra_context = {
         'appointments': json.dumps(appointments_json),
     }
+    if staff_id:
+        staff_member = get_object_or_404(StaffMember, id=staff_id)
+        offered_service = staff_member.get_services_offered()
+        extra_context['has_offered_service'] = True if offered_service else False
+    else:
+        staff_member = get_object_or_404(StaffMember, user=request.user)
+        offered_service = staff_member.get_services_offered()
+        extra_context['has_offered_service'] = True if offered_service else False
     context = get_generic_context_with_extra(request=request, extra=extra_context)
     # if appointment is empty and user doesn't have a staff-member instance, put a message
     # it's not clean
@@ -529,11 +600,14 @@ def edit_calendar_settings(request, staff_user_id=None):
             form.save()
             return render(request, "administration/calendar_settings_form.html", {"start_date": start_date,
                                                                           "settings": settings, "staff_member": staff_member})
-    else:
+    elif request.GET.get("edit") == "true":
         form = CalendarSettingsForm(instance=settings)
-
-    return render(request, "administration/calendar_settings_form.html", {"form": form, "start_date": start_date,
+        return render(request, "administration/calendar_settings_form.html", {"form": form, "start_date": start_date,
                                                                           "end_date": end_date, "staff_member": staff_member})
+    else:
+        return render(request, "administration/calendar_settings_form.html", {"start_date": start_date,
+                                                                              "end_date": end_date,
+                                                                              "staff_member": staff_member, "settings": settings})
 
 
 @require_user_authenticated
@@ -545,5 +619,134 @@ def search_users(request):
     ) | get_user_model().objects.filter(
         last_name__icontains=query
     )
-    results = list(users.values('id', 'first_name', 'last_name'))
+    only_users = users.filter(is_staff=False)
+    results = list(only_users.values('id', 'first_name', 'last_name'))
     return JsonResponse(results, safe=False)
+
+
+@require_user_authenticated
+@require_staff_or_superuser
+def staff_profile(request):
+    if request.headers.get('HX-Request') == 'true':
+        return render(request, 'administration/partials/staff_profile.html')
+    else:
+        return HttpResponseNotFound()
+
+
+@require_user_authenticated
+def service_offered(request, staff_user_id=None):
+    if not request.headers.get('HX-Request') == 'true':
+        return HttpResponseNotFound()
+
+    if staff_user_id:
+        staff_member = get_object_or_404(StaffMember, user=staff_user_id)
+    else:
+        staff_member = request.user.staffmember
+    services_offered = staff_member.get_services_offered()
+
+    return render(request, "administration/partials/service_offered.html", {"services_offered": services_offered})
+
+
+@require_user_authenticated
+@require_staff_or_superuser
+def update_staff_offered_services(request):
+    if request.method != "POST":
+        return HttpResponseBadRequest("Invalid request method.")
+
+    action_value = request.POST.get("action")
+    if not action_value:
+        return HttpResponseBadRequest("No action provided.")
+
+    try:
+        action, service_id = action_value.split("-")
+        service_id = int(service_id)
+    except ValueError:
+        return HttpResponseBadRequest("Invalid action format.")
+
+    service = get_object_or_404(Service, id=service_id)
+    staff_member = get_object_or_404(StaffMember, user=request.user)
+
+    if action == "add":
+        staff_member.services_offered.add(service)
+        trigger_event = "add-service-offered"
+    elif action == "revoke":
+        staff_member.services_offered.remove(service)
+        trigger_event = "revoke-service-offered"
+    else:
+        return HttpResponseBadRequest("Unknown action.")
+
+    staff_member.save()
+
+    context = {
+        "service": service,
+        "staff_member": staff_member,
+        "user": request.user
+    }
+
+    rendered_html = render(request, "administration/includes/service_row_btns.html", context).content
+
+    response = HttpResponse(rendered_html)
+    response["HX-Trigger"] = trigger_event
+    return response
+
+
+@require_user_authenticated
+@require_staff_or_superuser
+def update_offered_services_count(request):
+    try:
+        staff_member = StaffMember.objects.get(user=request.user)
+        count = staff_member.services_offered.all().count()
+    except StaffMember.DoesNotExist:
+        count = 0
+    return HttpResponse(str(count))
+
+
+@require_user_authenticated
+@require_superuser
+def search_services(request):
+    query = request.GET.get('search', '')
+    services = Service.objects.filter(
+        name__icontains=query
+    )
+    results = list(services.values('id', 'name', 'price'))
+    return JsonResponse(results, safe=False)
+
+
+@require_user_authenticated
+@require_staff_or_superuser
+def bulk_service_action(request):
+    service_ids = request.POST.getlist("services")
+    action = request.POST.get("action")
+    if not service_ids or not action:
+        return HttpResponseBadRequest("Выберите хотя бы одну услугу и действие.")
+
+    services = Service.objects.filter(id__in=service_ids)
+
+    # need to check can ли delete
+    if action == "delete":
+        if request.user.is_superuser:
+            services.delete()
+            messages.success(request, "Услуга удалена")
+        else:
+            messages.warning(request, "Свяжитесь с администратором")
+    # need to check can ли delete
+    elif action in ["add", "revoke"]:
+        staff_member = get_object_or_404(StaffMember, user=request.user)
+        for service in services:
+            if action == "add":
+                staff_member.services_offered.add(service)
+            elif action == "revoke":
+                staff_member.services_offered.remove(service)
+        staff_member.save()
+    else:
+        return HttpResponseBadRequest("Неизвестное действие.")
+
+    return redirect("get_service_list")
+
+
+@require_user_authenticated
+@require_staff_or_superuser
+def get_day_off_list(request, staff_user_id=None):
+    if not request.headers.get('HX-Request') == 'true':
+        return HttpResponseNotFound()
+    return get_day_off_list_service(request, staff_user_id)

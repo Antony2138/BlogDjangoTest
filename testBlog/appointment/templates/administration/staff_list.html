@@ -1,60 +1,71 @@
-{% extends 'mainController/layout.html'%}
 {% load i18n %}
 {% load static %}
-{% block title %} Работники {% endblock %}
-{% block customCSS %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/app_admin/staff_list.css' %}"/>
-{% endblock %}
-{% block body %}
-    <section class="content content-wrapper">
-        <div class="profile-container">
-            <section class="profile-section">
-                <div class="section-header">
-                    <a href="{% url 'show_all'%}" class="btn btn-warning"> Меню </a>
-                    <h2 class="section-header-itm">{% trans 'Работники' %}</h2>
+
+<section class="content content-wrapper" id="staff-list">
+    <div class="profile-container">
+        <section class="profile-section">
+            <div class="section-header">
+                <h2 class="section-header-itm">{% trans 'Работники' %}</h2>
+                 {% if user.is_superuser %}
                     <div class="buttons-container section-header-itm">
-                        <a href="{% url 'add_staff_member_info' %}"
+                        <a href="#"
+                           hx-get="{% url 'add_staff_member_info' %}"
+                           hx-target="#render-chunk"
+                           hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                            class="btn btn-secondary">
                             Добавить работника
                         </a>
                     </div>
-                </div>
-                <div class="responsive-table-container">
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>{% trans 'Имя' %}</th>
-                            <th>{% trans 'Email' %}</th>
-                            <th>{% trans 'Детали' %}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                            {% for staff_member in staff_members %}
-                                <tr>
-                                    <td data-label="Имя">{{ staff_member.get_staff_member_name }}</td>
-                                    <td data-label="Email">{{ staff_member.user.email|default:"Не указано" }}</td>
-                                    <td data-label="Детали">
-                                        <a href="{% url 'user_profile' staff_member.user.id %}" class="btn btn-warning">Профиль</a>
-                                        <a href="{% url 'remove_staff_member' staff_member.user.id %}" class="btn btn-danger">Удалить</a>
-                                    </td>
-                                </tr>
-                            {% empty %}
-                                <tr>
-                                    <td colspan="3">Сотрудников не добавлено.</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-            <div class="messages" style="margin: 20px 0">
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-dismissible {% if message.tags %}alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}danger{% else %}{{ message.tags }}{% endif %}{% endif %}"
-                             role="alert">{{ message }}</div>
-                    {% endfor %}
                 {% endif %}
             </div>
+            <div class="responsive-table-container">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>{% trans 'Имя' %}</th>
+                        <th>{% trans 'Email' %}</th>
+                        <th>{% trans 'Детали' %}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% for staff_member in staff_members %}
+                            <tr>
+                                <td data-label="Имя">{{ staff_member.get_staff_member_name }}</td>
+                                <td data-label="Email">{{ staff_member.user.email|default:"Не указано" }}</td>
+                                <td data-label="Детали">
+                                    {% if not staff_member.user.id == request.user.id %}
+                                        <a href="{% url 'show_staff_profile' staff_member.user.id %}" class="btn btn-outline-warning">Профиль</a>
+                                    {% endif %}
+                                    {% if user.is_superuser%}
+                                        <a href="#"
+                                           hx-post="{% url 'remove_staff_member' staff_member.user.id  %}"
+                                           hx-target="#render-chunk"
+                                           class="btn btn-outline-danger"
+                                           hx-confirm="Удалить работника?"
+                                           hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+                                           Удалить
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="3">Сотрудников не добавлено.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        {% if messages %}
+        <div class="mt-3">
+            {% for message in messages %}
+            <div class="alert alert-dismissible fade show custom-alert {{ message.tags }}">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
         </div>
-    </section>
-{% endblock %}
+        {% endif %}
+    </div>
+</section>

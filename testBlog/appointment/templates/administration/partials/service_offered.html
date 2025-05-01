@@ -1,0 +1,31 @@
+{% load i18n %}
+{% load static %}
+<section class="profile-container">
+    <h2 class="section-header">Предоставляемый услуги</h2>
+    <div class="responsive-table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>Название</th>
+                <th>Описание</th>
+                <th>Продолжительность</th>
+                <th>Цена</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for service in services_offered %}
+            <tr>
+                <td>{{ service.name }}</td>
+                <td>{{ service.description|default:"Не указано" }}</td>
+                <td>{{ service.get_duration }}</td>
+                <td>{{ service.get_price }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">{% trans 'No service offered yet' %}.</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>

@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
@@ -185,12 +186,15 @@ def update_personal_info_service(staff_user_id, post_data, current_user):
         return None, False, "Заполните все поля"
 
 
-def fetch_user_appointments(user):
+def fetch_user_appointments(user, staff_id):
     """Fetch the appointments for a given user.
 
     :param user: The user instance.
     :return: A list of appointments.
     """
+    if user.is_superuser and staff_id:
+        staff_member_instance = get_object_or_404(StaffMember, id=staff_id)
+        return get_staff_member_appointment_list(staff_member_instance)
     if user.is_superuser:
         return get_all_appointments()
     try:
@@ -225,6 +229,9 @@ def prepare_appointment_display_data(user, appointment_id):
 
 
 def create_new_appt_from_calender_modal(data, request):
+    service_id = data.get("service_id")
+    if not service_id:
+        return HttpResponseBadRequest("No service_id provided.")
     service = Service.objects.get(id=data.get("service_id"))
     staff_id = data.get("staff_member")
     if staff_id:
@@ -423,6 +430,11 @@ def handle_entity_management_request(
         context = get_working_hours_and_days_off_context(
             request, button_text, "day_off_form", form
         )
+        context.update(
+            {
+                "staff_user_id": staff_member.user.id,
+            }
+        )
         template = "administration/manage_day_off.html"
     else:
         form = StaffWorkingHoursForm(instance=instance)
@@ -438,19 +450,16 @@ def handle_entity_management_request(
         template = "administration/manage_working_hours.html"
 
     if request.method == "POST" and entity_type == "day_off":
+        print("print(instance)", instance)
         day_off_form = StaffDaysOffForm(request.POST, instance=instance)
         start_date = request.POST.get("start_date")
         end_date = request.POST.get("end_date")
-
         if day_off_exists_for_date_range(
                 staff_member, start_date, end_date, getattr(instance, "id", None)
         ):
             messages.error(request, "Такие выходные уже установлены")
-            redirect_url = reverse(
-                "add_day_off", kwargs={"staff_user_id": staff_member.user.id}
-            )
-            return json_response(custom_data={"redirect_url": redirect_url})
-        return handle_day_off_form(day_off_form, staff_member)
+            return get_day_off_list_service(request, staff_member.id)
+        return handle_day_off_form(request, day_off_form, staff_member)
 
     elif request.method == "POST" and entity_type == "working_hours":
         day_of_week = request.POST.get("day_of_week")
@@ -513,24 +522,16 @@ def get_working_hours_and_days_off_context(
     return context
 
 
-def handle_day_off_form(day_off_form, staff_member):
+def handle_day_off_form(request, day_off_form, staff_member):
     """Handle the day off form."""
     if day_off_form.is_valid():
         day_off = day_off_form.save(commit=False)
         day_off.staff_member = staff_member
         day_off.save()
-        redirect_url = reverse(
-            "user_profile", kwargs={"staff_user_id": staff_member.user.id}
-        )
-        return json_response(
-            "Выходные успешно добавлены", custom_data={"redirect_url": redirect_url}
-        )
+        messages.success(request, "Выходные успешно добавлены")
     else:
-        message = "Invalid data:"
-        message += get_error_message_in_form(form=day_off_form)
-        return json_response(
-            message, status=400, success=False, error_code=ErrorCode.INVALID_DATA
-        )
+        messages.error(request, "Ошибка попробуйте снова.")
+    return get_day_off_list_service(request, staff_member.id)
 
 
 def get_error_message_in_form(form):
@@ -638,3 +639,9 @@ def arhiv_appointment(appt):
     archived_appointment.appointment_request = archived_appointment_request
     archived_appointment.pk = None
     archived_appointment.save()
+
+
+def get_day_off_list_service(request, staff_id):
+    staff_member = get_object_or_404(StaffMember, id=staff_id)
+    days_off = staff_member.get_days_off()
+    return render(request, "administration/day_off_list.html", {"days_off": days_off, "staff_member": staff_member})
