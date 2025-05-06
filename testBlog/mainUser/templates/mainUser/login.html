@@ -3,7 +3,7 @@
 
 {% block body %}
 <div class="d-flex justify-content-center align-items-center custom-center">
-    <div class="card shadow-lg p-2" style="width: 500px; height: 540px; border-radius: 20px; background-color: #fff7dbcf;">
+    <div class="card shadow-lg p-2" style="width: 500px; height: 540px; border-radius: 20px; background-color: rgb(69 89 137);">
         <div class="card-body text-center">
             <div class="custom-container">
                 <div class="custom-btn">
@@ -16,11 +16,11 @@
                         <form method="POST" action="{% url 'login' %}">
                             {% csrf_token %}
                             <div class="d-block">
-                                <label class="pt-2 pb-2 fs-5 fw-bold"> Логин </label>
+                                <label class="pt-2 pb-2 fs-5 fw-bold text-white"> Логин </label>
                                 <input class="ele" type="text" name="username" maxlength="150" required="" id="id_username" placeholder="Логин">
                             </div>
                             <div class="d-block">
-                                <label class="pb-2 fs-5 fw-bold"> Пароль </label>
+                                <label class="pb-2 fs-5 fw-bold text-white"> Пароль </label>
                                 <input class="ele" type="password" name="password" required="" id="id_password" placeholder="Пароль">
                             </div>
                             <button type="submit" class="clkbtn">Вход</button>
@@ -29,7 +29,7 @@
                     </div>
 
                     <div class="signup-box">
-                        <form method="POST" action="{% url 'handle_user_registration' %}">
+                        <form method="POST" action="{% url 'handle_user_registration' %}" class="text-white fw-bold">
                             {% csrf_token %}
                             <div class="custom-form-group pt-2">
                                 <label for="id_usernamer">Логин:</label>

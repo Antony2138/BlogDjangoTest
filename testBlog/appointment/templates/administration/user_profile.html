@@ -28,11 +28,6 @@ text-align: left;
             {% endfor %}
             {% endif %}
         </div>
-        <section class="profile-section">
-            {% include "administration/personal_info_display.html" %}
-        </section>
-
-
         <!-- Appointment Information Section -->
         <section class="profile-section">
             <h2>Информация о приеме</h2>
@@ -57,93 +52,8 @@ text-align: left;
             {% endif %}
         </section>
 
-        <section class="profile-section">
-            <h2>Предоставляемый услуги</h2>
-            <small>
-                {% if not superuser %}
-                    Для изменения услуги свяжитесь с администратором
-                {% endif %}
-            </small>
-            <div class="responsive-table-container">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Название</th>
-                        <th>Описание</th>
-                        <th>Продолжительность</th>
-                        <th>Цена</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for service in services_offered %}
-                    <tr>
-                        <td>{{ service.name }}</td>
-                        <td>{{ service.description|default:"Не указано" }}</td>
-                        <td>{{ service.get_duration }}</td>
-                        <td>{{ service.get_price }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5">{% trans 'No service offered yet' %}.</td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </section>
 
 
-        <!-- Working Hours Information Section -->
-        <section class="profile-section">
-            <h2>Рабочие часы</h2>
-            <a href="{% url 'add_working_hours' staff_member.user.id %}"
-               class="section-content-button modify-btn button-color-green">
-                <i class="fa-solid fa-circle-plus"></i>
-            </a>
-            <small>
-                Ваши рабочие часы будут использоваться для определения того, когда вы доступны для приема.
-            </small>
-
-            <div class="responsive-table-container">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>День</th>
-                        <th>Начало</th>
-                        <th>Конец</th>
-                        <th>Функции</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for working_hour in working_hours %}
-                    <tr>
-                        <td>{{ working_hour.get_day_of_week_str }}</td>
-                        <td>{{ working_hour.start_time|time:"H:i" }}</td>
-                        <td>{{ working_hour.end_time|time:"H:i" }}</td>
-                        <td>
-                            <div class="buttons-container">
-                                <a href="{% url 'update_working_hours' working_hour.id %}"
-                                   class="modify-btn button-color-blue">
-                                    <i class="fa-solid fa-gear" style="margin-right:10px;"></i>
-                                </a>
-                                {% trans "Вы действительно хотите удалить рабочие часы?" as w_modal_message %}
-                                <a href="javascript:void(0)"
-                                   onclick="showModal('{{ modal_title }}', '{{ w_modal_message }}', 'Удалить', '{% url 'delete_working_hours' working_hours_id=working_hour.id %}', null)"
-                                   class="modify-btn button-color-red">
-                                    <i class="fa-solid fa-trash"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="4">Рабочих часов не установлено.</td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </section>
     </div>
 
     {% include 'modal/confirm_modal.html' %}

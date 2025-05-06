@@ -21,6 +21,7 @@ from .models import (Appointment, ArchivedAppointment, DayOff, Service,
 from .services import (arhiv_appointment, check_exists_calander_settings,
                        create_new_appt_from_calender_modal,
                        fetch_user_appointments, get_day_off_list_service,
+                       get_working_hours_list_service,
                        handle_entity_management_request,
                        prepare_appointment_display_data,
                        prepare_user_profile_data, save_appt_date_time,
@@ -55,8 +56,7 @@ def add_or_update_service(request, service_id=None):
                 if service:
                     messages.success(request, _("Service saved successfully"))
                 else:
-                    messages.success(request,
-                                     _("The service has been successfully added. Don't forget to select the master providing the service"))
+                    messages.success(request, "Услуга успешно добавлена")
                 return redirect("get_service_list")
             else:
                 messages.warning(request, "Такое название уже существует")
@@ -98,9 +98,9 @@ def get_service_list(request):
             services = staff_member.services_offered.all()
         elif action == "un_offered":
             services = Service.objects.exclude(id__in=staff_member.services_offered.values_list('id', flat=True))
-        context["service"] = services
+        context["services"] = services
     else:
-        context["service"] = []
+        context["services"] = []
     return render(request, "administration/service_list.html", context=context)
 
 
@@ -275,7 +275,6 @@ def add_day_off(request, staff_user_id=None, response_type="html"):
 @require_staff_or_superuser
 def update_day_off(request, day_off_id, staff_user_id=None, response_type="html"):
     day_off = DayOff.objects.get(pk=day_off_id)
-    print(day_off, "day_off")
     if not day_off:
         if response_type == "json":
             return json_response(
@@ -750,3 +749,11 @@ def get_day_off_list(request, staff_user_id=None):
     if not request.headers.get('HX-Request') == 'true':
         return HttpResponseNotFound()
     return get_day_off_list_service(request, staff_user_id)
+
+
+@require_user_authenticated
+@require_staff_or_superuser
+def get_working_hours_list(request, staff_user_id=None):
+    if not request.headers.get('HX-Request') == 'true':
+        return HttpResponseNotFound()
+    return get_working_hours_list_service(request, staff_user_id)

@@ -1,4 +1,12 @@
 <div class="mx-auto">
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-dismissible fade show custom-alert {{ message.tags }}">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
     <h3 class="mb-3">My Projects</h3>
     <div class="row">
         <div class="col-md-4">

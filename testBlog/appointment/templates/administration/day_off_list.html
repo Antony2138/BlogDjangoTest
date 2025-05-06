@@ -36,17 +36,16 @@
                                     hx-target="#render-chunk"
                                    class="btn btn-outline-primary btn-sm">
                                     <i class="fa-solid fa-pen"></i>
-
+                                </a>
                                 {% trans "Вы действительно хотите удалить выходные?" as w_modal_message %}
                                 <a href="#"
-                                   hx-confirm="Удалить выходные?"
+                                   hx-confirm="{% if request.user.id == staff_member.user.id %}Удалить выходные?{% else %}Удалить выходные выходные этого работника?{% endif %}"
                                    hx-post="{% url 'delete_day_off' day_off_id=day_off.id %}"
                                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                                    hx-target="#render-chunk"
                                    hx-vals='{"staff_member": {{staff_member.id}} }'
                                    class="btn btn-outline-danger btn-sm">
                                     <i class="fa-solid fa-trash"></i>
-
                                 </a>
                             </div>
                         </td>
@@ -80,6 +79,14 @@ document.addEventListener('htmx:afterSwap', function () {
     const endDisplay = document.getElementById('end_date_display');
     const startHidden = document.getElementById('start_date');
     const endHidden = document.getElementById('end_date');
+
+    function formatDateToYMD(date) {
+        const year = date.getFullYear();
+        const month = ("0" + (date.getMonth() + 1)).slice(-2);
+        const day = ("0" + date.getDate()).slice(-2);
+        return `${year}-${month}-${day}`;
+    }
+
     flatpickr(startDisplay, {
         dateFormat: "M. d, Y",
         altInput: true,
@@ -87,7 +94,7 @@ document.addEventListener('htmx:afterSwap', function () {
         locale: 'ru',
         onChange: function(selectedDates, dateStr, instance) {
             if (selectedDates.length > 0) {
-                startHidden.value = selectedDates[0].toISOString().split('T')[0];
+                startHidden.value = formatDateToYMD(selectedDates[0]);
             }
         }
     });
@@ -99,17 +106,8 @@ document.addEventListener('htmx:afterSwap', function () {
         locale: 'ru',
         onChange: function(selectedDates, dateStr, instance) {
             if (selectedDates.length > 0) {
-                endHidden.value = selectedDates[0].toISOString().split('T')[0];
+                endHidden.value = formatDateToYMD(selectedDates[0]);
             }
-        }
-    });
-
-    document.getElementById('days-off-form').addEventListener('htmx:afterRequest', function(event) {
-        const detail = event.detail.xhr.response;
-        if (detail.success) {
-            window.location.href = detail.redirect_url;
-        } else if (detail.message) {
-            alert(detail.message);
         }
     });
 });

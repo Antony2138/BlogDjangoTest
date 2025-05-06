@@ -149,6 +149,8 @@ admin_urlpatterns = [
     path('bulk_service_action/', views_admin.bulk_service_action, name='bulk_service_action'),
     path('get_day_off_list/', views_admin.get_day_off_list, name='get_day_off_list'),
     path('get_day_off_list/<int:staff_user_id>', views_admin.get_day_off_list, name='get_day_off_list'),
+    path('get_working_hours_list/<int:staff_user_id>', views_admin.get_working_hours_list, name='get_working_hours_list'),
+
 
 
 ]

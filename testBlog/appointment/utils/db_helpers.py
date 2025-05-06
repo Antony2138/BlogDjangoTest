@@ -302,7 +302,6 @@ def username_in_user_model():
 
 def tg_in_user_model():
     try:
-        # Check if the 'username' field exists in the User model
         get_user_model()._meta.get_field("social_link_tg")
         return True
     except FieldDoesNotExist:
@@ -311,7 +310,6 @@ def tg_in_user_model():
 
 def vk_in_user_model():
     try:
-        # Check if the 'username' field exists in the User model
         get_user_model()._meta.get_field("social_link_vk")
         return True
     except FieldDoesNotExist:

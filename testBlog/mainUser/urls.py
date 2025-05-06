@@ -22,7 +22,7 @@ urlpatterns = [
          name="show_confirming_credentials_modal"),
 
     path("reject_appointment/<int:appointment_id>", views.reject_appointment, name="reject_appointment"),
-    path("edit_client_profile/", views.edit_client_profile, name="edit_client_profile"),
+    path("edit_user_profile/", views.edit_user_profile, name="edit_user_profile"),
 
     # htmx_get
     path('get_clients_appointments/', views.get_clients_appointments, name='get_clients_appointments'),
