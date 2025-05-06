@@ -9,6 +9,7 @@ from django.db import models
 class CustomUser(AbstractUser):
     telegram_id = models.BigIntegerField(unique=True, null=True, blank=True)
     social_link_vk = models.CharField(max_length=160, null=True, blank=True)
+    social_link_tg = models.CharField(max_length=160, null=True, blank=True)
     phone_number = models.CharField(max_length=12, null=True, blank=True)
     photo_url = models.URLField(blank=True, null=True)
     avatar = models.ImageField(upload_to="avatar/", blank=True, null=True)

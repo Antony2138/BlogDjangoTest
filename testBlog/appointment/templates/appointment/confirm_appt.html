@@ -6,8 +6,8 @@
 {% endblock %}
 
 {% block body %}
-<div class="card">
-    <h1 class="thank-you-title text-black">{% trans "Confirm" %}</h1>
+<div class="card bg-dark text-white p-4">
+    <h1 class="thank-you-title">{% trans "Confirm" %}</h1>
     <p class="thank-you-message">{% trans "Almost ready, please check the details" %}.</p>
     <p class="appointment-details-title">{% trans "Appointment details" %}:</p>
     <ul class="appointment-details">
@@ -17,11 +17,11 @@
         <li>{% trans 'Duration' %}: {{ appointment_request.get_service_duration }}</li>
     </ul>
     <div class="bottom mt-3">
-        <button class="btn btn-warning" style="margin-right:10px">
-            <a href="{% url 'confirm_appt' appointment_request.id %}"> Подтвердить </a>
-        </button>
+<!--        <a href="" class="btn btn-outline-warning me-2">Изменить детали</a>-->
+        <a href="{% url 'confirm_appt' appointment_request.id %}" class="btn btn-outline-success">Подтвердить</a>
     </div>
 </div>
+
 {% if messages %}
 {% for message in messages %}
 <div class="alert alert-dismissible {% if message.tags %}alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}danger{% else %}{{ message.tags }}{% endif %}{% endif %}"

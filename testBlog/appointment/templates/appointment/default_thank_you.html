@@ -4,15 +4,12 @@
 {% block customCSS %}
 <link rel="stylesheet" type="text/css" href="{% static 'css/thank_you.css' %}"/>
 {% endblock %}
-{% block title %}
-Благодарность
-{% endblock %}
 {% block description %}
 {{ page_description }}
 {% endblock %}
 {% block body %}
-<div class="card">
-    <h1 class="thank-you-title text-black">{% trans "See you soon" %} !</h1>
+<div class="card bg-dark text-white p-4">
+    <h1 class="thank-you-title">{% trans "See you soon" %} !</h1>
     <p class="thank-you-message">{% trans "We have successfully scheduled your appointment!" %}.</p>
     <p class="appointment-details-title">{% trans "Appointment details" %}:</p>
     <ul class="appointment-details">

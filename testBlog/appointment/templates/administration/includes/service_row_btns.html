@@ -1,0 +1,27 @@
+{% load i18n %}
+{% load static %}
+{% if service in user.staffmember.get_services_offered %}
+    <button
+        hx-post="{% url 'update_staff_offered_services' %}"
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        hx-target="#service-row-btns-{{ service.id }}"
+        hx-swap="innerHTML"
+        name="action"
+        value="revoke-{{ service.id }}"
+        class="btn btn-outline-danger btn-sm"
+        style="min-width: 150px;">
+        Не предоставлять
+    </button>
+{% else %}
+    <button
+        hx-post="{% url 'update_staff_offered_services' %}"
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        hx-target="#service-row-btns-{{ service.id }}"
+        hx-swap="innerHTML"
+        name="action"
+        value="add-{{ service.id }}"
+        class="btn btn-outline-success btn-sm"
+        style="min-width: 150px;">
+        Предоставлять
+    </button>
+{% endif %}

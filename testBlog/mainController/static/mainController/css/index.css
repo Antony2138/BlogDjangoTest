@@ -42,10 +42,11 @@
     background: white;
     box-shadow: 0 10px 20px -5px rgba(0, 0, 0, .125);
     height: 600px;
-    margin: auto;
+    margin: 0 auto;
     overflow: hidden;
     position: relative;
-    width: 1800px; /* Адаптивная ширина */
+    max-width: 1800px;
+    width: 96%; /* Адаптивная ширина */
     display: flex; /* Размещаем элементы по горизонтали */
     align-items: center;
     justify-content: center;

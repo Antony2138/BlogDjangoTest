@@ -39,10 +39,12 @@ ajax_urlpatterns = [
 ]
 
 admin_urlpatterns = [
-    path("", views_admin.show_abilities, name="show_all"),
+    path("", views_admin.show_staff_profile, name="show_staff_profile"),
+    path("staff-profile/<int:staff_user_id>/", views_admin.show_staff_profile, name="show_staff_profile"),
 
     path('appointments/<str:response_type>/', views_admin.get_user_appointments, name='get_user_event_type'),
     path('appointments/', views_admin.get_user_appointments, name='get_user_appointments'),
+    path('appointments/<int:staff_id>', views_admin.get_user_appointments, name='get_user_appointments'),
     path('display-appointment/<int:appointment_id>/', views_admin.display_appointment, name='display_appointment'),
     path('delete-appointment/<int:appointment_id>/', views_admin.delete_appointment, name='delete_appointment'),
 
@@ -134,6 +136,23 @@ admin_urlpatterns = [
         name="edit_calendar_settings",
     ),
     path('search-users/', views_admin.search_users, name='search_users'),
+    path('search-services/', views_admin.search_services, name='search_services'),
+    path('staff_profile/', views_admin.staff_profile, name='staff_profile'),
+
+    path('service_offered/', views_admin.service_offered, name='service_offered'),
+    path('service_offered/<int:staff_user_id>', views_admin.service_offered, name='service_offered'),
+
+    path('update_staff_offered_services/',
+         views_admin.update_staff_offered_services,
+         name='update_staff_offered_services'),
+    path('update_offered_services_count/', views_admin.update_offered_services_count, name='update_offered_services_count'),
+    path('bulk_service_action/', views_admin.bulk_service_action, name='bulk_service_action'),
+    path('get_day_off_list/', views_admin.get_day_off_list, name='get_day_off_list'),
+    path('get_day_off_list/<int:staff_user_id>', views_admin.get_day_off_list, name='get_day_off_list'),
+    path('get_working_hours_list/<int:staff_user_id>', views_admin.get_working_hours_list, name='get_working_hours_list'),
+
+
+
 ]
 
 urlpatterns = [

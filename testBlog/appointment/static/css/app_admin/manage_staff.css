@@ -1,15 +1,6 @@
-.card{
-    background-color: #ffffffc4;
-}
-
 .staff-form-wrapper small{
     color: gray;
-}
 
-.card-body span{
-    font-size: 1.15rem;
-
-}
 
 .highlight {
     animation: highlight-animation 3s ease-out forwards;
@@ -17,10 +8,10 @@
 
 @keyframes highlight-animation {
     0% {
-        background-color: #e6e6fa; /* Лавандовый */
+        background-color: #e6e6fa;
     }
     50% {
-        background-color: #d8c2ff4c; /* Пастельный голубой */
+        background-color: #d8c2ff4c;
     }
     100% {
         background-color: white;

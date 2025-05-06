@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
@@ -185,12 +186,15 @@ def update_personal_info_service(staff_user_id, post_data, current_user):
         return None, False, "Заполните все поля"
 
 
-def fetch_user_appointments(user):
+def fetch_user_appointments(user, staff_id):
     """Fetch the appointments for a given user.
 
     :param user: The user instance.
     :return: A list of appointments.
     """
+    if user.is_superuser and staff_id:
+        staff_member_instance = get_object_or_404(StaffMember, id=staff_id)
+        return get_staff_member_appointment_list(staff_member_instance)
     if user.is_superuser:
         return get_all_appointments()
     try:
@@ -225,6 +229,9 @@ def prepare_appointment_display_data(user, appointment_id):
 
 
 def create_new_appt_from_calender_modal(data, request):
+    service_id = data.get("service_id")
+    if not service_id:
+        return HttpResponseBadRequest("No service_id provided.")
     service = Service.objects.get(id=data.get("service_id"))
     staff_id = data.get("staff_member")
     if staff_id:
@@ -276,7 +283,7 @@ def update_existing_appointment(data, request):
         if not staff_id:
             try:
                 staff_member = StaffMember.objects.get(user=request.user)
-                staff_id = staff_member.id  # ID работника
+                staff_id = staff_member.id
             except StaffMember.DoesNotExist:
                 staff_id = None
         appt = save_appointment(
@@ -323,15 +330,15 @@ def save_appointment(appt, client_name, client_email, start_time, phone_number, 
         start_time = convert_str_to_time(start_time)
     # calculate end time from start time and service duration
     end_time = get_ar_end_time(start_time, service.duration)
-
+    appt_date = appt.appointment_request.date
     overlapping_appointments = Appointment.objects.filter(
         appointment_request__staff_member_id=staff_member_id,
         appointment_request__service_id=service_id,
+        appointment_request__date=appt_date,
     ).exclude(id=appt.id).filter(
         Q(appointment_request__start_time__lt=end_time,
           appointment_request__end_time__gt=start_time)
     )
-    print(overlapping_appointments)
     if overlapping_appointments.exists():
         return None
 
@@ -421,7 +428,12 @@ def handle_entity_management_request(
     if entity_type == "day_off":
         form = StaffDaysOffForm(instance=instance)
         context = get_working_hours_and_days_off_context(
-            request, button_text, "day_off_form", form
+            request, button_text, "day_off_form", form, instance=instance
+        )
+        context.update(
+            {
+                "staff_user_id": staff_member.user.id,
+            }
         )
         template = "administration/manage_day_off.html"
     else:
@@ -438,19 +450,16 @@ def handle_entity_management_request(
         template = "administration/manage_working_hours.html"
 
     if request.method == "POST" and entity_type == "day_off":
+
         day_off_form = StaffDaysOffForm(request.POST, instance=instance)
         start_date = request.POST.get("start_date")
         end_date = request.POST.get("end_date")
-
         if day_off_exists_for_date_range(
                 staff_member, start_date, end_date, getattr(instance, "id", None)
         ):
             messages.error(request, "Такие выходные уже установлены")
-            redirect_url = reverse(
-                "add_day_off", kwargs={"staff_user_id": staff_member.user.id}
-            )
-            return json_response(custom_data={"redirect_url": redirect_url})
-        return handle_day_off_form(day_off_form, staff_member)
+            return get_day_off_list_service(request, staff_member.id)
+        return handle_day_off_form(request, day_off_form, staff_member)
 
     elif request.method == "POST" and entity_type == "working_hours":
         day_of_week = request.POST.get("day_of_week")
@@ -458,7 +467,7 @@ def handle_entity_management_request(
         end_time = request.POST.get("end_time")
 
         return handle_working_hours_form(
-            staff_member, day_of_week, start_time, end_time, add, instance_id
+            request, staff_member, day_of_week, start_time, end_time, add, instance_id
         )
 
     return render(request, template, context, status=200)
@@ -496,7 +505,7 @@ def get_working_hours_and_days_off_context(
     if instance:
         context.update(
             {
-                "working_hours_instance": instance,
+                "instance_id": instance.id,
             }
         )
     if wh_id:
@@ -513,24 +522,16 @@ def get_working_hours_and_days_off_context(
     return context
 
 
-def handle_day_off_form(day_off_form, staff_member):
+def handle_day_off_form(request, day_off_form, staff_member):
     """Handle the day off form."""
     if day_off_form.is_valid():
         day_off = day_off_form.save(commit=False)
         day_off.staff_member = staff_member
         day_off.save()
-        redirect_url = reverse(
-            "user_profile", kwargs={"staff_user_id": staff_member.user.id}
-        )
-        return json_response(
-            "Выходные успешно добавлены", custom_data={"redirect_url": redirect_url}
-        )
+        messages.success(request, "Выходные успешно сохранены")
     else:
-        message = "Invalid data:"
-        message += get_error_message_in_form(form=day_off_form)
-        return json_response(
-            message, status=400, success=False, error_code=ErrorCode.INVALID_DATA
-        )
+        messages.error(request, "Ошибка попробуйте снова.")
+    return get_day_off_list_service(request, staff_member.id)
 
 
 def get_error_message_in_form(form):
@@ -546,7 +547,7 @@ def get_error_message_in_form(form):
 
 
 def handle_working_hours_form(
-        staff_member, day_of_week, start_time, end_time, add, wh_id=None
+        request, staff_member, day_of_week, start_time, end_time, add, wh_id=None
 ):
     # Handle the working hours form.
 
@@ -613,14 +614,13 @@ def handle_working_hours_form(
     wk.save()
 
     # Return success with redirect URL
-    redirect_url = (
+    (
         reverse("user_profile", kwargs={"staff_user_id": staff_member.user.id})
         if staff_member.user.id
         else reverse("user_profile")
     )
-    return json_response(
-        "Working hours saved successfully.", custom_data={"redirect_url": redirect_url}
-    )
+    messages.success(request, "Рабочие часы успешно сохранены")
+    return get_working_hours_list_service(request, staff_member.id)
 
 
 def arhiv_appointment(appt):
@@ -638,3 +638,15 @@ def arhiv_appointment(appt):
     archived_appointment.appointment_request = archived_appointment_request
     archived_appointment.pk = None
     archived_appointment.save()
+
+
+def get_day_off_list_service(request, staff_id):
+    staff_member = get_object_or_404(StaffMember, id=staff_id)
+    days_off = staff_member.get_days_off()
+    return render(request, "administration/day_off_list.html", {"days_off": days_off, "staff_member": staff_member})
+
+
+def get_working_hours_list_service(request, staff_id):
+    staff_member = get_object_or_404(StaffMember, id=staff_id)
+    working_hours = staff_member.get_working_hours()
+    return render(request, "administration/working_hours_list.html", {"working_hours": working_hours, "staff_member": staff_member})

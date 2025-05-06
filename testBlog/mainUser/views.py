@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template import loader
 from django.urls import reverse
@@ -169,11 +169,9 @@ def confirm_email_code(request):
         user_email = request.session.get("email_to_verify")
         user = get_user_model().objects.get(email=user_email)
         verification_code = EmailVerificationCode.objects.filter(user=user).first()
-        print(verification_code, "verification_code")
         form = EnterCodeForm(request.POST)
         if form.is_valid():
             entered_code = form.cleaned_data["code"]
-            print(entered_code, "entered_code")
             if verification_code and verification_code.check_code(entered_code):
                 user.is_active = True
                 user.save()
@@ -236,18 +234,20 @@ def change_email(request):
 
 
 @login_required
-def edit_client_profile(request):
+def edit_user_profile(request):
     user = request.user
     if request.method == 'POST':
         action = request.POST.get('action')
         if action == "save_details":
             form = ClientProfileForm(request.POST, request.FILES, instance=user)
-            if user.avatar:
+            if user.avatar and request.FILES:
                 user.avatar.delete()
                 user.save()
             if form.is_valid():
                 form.save()
                 messages.success(request, "Профиль обновлён.")
+                if hasattr(request.user, 'staffmember'):
+                    return redirect('show_staff_profile')
                 return redirect('profile')
         elif action == "delete_avatar":
             if user.avatar:
@@ -256,8 +256,12 @@ def edit_client_profile(request):
                 messages.success(request, "Фото удалено")
             else:
                 messages.warning(request, "У вас нет фотографии профиля")
+            if hasattr(request.user, 'staffmember'):
+                return redirect('show_staff_profile')
             return redirect('profile')
     else:
+        if not request.headers.get('HX-Request') == 'true':
+            return HttpResponseNotFound()
         form = ClientProfileForm(instance=user)
 
     return render(request, "partials/edit_client_profile.html", {"form": form})

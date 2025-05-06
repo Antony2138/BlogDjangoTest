@@ -39,27 +39,31 @@ class ServiceForm(forms.ModelForm):
             "name": forms.TextInput(
                 attrs={
                     "label": "Название",
-                    "class": "form-control",
+                    'class': 'form-control bg-dark text-white border-secondary',
                     "placeholder": "Пример: Наращивание",
                 }
             ),
             "description": forms.Textarea(
                 attrs={
                     "label": "Название",
-                    "class": "form-control",
+                    'class': 'form-control bg-dark text-white border-secondary',
                     "placeholder": "Пример: Описание для клиентов.",
+                    "rows": 2,
                 }
             ),
             "duration": forms.TextInput(
                 attrs={
-                    "class": "form-control",
-                    "placeholder": "ЧЧ:MM:СС, (Пример: 00:15:00 для 15 минут)",
+                    'class': 'form-control bg-dark text-white border-secondary',
+                    "placeholder": "ЧЧ:MM:СС, (Пример: 00:30:00 для 30 минут)",
                 }
             ),
             "price": forms.NumberInput(
-                attrs={"class": "form-control", "placeholder": "Пример: 100.00"}
+                attrs={
+                    'class': 'form-control bg-dark text-white border-secondary',
+                    "placeholder": "Пример: 100.00",
+                }
             ),
-            "image": forms.ClearableFileInput(attrs={"class": "form-control"}),
+            "image": forms.ClearableFileInput(attrs={"class": "form-control bg-secondary text-white border-secondary mb-2"}),
         }
 
 
@@ -95,27 +99,27 @@ class StaffMemberForm(forms.ModelForm):
             "service_offered": forms.Select(attrs={"class": "form-control"}),
             "slot_duration": forms.NumberInput(
                 attrs={
-                    "class": "form-control",
+                    "class": "form-control bg-dark text-white border-secondary",
                     "placeholder": "15, 30, 60... (в минутах). Pекомендуемое 30",
                 }
             ),
             "lead_time": forms.TimeInput(
                 attrs={
-                    "class": "form-control",
+                    "class": "form-control bg-dark text-white border-secondary",
                     "placeholder": "Пример значений: 08:00:00, "
                                    "09:00:00... (24-часовой формат)",
                 }
             ),
             "finish_time": forms.TimeInput(
                 attrs={
-                    "class": "form-control",
+                    "class": "form-control bg-dark text-white border-secondary",
                     "placeholder": "Пример значений: 17:00:00, "
                                    "18:00:00... (24-часовой формат)",
                 }
             ),
             "appointment_buffer_time": forms.NumberInput(
                 attrs={
-                    "class": "form-control",
+                    "class": "form-control bg-dark text-white border-secondary",
                     "placeholder": "Пример значений: 15, 30, 45, 60... (в минутах)",
                 }
             ),

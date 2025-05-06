@@ -28,12 +28,14 @@
     color: white;
     border: 1px solid #6c757d; /* border-secondary */
     border-radius: 6px;
+    padding-bottom: 5px;
     overflow: hidden;
 }
 
 .responsive-table-container th,
 .responsive-table-container td {
-    padding: 12px 15px;
+    max-height: 45px;
+    padding: 8px 10px;
     text-align: left;
     border-bottom: 1px solid #6c757d; /* border-secondary */
     font-size: 16px;
@@ -53,6 +55,21 @@
     background-color: #495057; /* hover эффект */
 }
 
+#render-chunk .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    border-radius: 0.2rem;
+}
+
+.clickable {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.clickable:hover {
+    background-color: #003153; /* или любой красивый тёмный оттенок */
+}
 /* Адаптация под экраны < 450px */
 @media (max-width: 450px) {
     .responsive-table-container table,
@@ -63,6 +80,12 @@
     .responsive-table-container tr {
         display: block;
         width: 100%;
+    }
+    .mobile-none {
+        display: none;
+    }
+    .mobile {
+        flex-direction: column;
     }
 
     .responsive-table-container thead {

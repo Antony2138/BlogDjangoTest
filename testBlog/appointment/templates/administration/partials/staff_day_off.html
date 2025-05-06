@@ -1,0 +1,52 @@
+{% load static %}
+{% load i18n %}
+<section class="profile-container rounded mb-3" style="background-color: #343a40;">
+    <h2>{% trans 'Days Off' %}</h2>
+    <a href="{% url 'add_day_off' staff_member.user.id %}"
+       class="section-content-button modify-btn button-color-green">
+        <i class="fa-solid fa-circle-plus"></i>
+    </a>
+    <small>
+        Выходные — дни, когда вы не работаете, их нужно также включить в праздничные дни, чтобы клиенты не
+        записывали вас на эти дни.
+    </small>
+    <div class="responsive-table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>{% trans 'Start date' %}</th>
+                <th>{% trans 'End date' %}</th>
+                <th>{% trans 'Description' %}</th>
+                <th>{% trans 'Action' %}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for day_off in days_off %}
+            <tr>
+                <td>{{ day_off.start_date }}</td>
+                <td>{{ day_off.end_date }}</td>
+                <td>{{ day_off.description }}</td>
+                <td>
+                    <div class="buttons-container">
+                        <a href="{% url 'update_day_off' day_off.id %}"
+                           class="modify-btn button-color-blue">
+                            <i class="fa-solid fa-gear" style="margin-right:10px;"></i>
+                        </a>
+                        {% trans "Вы действительно хотите удалить выходные?" as w_modal_message %}
+                        <a href="javascript:void(0)"
+                           onclick="showModal('{{ modal_title }}', '{{ w_modal_message }}', 'Удалить', '{% url 'delete_day_off' day_off_id=day_off.id %}', null)"
+                           class="modify-btn button-color-red">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">Выходные не установлены.</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>

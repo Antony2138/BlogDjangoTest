@@ -1,62 +1,106 @@
-{% extends 'mainController/layout.html'%}
+{% load i18n %}
 {% load static %}
-{% block title %} Управление работниками {% endblock %}
-{% block customCSS %}
-<link rel="stylesheet" type="text/css" href="{%static 'css/app_admin/manage_staff.css'%}"/>
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-{% endblock %}
+<style>
+    .bg-dark ::placeholder {
+        color: #cccccc !important;
+    }
+    .select2-container .select2-selection--multiple {
+        background-color: #343a40 !important;
+    }
+    .select2-selection--single{
+        background-color: #343a40 !important;
+    }
+    .select2-search__field{
+        padding: 2px !important;
+        min-height: 26px !important;
+        color: white !important;
+    }
+    .select2-selection__rendered{
+        color: white !important;
+    }
+    .select2-selection__choice{
+        background-color: #8975afb0 !important;
+    }
+    .select2-search--dropdown{
+        background-color: #343a40 !important;
+    }
+    .select2-search__field{
+        background-color: #343a40 !important;
+    }
+    .select2-results{
+        background-color: #343a40 !important;
+        color: white !important;
+    }
+    .select2-results__option--selected{
+        background-color: #8975afb0 !important;
+    }
+    .select2-selection--single{
+        padding: 2px !important;
+        min-height: 38px !important;
+    }
+    .select2-selection__choice__remove{
+        color: white !important;
+    }
+    .select2-selection__choice__remove:hover{
+        color: black !important;
+    }
+</style>
 
-{% block body %}
-<div class="d-flex justify-content-center align-items-center">
-    <div class="card shadow-lg p-4" style="width: 700px; border-radius: 20px;">
-        <div class="card-body text-center">
-            <h2 class="card-title text-black">{{ page_title }}</h2>
-            <form method="post">
-                {% csrf_token %}
-                {% if user.is_superuser%}
+<div class="card bg-dark text-white border-secondary">
+    <div class="card-header border-bottom border-secondary">
+        <h5 class="mb-0">{{ page_title }}</h5>
+    </div>
+    <div class="card-body text-start">
+        <form hx-post="{% url 'add_staff_member_info' %}" hx-target="#render-chunk">
+            {% csrf_token %}
+            {% if user.is_superuser and add_form %}
+            <div class="mb-2">
+                <label class="form-label" for="id_user">Пользователь</label>
                 <select id="id_user" name="user" style="width: 100%"></select>
-                {% endif %}
-
-                <div class="form-group">
-                    <span>{{ form.services_offered.label }}</span><br>
-                    {{ form.services_offered }}<br>
-                    <small>Нажмите “Control” для выбора нескольких услуг</small>
-                </div>
-                <div class="form-group">
-                    <span>{{ form.slot_duration.label }}</span>
-                    {{ form.slot_duration }}
-                    <small>{{ form.slot_duration.help_text }}</small>
-                </div>
-
-                <div class="mb-3 d-flex align-items-center">
-                    <label class="col-form-label me-3">{{ form.lead_time.label }}</label>
-                    <div class="flex-grow-1">
-                        {{ form.lead_time }}
-                    </div>
-                </div>
-
-                <div class="mb-3 d-flex align-items-center">
-                    <label class="col-form-label me-3">{{ form.finish_time.label }}</label>
-                    <div class="flex-grow-1">
-                        {{ form.finish_time }}
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-primary">{{btn_text}}</button>
-            </form>
-            <div class="messages" style="margin: 20px 0">
-                {% if messages %}
-                {% for message in messages %}
-                <div class="alert alert-dismissible {% if message.tags %}alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}danger{% else %}{{ message.tags }}{% endif %}{% endif %}"
-                     role="alert">{{ message }}
-                </div>
-                {% endfor %}
-                {% endif %}
             </div>
+            {% endif %}
+            <div class="mb-2">
+                <label class="form-label" for="id_services_offered">Услуги</label>
+                <select name="services_offered" style="width: 100%" required id="id_services_offered" multiple>
+                </select>
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label" for="id_slot_duration">{{ form.slot_duration.label }}</label>
+                <div class="input-group">
+                    {{ form.slot_duration }}
+                </div>
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label" for="id_lead_time">{{ form.lead_time.label }}</label>
+                <div class="input-group">
+                    {{ form.lead_time }}
+                </div>
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label" for="id_finish_time">{{ form.finish_time.label }}</label>
+                <div class="input-group">
+                    {{ form.finish_time }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-outline-light mb-2">{{ btn_text }}</button>
+        </form>
+
+        {% if messages %}
+        <div class="mt-3">
+            {% for message in messages %}
+            <div class="alert alert-dismissible fade show custom-alert {{ message.tags }}">
+                {{ message }}
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
         </div>
+        {% endif %}
     </div>
 </div>
-{% endblock %}
 
 {% block customJS %}
 <script>
@@ -69,15 +113,35 @@
                 dataType: 'json',
                 delay: 250,
                 data: function (params) {
-                    return {
-                        search: params.term
-                    };
+                    return { search: params.term };
                 },
                 processResults: function (data) {
                     return {
                         results: data.map(user => ({
                             id: user.id,
                             text: `${user.first_name} ${user.last_name}`
+                        }))
+                    };
+                },
+                cache: true
+            },
+        });
+
+        $('#id_services_offered').select2({
+            placeholder: 'Введите название услуги',
+            allowClear: true,
+            ajax: {
+                url: "{% url 'search_services' %}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return { search: params.term };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.map(service => ({
+                            id: service.id,
+                            text: `${service.name} - ${service.price} руб.`
                         }))
                     };
                 },

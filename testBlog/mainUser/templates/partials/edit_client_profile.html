@@ -3,7 +3,7 @@
         <h5 class="mb-0">Редактирование профиля</h5>
     </div>
     <div class="card-body" style="padding: 40px;">
-        <form method="post" action="{% url 'edit_client_profile' %}" enctype="multipart/form-data">
+        <form method="post" action="{% url 'edit_user_profile' %}" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="mb-3">
                 <label class="form-label">Имя</label>

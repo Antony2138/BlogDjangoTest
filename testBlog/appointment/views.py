@@ -220,13 +220,16 @@ def appointment_request(request, service_id=None, staff_member_id=None):
     staff_member = None
     all_staff_members = None
     available_slots = []
-    label = '"Lucky" пилка'
+    label = 'Мастер:'
     if not request.user.is_authenticated:
         messages.error(request, _("To recording you must be registered"))
         return redirect("services")
     if service_id:
         service = get_object_or_404(Service, pk=service_id)
-        all_staff_members = StaffMember.objects.filter(services_offered=service)
+        all_staff_members = StaffMember.objects.filter(
+            services_offered=service,
+            workinghours__isnull=False
+        ).distinct()
 
         # If only one staff member for a service, choose them by default and fetch their slots.
         if all_staff_members.count() == 1:
