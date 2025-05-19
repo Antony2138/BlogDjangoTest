@@ -1,0 +1,58 @@
+{% load static %}
+{% load i18n %}
+<style>
+    #animation-p {
+        display: none;
+    }
+    #animation {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        border-radius: 10px;
+    }
+    #animation:focus-within {
+        background-color: #114545;
+    }
+    #animation:focus-within p {
+        display: block;
+        color: white;
+        margin-top: 5px;
+    }
+</style>
+<div id="slot-duration-staff">
+    {% if not form %}
+    <div class="d-flex justify-content-start gap-3">
+        <h2>Настройка количества слотов</h2>
+        <a hx-get="{% url 'edit_staff_slot_duration' staff_member.id %}?edit=true"
+           hx-swap="outerHTML"
+           hx-target="#slot-duration-staff"
+           class="section-content-button modify-btn button-color-green">
+            <i class="fa-solid fa-gear"></i>
+        </a>
+    </div>
+    <p>
+        <strong>Частота записи в минутах:</strong> {{ staff_member.get_slot_duration_text }}.
+    </p>
+    {% else %}
+    <div class="d-flex justify-content-start gap-3">
+        <h2>Настройка количества слотов</h2>
+    </div>
+    <div>
+        <form hx-post="{% url 'edit_staff_slot_duration' staff_member.id %}"
+              hx-swap="outerHTML"
+              hx-target="#slot-duration-staff">
+            {% csrf_token %}
+            <label for="{{ form.slot_duration.id_for_label }}" class="mb-0">
+                Продолжительность слотов:
+            </label>
+            <div id="animation" class="w-75">
+                {{ form.slot_duration }}
+                <div class="d-flex align-items-center justify-content-center">
+                    <p id="animation-p" class="ps-4 pe-4 pt-2">{{ sd_help_text }}</p>
+                </div>
+
+            </div>
+            <button type="submit" class="btn btn-success">Сохранить</button>
+        </form>
+    </div>
+    {% endif %}
+</div>

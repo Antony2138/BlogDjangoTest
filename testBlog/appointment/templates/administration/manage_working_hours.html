@@ -9,7 +9,7 @@
             </div>
 
             <div class="card-body text-start">
-                <form hx-post="{% if not instance_id %}{% url 'add_working_hours' staff_user_id %}{% else %}{% url 'update_working_hours' instance_id %}{% endif %}"
+                <form hx-post="{% if not instance_id %}{% url 'add_working_hours' staff_user_id %}{% else %}{% url 'update_working_hours' instance_id staff_user_id%}{% endif %}"
                       hx-target="#render-chunk"
                       id="workingHoursForm"
                       data-action="{% if working_hours_instance %}update{% else %}create{% endif %}"

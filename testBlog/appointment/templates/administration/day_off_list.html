@@ -31,15 +31,25 @@
                         <td data-label="Описание">{{ day_off.description|default:"-" }}</td>
                         <td data-label="Действие" class="text-center">
                             <div class="d-flex justify-content-center gap-2">
+                                {% if not user.is_superuser%}
                                 <a
                                     hx-get="{% url 'update_day_off' day_off.id %}"
                                     hx-target="#render-chunk"
                                    class="btn btn-outline-primary btn-sm">
                                     <i class="fa-solid fa-pen"></i>
                                 </a>
+                                {% else %}
+                                <a
+                                    hx-get="{% url 'update_day_off' day_off.id staff_member.user.id%}"
+                                    hx-target="#render-chunk"
+                                   class="btn btn-outline-primary btn-sm">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                                {% endif %}
+
                                 {% trans "Вы действительно хотите удалить выходные?" as w_modal_message %}
                                 <a href="#"
-                                   hx-confirm="{% if request.user.id == staff_member.user.id %}Удалить выходные?{% else %}Удалить выходные выходные этого работника?{% endif %}"
+                                   hx-confirm="{% if request.user.id == staff_member.user.id %}Удалить выходные?{% else %}Удалить выходные этого работника?{% endif %}"
                                    hx-post="{% url 'delete_day_off' day_off_id=day_off.id %}"
                                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                                    hx-target="#render-chunk"

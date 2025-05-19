@@ -66,7 +66,28 @@
             <aside class="col-md-3 text-light">
                 <div class="d-flex flex-column align-items-start">
                     <div class="d-flex align-items-start gap-3">
-                        <div class="avatar overflow-hidden rounded">
+                        <div data-bs-toggle="modal"
+                             data-bs-target="#avatarModal"
+                             data-avatar-url="{% if not staff_member %}
+                                                    {% if user.avatar %}
+                                                        {{ user.get_avatar_url }}
+                                                    {% elif user.is_tg_user %}
+                                                        {{ user.photo_url }}
+                                                    {% else %}
+                                                        {% static 'mainUser/img/avatar-d.png' %}
+                                                    {% endif %}
+                                                {% else %}
+                                                    {% if staff_member.user.avatar %}
+                                                        {{ staff_member.user.get_avatar_url }}
+                                                    {% elif staff_member.user.is_tg_user %}
+                                                        {{ staff_member.user.photo_url }}
+                                                    {% else %}
+                                                        {% static 'mainUser/img/avatar-d.png' %}
+                                                    {% endif %}
+                                                {% endif %}"
+                             onclick="showAvatarModal(this)"
+                             class="avatar overflow-hidden rounded"
+                             style="cursor: pointer;">
                             {% if not staff_member %}
                                 {% if user.avatar %}
                                 <img src="{{ user.get_avatar_url }}" alt="Avatar"
@@ -116,6 +137,7 @@
                                 Профиль
                             </a>
 <!--                        Блок -->
+                        {% if not staff_member or staff_member.user == request.user %}
                             <a href="#"
                                hx-get="{% url 'edit_user_profile' %}"
                                hx-target="#render-chunk"
@@ -123,6 +145,7 @@
                                style="width: 38px; height: 38px;">
                                 <i class="fa-solid fa-pen"></i>
                             </a>
+                        {% endif %}
                         </div>
 
                         {% if not staff_member %}
@@ -161,13 +184,9 @@
             <main class="col-md-9" id="render-chunk">
                 {% include 'administration/partials/staff_profile.html' %}
             </main>
+            {% include 'modal/avatar_user_modal.html' %}
 <!--            Modal for load forms -->
-            <div class="modal fade" id="formModal" tabindex="-1" aria-hidden="true">
-                  <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content bg-dark text-white" id="formModalContent">
-                        </div>
-                  </div>
-            </div>
+            {% include 'modal/form_modal.html' %}
 <!--            Modal for load forms -->
         </div>
     </div>

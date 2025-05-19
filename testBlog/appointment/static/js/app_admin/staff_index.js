@@ -836,7 +836,7 @@ function collectFormDataFromModal(modal) {
         isCreating: AppState.isCreating,
         service_id: serviceId,
         user_id: userId,
-        appointment_id: AppState.eventIdSelected
+        appointment_id: AppState.eventIdSelected,
     };
 
     if (staffId) {

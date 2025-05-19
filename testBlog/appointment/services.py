@@ -7,7 +7,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
@@ -613,12 +612,6 @@ def handle_working_hours_form(
         # Save working hours
     wk.save()
 
-    # Return success with redirect URL
-    (
-        reverse("user_profile", kwargs={"staff_user_id": staff_member.user.id})
-        if staff_member.user.id
-        else reverse("user_profile")
-    )
     messages.success(request, "Рабочие часы успешно сохранены")
     return get_working_hours_list_service(request, staff_member.id)
 
@@ -643,10 +636,12 @@ def arhiv_appointment(appt):
 def get_day_off_list_service(request, staff_id):
     staff_member = get_object_or_404(StaffMember, id=staff_id)
     days_off = staff_member.get_days_off()
-    return render(request, "administration/day_off_list.html", {"days_off": days_off, "staff_member": staff_member})
+    return render(request, "administration/day_off_list.html", {"days_off": days_off,
+                                                                "staff_member": staff_member})
 
 
 def get_working_hours_list_service(request, staff_id):
     staff_member = get_object_or_404(StaffMember, id=staff_id)
     working_hours = staff_member.get_working_hours()
-    return render(request, "administration/working_hours_list.html", {"working_hours": working_hours, "staff_member": staff_member})
+    return render(request, "administration/working_hours_list.html", {"working_hours": working_hours,
+                                                                      "staff_member": staff_member})

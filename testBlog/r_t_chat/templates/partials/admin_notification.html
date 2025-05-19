@@ -1,9 +1,9 @@
-<div class="admin-notification cursor-pointer" id="admin-notifications-container"
-    hx-get="{% url 'chatroom' chatroom_name %}"
+<div class="admin-notification" id="admin-notifications-container"
+    hx-get="{% url 'load_chatroom_from_push' chatroom_name %}"
     hx-trigger="click"
     hx-target="#hx-getter"
-    hx-select="#hx-getter"
-    hx-swap="outerHTML"
+    hx-select="#container-chat-admin"
+    hx-swap="innerHTML"
     hx-on="htmx:afterRequest:this.remove()">
     <div class="notification-header">
         Новое сообщение

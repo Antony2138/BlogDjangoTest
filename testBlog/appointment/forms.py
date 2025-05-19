@@ -252,3 +252,22 @@ class CalendarSettingsForm(forms.ModelForm):
         widgets = {
             "duration": forms.Select(attrs={"class": "form-control"}),
         }
+
+
+class StaffSlotDurationForm(forms.ModelForm):
+    class Meta:
+        model = StaffMember
+        fields = [
+            "slot_duration",
+        ]
+        labels = {
+            "slot_duration": "Частота записи в минутах:",
+        }
+        widgets = {
+            "slot_duration": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Пример значений: 30, 60, 90, 120... (в минутах)",
+                }
+            ),
+        }

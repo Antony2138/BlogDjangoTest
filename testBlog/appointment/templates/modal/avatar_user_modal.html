@@ -1,0 +1,14 @@
+<div class="modal fade" id="avatarModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-white" id="avatarModalContent" >
+                <img id="modalAvatarImg" src="" class="img-fluid w-100" alt="Avatar full view">
+            </div>
+      </div>
+</div>
+<script>
+function showAvatarModal(el) {
+    const avatarUrl = el.getAttribute('data-avatar-url');
+    const modalImg = document.getElementById('modalAvatarImg');
+    modalImg.src = avatarUrl;
+}
+</script>

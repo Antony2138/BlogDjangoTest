@@ -1,7 +1,63 @@
 {% load i18n %}
 {% load static %}
 <style>
-/* Общая адаптация для ширины экрана меньше 450px */
+.table-highlight {
+    animation: rowHighlight 1s ease-in-out forwards;
+}
+
+/* Основные цвета */
+:root {
+  --primary: #6366f1;  /* Фиолетовый Indigo */
+  --primary-hover: #4f46e5;
+  --secondary: #f43f5e; /* Розовый Rose */
+  --background: #f8fafc; /* Очень светлый серый */
+  --surface: #ffffff;   /* Белый */
+  --text-primary: #1e293b; /* Темно-синий серый */
+  --text-secondary: #64748b; /* Серый */
+  --border: #e2e8f0;   /* Светло-серый */
+  --success: #10b981;  /* Зеленый Emerald */
+  --warning: #f59e0b;  /* Желтый Amber */
+  --error: #ef4444;    /* Красный Red */
+}
+
+/* Анимация для выделения строк */
+@keyframes rowHighlight {
+  0% {
+    background-color: rgba(99, 102, 241, 0.2); /* Полупрозрачный индиго */
+    box-shadow: 0 0 0 1px var(--primary);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}
+
+/* Стили для скроллбара */
+.responsive-table-container::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.responsive-table-container::-webkit-scrollbar-track {
+  background: rgba(226, 232, 240, 0.5); /* Светлый с прозрачностью */
+  border-radius: 3px;
+}
+
+.responsive-table-container::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 3px;
+}
+
+.responsive-table-container::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-hover);
+}
+
+/* Firefox */
+.responsive-table-container {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) rgba(226, 232, 240, 0.5);
+}
+
 @media (max-width: 450px) {
     .section-header {
         padding: 10px;
@@ -69,6 +125,45 @@
         width: 100%;
     }
 }
+
+.responsive-table-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.responsive-table-container::-webkit-scrollbar-track {
+    background: #2d3748;
+    border-radius: 4px;
+}
+
+.responsive-table-container::-webkit-scrollbar-thumb {
+    background: #4a5568;
+    border-radius: 4px;
+}
+
+.responsive-table-container::-webkit-scrollbar-thumb:hover {
+    background: #718096;
+}
+
+.responsive-table-container {
+    scrollbar-width: thin;
+    scrollbar-color: #4a5568 #2d3748;
+}
+
+.responsive-table-container {
+    scroll-behavior: smooth;
+}
+
+.responsive-table-container {
+    --shadow-size: 10px;
+    mask-image: linear-gradient(
+        to bottom,
+        transparent 0,
+        black var(--shadow-size),
+        black calc(100% - var(--shadow-size)),
+        transparent 100%
+    );
+}
 </style>
 <section class="content content-wrapper" id="service-list">
     <div class="profile-container">
@@ -76,6 +171,9 @@
             <h2 class="section-header-itm">{% trans 'List of services' %}</h2>
             <div class="section-header">
                 <div class="buttons-container section-header-itm d-flex gap-2 align-items-center">
+                    <button hx-on:click="toggleEditingMode()" type="button" class="btn btn-outline-light btn-sm"
+                            id="toggle-editing">Редактировать
+                    </button>
                     <!--    FILTERS     FILTERS        FILTERS   -->
                     <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
@@ -111,9 +209,6 @@
                         </li>
                     </ul>
                     <!--    FILTERS      FILTERS       FILTERS   -->
-                    <button hx-on:click="toggleEditingMode()" type="button" class="btn btn-outline-light btn-sm"
-                            id="toggle-editing">Редактировать
-                    </button>
                     {% if not staff_member %}
                     <a href="#"
                        hx-get="{% url 'service_offered' %}"
@@ -133,14 +228,6 @@
 
                     </a>
                     {% endif %}
-<!--                    <a href="#"-->
-<!--                       hx-get="{% url 'add_service' %}"-->
-<!--                       hx-target="#render-chunk"-->
-<!--                       class="btn btn-secondary btn-sm"-->
-<!--                    >-->
-<!--                        Добавить услугу-->
-<!--                    </a>-->
-
                     <a href="#"
                        hx-get="{% url 'add_service' %}"
                        hx-target="#formModalContent"
@@ -154,7 +241,7 @@
 
                 </div>
             </div>
-            <form method="post"
+            <form method="post" style="height: 450px; display: flex; flex-direction: column;"
                   hx-post="{% url 'bulk_service_action' %}"
                   hx-target="#service-list"
                   hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
@@ -177,7 +264,7 @@
                         </button>
                     </div>
                 </div>
-                <div class="responsive-table-container">
+                <div class="responsive-table-container" style="flex-grow: 1; overflow-y: auto;">
                     <table>
                         <thead>
                         <tr>
@@ -192,29 +279,26 @@
                             </th>
                         </tr>
                         </thead>
-                        <tbody>
-                        {% for service in services %}
-                        {% include 'administration/includes/services_row.html' with edit_mode=True %}
-                        {% empty %}
-                        <tr>
-                            <td colspan="4">Услуги нет.</td>
-                        </tr>
-                        {% endfor %}
+                        <tbody id="services-list-table">
+                            {% include 'administration/partials/services_chunk.html' %}
                         </tbody>
                     </table>
                 </div>
             </form>
         </section>
-        {% if messages %}
-        <div class="mt-3">
-            {% for message in messages %}
-            <div class="alert alert-dismissible fade show custom-alert {{ message.tags }}">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            {% endfor %}
+        <div id="messages">
+            {% if messages %}
+                <div class="mt-3">
+                    {% for message in messages %}
+                        <div class="alert alert-dismissible fade show custom-alert {{ message.tags }}">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
-        {% endif %}
+
     </div>
 </section>
 
@@ -234,10 +318,23 @@
   </div>
 </div>
 <script>
-
+    let toggleEditing = false;
     function toggleEditingMode() {
+        const toggleBtn = document.getElementById("toggle-editing");
         const bulkActions = document.getElementById("bulk-actions");
         const checkCols = document.querySelectorAll(".edit-mode");
+
+        toggleEditing = !toggleEditing;
+
+        if (toggleEditing) {
+            toggleBtn.textContent = "Закрыть";
+            toggleBtn.classList.remove("btn-outline-light");
+            toggleBtn.classList.add("btn-outline-success");
+        } else {
+            toggleBtn.textContent = "Редактировать";
+            toggleBtn.classList.remove("btn-outline-success");
+            toggleBtn.classList.add("btn-outline-light");
+        }
 
         if (bulkActions && checkCols.length > 0) {
             bulkActions.classList.toggle("d-none");
@@ -246,6 +343,22 @@
     }
 
     document.addEventListener("htmx:afterSwap", function() {
+        if (toggleEditing) {
+            const toggleBtn = document.getElementById("toggle-editing");
+            const bulkActions = document.getElementById("bulk-actions");
+            const checkCols = document.querySelectorAll(".edit-mode");
+
+            if (toggleBtn) {
+                toggleBtn.textContent = "Закрыть";
+                toggleBtn.classList.remove("btn-outline-light");
+                toggleBtn.classList.add("btn-outline-success");
+            }
+
+            if (bulkActions && checkCols.length > 0) {
+                bulkActions.classList.remove("d-none");
+                checkCols.forEach(col => col.classList.remove("d-none"));
+            }
+        }
         const selectAll = document.getElementById("select-all");
         if (selectAll) {
             selectAll.addEventListener("change", function (e) {
