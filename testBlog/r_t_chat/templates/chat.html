@@ -1,9 +1,6 @@
-{% extends 'mainController/layout.html'%}
 {% load i18n %}
 {% load static %}
-{% block title %} Чат {% endblock %}
-
-{% block css %}
+<style>
 .card-header {
     position: relative;
 }
@@ -13,14 +10,65 @@
     align-items: center;
     justify-content: center;
 }
-{% endblock %}
-{% block body %}
-<div class="container mt-4">
 
-    <div class="card">
-        <div class="card-header text-white text-center" style="background-color: #0e2238;">
+    #chat_container::-webkit-scrollbar-track {
+        background: #1f2937;
+        border-radius: 4px;
+    }
+
+    #chat_container::-webkit-scrollbar-thumb {
+        background: #374151;
+        border-radius: 4px;
+    }
+
+    #chat_container::-webkit-scrollbar-thumb:hover {
+        background: #4b5563;
+    }
+
+    #chat_container {
+        scrollbar-width: thin;
+        scrollbar-color: #374151 #1f2937;
+        scroll-behavior: smooth;
+        --shadow-size: 10px;
+        mask-image: linear-gradient(
+            to bottom,
+            transparent 0,
+            black var(--shadow-size),
+            black calc(100% - var(--shadow-size)),
+            transparent 100%
+        );
+        background: linear-gradient(to bottom, #2d2d2d 0%, #1a1a1a 100%);
+    }
+
+    .card-header {
+        background: linear-gradient(to right, #2d2d2d 0%, #383838 100%) !important;
+        border-bottom: 1px solid #444 !important;
+    }
+
+    .card-footer {
+        background: linear-gradient(to right, #1a1a1a 0%, #2d2d2d 100%) !important;
+        border-top: 1px solid #444 !important;
+    }
+
+    .card {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        background-color: #252525;
+    }
+
+    .chat-enter {
+        background-color: #e8f0fe !important;
+        border-color: #555 !important;
+        color: black !important;
+    }
+
+
+</style>
+
+<div class="container mt-5">
+    <div class="card border-0" style="background: transparent;">
+        <div class="card-header text-white text-center">
             <div class="d-flex align-items-center justify-content-center position-relative">
-                <h1 class="text-center m-2">Чат с администратором</h1>
+                <h1 class="text-center m-2">Чат с {{ other_user.get_full_name }}</h1>
                 <div id="online_status" class="me-2"></div>
             </div>
         </div>
@@ -30,7 +78,6 @@
                 {% include 'partials/chat_message.html' %}
                 {% endfor %}
             </ul>
-
         </div>
         <div class="card-footer">
             <form id="chat_message_form" class="w-full"
@@ -38,12 +85,18 @@
                   ws-connect="/ws/chat/{{ chatroom_name }}/"
                   ws-send="this">
                 {% csrf_token %}
-                {{ form }}
+                <div class="d-flex justify-content-center gap-3 w-full">
+                    <div class="w-75">
+                        <input type="text" name="body" placeholder="Введите сообщение..." class="form-control chat-enter" maxlength="300" autofocus="" id="id_body">
+                    </div>
+                    <button type="submit" class="btn btn-outline-primary border-2">
+                        <i class="fa fa-paper-plane"></i>
+                    </button>
+                </div>
             </form>
         </div>
     </div>
 </div>
-
 <script>
     function scrollToBottom(time=0) {
     setTimeout(function() {
@@ -56,4 +109,3 @@
         this.reset();
     });
 </script>
-{% endblock %}

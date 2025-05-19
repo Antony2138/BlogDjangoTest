@@ -4,6 +4,7 @@ from datetime import date
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.paginator import Paginator
 from django.db.models import ProtectedError
 from django.http import (HttpResponse, HttpResponseBadRequest,
                          HttpResponseNotFound, JsonResponse)
@@ -15,7 +16,8 @@ from django.views.decorators.http import require_POST
 from .decorators import (require_ajax, require_staff_or_superuser,
                          require_superuser, require_user_authenticated)
 from .forms import (CalendarSettingsForm, PersonalInformationForm, ServiceForm,
-                    StaffAppointmentInformationForm, StaffMemberForm)
+                    StaffAppointmentInformationForm, StaffMemberForm,
+                    StaffSlotDurationForm)
 from .models import (Appointment, ArchivedAppointment, DayOff, Service,
                      StaffMember, WorkingHours)
 from .services import (arhiv_appointment, check_exists_calander_settings,
@@ -36,7 +38,7 @@ from .utils.permissions import (check_extensive_permissions, check_permissions,
 
 
 @require_user_authenticated
-@require_staff_or_superuser
+@require_superuser
 def add_or_update_service(request, service_id=None):
     if service_id:
         service = get_object_or_404(Service, pk=service_id)
@@ -52,12 +54,19 @@ def add_or_update_service(request, service_id=None):
             name_service = form.cleaned_data['name']
             existing_service = Service.objects.filter(name=name_service).exclude(pk=service.pk if service else None)
             if not existing_service:
-                form.save()
+                service_to_render = form.save()
+                rendered_row = loader.render_to_string(
+                    "administration/includes/services_row.html",
+                    {"service": service_to_render, "user": request.user, "highlight": True, "edit_mode": True},
+                    request=request
+                )
+                response = HttpResponse(rendered_row)
                 if service:
-                    messages.success(request, _("Service saved successfully"))
+                    response["HX-Retarget"] = f"#service-{service_to_render.id}"
+                    response["HX-Reswap"] = "outerHTML"
                 else:
-                    messages.success(request, "Услуга успешно добавлена")
-                return redirect("get_service_list")
+                    response["HX-Reswap"] = "afterbegin"
+                return response
             else:
                 messages.warning(request, "Такое название уже существует")
                 response = render(request, "administration/manage_service.html", {
@@ -65,10 +74,19 @@ def add_or_update_service(request, service_id=None):
                     "btn_text": btn_text,
                     "form": form,
                     "service": service,
-                    "errorForm": True
                 })
                 response["HX-Retarget"] = "#formModalContent"
                 return response
+        else:
+            messages.warning(request, "Проблема с заполнением формы")
+            response = render(request, "administration/manage_service.html", {
+                "page_title": page_title,
+                "btn_text": btn_text,
+                "form": form,
+                "service": service,
+            })
+            response["HX-Retarget"] = "#formModalContent"
+            return response
     else:
         form = ServiceForm(instance=service)
     context = {
@@ -87,21 +105,52 @@ def add_or_update_service(request, service_id=None):
 @require_staff_or_superuser
 def get_service_list(request):
     action = request.GET.get("action")
+    page_number = 1
     try:
         staff_member = request.user.staffmember
     except ObjectDoesNotExist:
         staff_member = None
     context = {}
     if staff_member:
-        services = Service.objects.all()
+        services = Service.objects.all().order_by("-id")
         if action == "offered":
             services = staff_member.services_offered.all()
         elif action == "un_offered":
             services = Service.objects.exclude(id__in=staff_member.services_offered.values_list('id', flat=True))
-        context["services"] = services
+
+        paginator = Paginator(services, 10)
+        page = paginator.get_page(page_number)
+        context["services"] = page
     else:
         context["services"] = []
     return render(request, "administration/service_list.html", context=context)
+
+
+@require_user_authenticated
+@require_staff_or_superuser
+def get_service_rows(request):
+    action = request.GET.get("action")
+    page_number = request.GET.get('page', 1)
+    try:
+        staff_member = request.user.staffmember
+    except ObjectDoesNotExist:
+        staff_member = None
+
+    if not staff_member:
+        return render(request, "administration/service_list_rows.html", context={"services": []})
+
+    if action == "offered":
+        services_qs = staff_member.services_offered.all()
+    elif action == "un_offered":
+        services_qs = Service.objects.exclude(id__in=staff_member.services_offered.values_list('id', flat=True))
+    else:
+        services_qs = Service.objects.all()
+
+    services_qs = services_qs.order_by("-id")
+    paginator = Paginator(services_qs, 10)
+    page = paginator.get_page(page_number)
+
+    return render(request, "administration/partials/services_chunk.html", context={"services": page})
 
 
 @require_user_authenticated
@@ -292,9 +341,9 @@ def update_day_off(request, day_off_id, staff_user_id=None, response_type="html"
         message = _("You can only update your own days off.")
         return handle_unauthorized_response(request, message, response_type)
     staff_user_id = staff_user_id or request.user.pk
-    staff_member = StaffMember.objects.get(user_id=staff_user_id)
+    staff_member = StaffMember.objects.get(user=staff_user_id)
     return handle_entity_management_request(
-        request, staff_member, entity_type="day_off", instance=day_off
+        request, staff_member, entity_type="day_off", staff_user_id=staff_user_id, instance=day_off
     )
 
 
@@ -352,7 +401,7 @@ def update_working_hours(
         return handle_unauthorized_response(request, message, response_type)
     staff_user_id = staff_user_id or request.user.pk
     staff_member = get_object_or_404(
-        StaffMember, user_id=staff_user_id or request.user.id
+        StaffMember, user=staff_user_id or request.user.id
     )
     return handle_entity_management_request(
         request=request,
@@ -367,14 +416,14 @@ def update_working_hours(
 
 @require_user_authenticated
 @require_staff_or_superuser
-def delete_working_hours(request, working_hours_id, response_type="html"):
+def delete_working_hours(request, working_hours_id):
     working_hours = get_object_or_404(WorkingHours, pk=working_hours_id)
     if not check_extensive_permissions(request.user.id, request.user, working_hours):
-        message = _("You can only delete your own working hours.")
-        return handle_unauthorized_response(request, message, response_type)
+        return HttpResponseBadRequest()
+    staff_member = int(request.POST.get("staff_member"))
     working_hours.delete()
     messages.success(request, "Рабочие часы успешно удалены!")
-    return redirect("user_profile", staff_user_id=request.user.id)
+    return get_working_hours_list_service(request, staff_member)
 
 
 @require_user_authenticated
@@ -454,7 +503,7 @@ def fetch_service_list_for_staff(request):
     if appointment_id:
         # Fetch services for a specific appointment (edit mode)
         if request.user.is_superuser:
-            appointment = Appointment.objects.get(id=appointment_id)
+            appointment = get_object_or_404(Appointment, id=appointment_id)
             staff_member = appointment.get_staff_member()
         else:
             staff_member = StaffMember.objects.get(user=request.user)
@@ -724,8 +773,11 @@ def bulk_service_action(request):
     # need to check can ли delete
     if action == "delete":
         if request.user.is_superuser:
-            services.delete()
-            messages.success(request, "Услуга удалена")
+            try:
+                services.delete()
+                messages.success(request, "Услуга удалена")
+            except ProtectedError:
+                messages.warning(request, "Для удаления услуги удалите вручную все записи звазанные с этой услугой")
         else:
             messages.warning(request, "Свяжитесь с администратором")
     # need to check can ли delete
@@ -757,3 +809,26 @@ def get_working_hours_list(request, staff_user_id=None):
     if not request.headers.get('HX-Request') == 'true':
         return HttpResponseNotFound()
     return get_working_hours_list_service(request, staff_user_id)
+
+
+@require_user_authenticated
+@require_staff_or_superuser
+def edit_staff_slot_duration(request, staff_id=None):
+    if not request.headers.get('HX-Request') == 'true':
+        return HttpResponseNotFound()
+    staff_member = get_object_or_404(StaffMember, id=staff_id)
+    if request.method == "POST":
+        form = StaffSlotDurationForm(request.POST, instance=staff_member)
+        if form.is_valid():
+            form.save()
+            return render(request, "administration/edit_staff_slot_duration.html", {"staff_member": staff_member
+                                                                                    })
+    elif request.GET.get("edit") == "true":
+        sd_help = StaffMember._meta.get_field("slot_duration")
+        sd_help_text = sd_help.help_text
+        form = StaffSlotDurationForm(instance=staff_member)
+        return render(request, "administration/edit_staff_slot_duration.html", {"staff_member": staff_member,
+                                                                                "form": form, "sd_help_text": sd_help_text})
+    else:
+        return render(request, "administration/edit_staff_slot_duration.html", {"staff_member": staff_member
+                                                                            })

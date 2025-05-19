@@ -1,0 +1,19 @@
+{% for service in services %}
+    {% include 'administration/includes/services_row.html' with edit_mode=True %}
+{% empty %}
+<tr>
+    <td colspan="4">Услуги нет.</td>
+</tr>
+{% endfor %}
+
+{% if services.has_next %}
+<tr id="load-more-trigger"
+    hx-get="{% url 'get_service_rows' %}?page={{ services.next_page_number }}&action={{ request.GET.action }}"
+    hx-trigger="intersect once"
+    hx-target="#services-list-table"
+    hx-swap="beforeend"
+    style="height: 1px; visibility: hidden;"
+>
+</tr>
+
+{% endif %}

@@ -1,62 +1,80 @@
 {% load i18n %}
 {% load static %}
 <section class="profile-container">
-    <div class="section-header d-flex justify-content-between align-items-center">
-        <h2 class="section-header-itm">{% trans 'Рабочие часы' %}</h2>
-        <a hx-get="{% url 'add_working_hours' staff_member.user.id %}"
-           hx-target="#render-chunk"
-           class="btn btn-outline-success btn-sm">
-            <i class="fa-solid fa-circle-plus"></i> Добавить
-        </a>
-    </div>
-    <small class="text-white d-block mb-3">
-        Ваши рабочие часы будут использоваться для определения того, когда вы доступны для приема.
-    </small>
+    <div id="working-hours-list" class="mb-5">
+        <div class="section-header d-flex justify-content-between align-items-center">
+            <h2 class="section-header-itm">{% trans 'Рабочие часы' %}</h2>
+            <a hx-get="{% url 'add_working_hours' staff_member.user.id %}"
+               hx-target="#working-hours-list"
+               class="btn btn-outline-success btn-sm">
+                <i class="fa-solid fa-circle-plus"></i> Добавить
+            </a>
+        </div>
+        <small class="text-white d-block mb-3">
+            Ваши рабочие часы будут использоваться для определения того, когда вы доступны для приема.
+        </small>
 
-    <div class="responsive-table-container">
-        <table class="table table-dark table-hover table-striped align-middle">
-            <thead>
+        <div class="responsive-table-container  mb-5">
+            <table class="table table-dark table-hover table-striped align-middle">
+                <thead>
                 <tr>
                     <th>{% trans 'День' %}</th>
                     <th>{% trans 'Начало' %}</th>
                     <th>{% trans 'Конец' %}</th>
                     <th class="text-center">{% trans 'Действие' %}</th>
                 </tr>
-            </thead>
-            <tbody>
+                </thead>
+                <tbody>
                 {% for working_hour in working_hours %}
-                    <tr>
-                        <td data-label="День">{{ working_hour.get_day_of_week_str }}</td>
-                        <td data-label="Начало">{{ working_hour.start_time|time:"H:i" }}</td>
-                        <td data-label="Конец">{{ working_hour.end_time|time:"H:i" }}</td>
-                        <td data-label="Действие" class="text-center">
-                            <div class="d-flex justify-content-center gap-2">
-                                <a
+                <tr>
+                    <td data-label="День">{{ working_hour.get_day_of_week_str }}</td>
+                    <td data-label="Начало">{{ working_hour.start_time|time:"H:i" }}</td>
+                    <td data-label="Конец">{{ working_hour.end_time|time:"H:i" }}</td>
+                    <td data-label="Действие" class="text-center">
+                        <div class="d-flex justify-content-center gap-2">
+                            {% if not user.is_superuser %}
+                            <a
                                     hx-get="{% url 'update_working_hours' working_hour.id %}"
-                                    hx-target="#render-chunk"
-                                   class="btn btn-outline-primary btn-sm">
-                                    <i class="fa-solid fa-pen"></i>
-                                </a>
-                                {% trans "Вы действительно хотите удалить рабочие часы?" as w_modal_message %}
-                                <a href="#"
-                                   hx-confirm="Удалить рабочие часы?"
-                                   hx-post="{% url 'delete_working_hours' working_hours_id=working_hour.id %}"
-                                   hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                                   hx-target="#render-chunk"
-                                   hx-vals='{"staff_member": {{staff_member.id}} }'
-                                   class="btn btn-outline-danger btn-sm">
-                                    <i class="fa-solid fa-trash"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
+                                    hx-target="#working-hours-list"
+                                    class="btn btn-outline-primary btn-sm">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+                            {% else %}
+                            <a
+                                    hx-get="{% url 'update_working_hours' working_hour.id staff_member.user.id%}"
+                                    hx-target="#working-hours-list"
+                                    class="btn btn-outline-primary btn-sm">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+                            {% endif %}
+                            {% trans "Вы действительно хотите удалить рабочие часы?" as w_modal_message %}
+                            <a href="#"
+                               hx-confirm="{% if request.user.id == staff_member.user.id %}Удалить рабочие часы?{% else %}Удалить рабочие часы этого работника?{% endif %}"
+                               hx-post="{% url 'delete_working_hours' working_hours_id=working_hour.id %}"
+                               hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                               hx-target="#working-hours-list"
+                               hx-vals='{"staff_member": {{staff_member.id}} }'
+                               class="btn btn-outline-danger btn-sm">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
                 {% empty %}
-                    <tr>
-                        <td colspan="4" class="text-center">Рабочих часов не установлено.</td>
-                    </tr>
+                <tr>
+                    <td colspan="4" class="text-center">Рабочих часов не установлено.</td>
+                </tr>
                 {% endfor %}
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <div id="slot-duration-container"
+         hx-trigger="load from:body"
+         hx-get="{% url 'edit_staff_slot_duration' staff_member.id %}"
+         class="profile-container rounded" style="background-color: #343a40;">
     </div>
 </section>
 

@@ -52,6 +52,8 @@ admin_urlpatterns = [
     # add, remove, show, update service
     path("add-service/", views_admin.add_or_update_service, name="add_service"),
     path("service-list/", views_admin.get_service_list, name="get_service_list"),
+    path("get_service_rows/", views_admin.get_service_rows, name="get_service_rows"),
+
     path(
         "update-service/<int:service_id>/",
         views_admin.add_or_update_service,
@@ -105,6 +107,11 @@ admin_urlpatterns = [
         name="update_day_off",
     ),
     path(
+        "update-day-off/<int:day_off_id>/<int:staff_user_id>/",
+        views_admin.update_day_off,
+        name="update_day_off",
+    ),
+    path(
         "delete-day-off/<int:day_off_id>/",
         views_admin.delete_day_off,
         name="delete_day_off",
@@ -117,6 +124,11 @@ admin_urlpatterns = [
     ),
     path(
         "update-working-hours/<int:working_hours_id>/",
+        views_admin.update_working_hours,
+        name="update_working_hours",
+    ),
+    path(
+        "update-working-hours/<int:working_hours_id>/<int:staff_user_id>/",
         views_admin.update_working_hours,
         name="update_working_hours",
     ),
@@ -150,6 +162,7 @@ admin_urlpatterns = [
     path('get_day_off_list/', views_admin.get_day_off_list, name='get_day_off_list'),
     path('get_day_off_list/<int:staff_user_id>', views_admin.get_day_off_list, name='get_day_off_list'),
     path('get_working_hours_list/<int:staff_user_id>', views_admin.get_working_hours_list, name='get_working_hours_list'),
+    path('edit_staff_slot_duration/<int:staff_id>', views_admin.edit_staff_slot_duration, name='edit_staff_slot_duration'),
 
 
 

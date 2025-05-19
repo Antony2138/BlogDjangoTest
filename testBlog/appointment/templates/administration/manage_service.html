@@ -15,9 +15,10 @@
     <div class="card-body text-start">
         <form
             hx-post="{% if not service %}{% url 'add_service' %}{% endif %}{% if service %}{% url 'update_service'  service.pk %}{% endif %}"
-            hx-target="#render-chunk"
+            hx-target="#services-list-table"
+            hx-swap="innerHTML"
             enctype="multipart/form-data"
-            hx-on="{% if not errorForm %}htmx:after-request: $('#formModal').modal('hide'){% endif %}"
+            hx-on="htmx:after-request: $('#formModal').modal('hide')"
         >
             {% csrf_token %}
             <div class="mb-2">

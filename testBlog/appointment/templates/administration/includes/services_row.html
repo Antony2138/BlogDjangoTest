@@ -1,24 +1,32 @@
 {% load i18n %}
 {% load static %}
-<tr id="service-{{ service.id }}">
+<tr id="service-{{ service.id }}" class="{% if highlight %}table-highlight{% endif %}">
     {% if edit_mode %}
-        <td class="edit-mode d-none">
-            <input type="checkbox" name="services" value="{{ service.id }}">
+        <td class="edit-mode d-none"
+        style="cursor: pointer;"
+        onclick="event.stopPropagation(); this.querySelector('input[type=checkbox]').click()"
+        >
+            <input type="checkbox" name="services" value="{{ service.id }}" style="margin: auto; pointer-events: none;">
         </td>
     {% endif %}
     <td data-label="Название"
+        style="width: 50%; min-width: 200px; max-width: 400px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
         hx-trigger="{% if user.is_superuser %}click{% endif %}"
-        hx-get="{% url 'update_service' service_id=service.id %}"
+        hx-get="{% if user.is_superuser %}{% url 'update_service' service_id=service.id %}{% endif %}"
         hx-target="#formModalContent"
-        data-bs-toggle="modal"
-        data-bs-target="#formModal"
+        data-bs-toggle="{% if user.is_superuser %}modal{% endif %}"
+        data-bs-target="{% if user.is_superuser %}#formModal{% endif %}"
         class="{% if user.is_superuser %}clickable{% endif %}"
     >
         {{ service.name }}
     </td>
-    <td data-label="Продолжительность">{{ service.get_duration }}</td>
-    <td data-label="Цена">{{ service.get_price }}</td>
-    <td>
+    <td data-label="Продолжительность" style="width: 20%; text-align: left;">
+        {{ service.get_duration }}
+    </td>
+    <td data-label="Цена" style="width: 20%; text-align: left;">
+        {{ service.get_price }}
+    </td>
+    <td style="width: 10%;">
         <div class="d-flex align-items-center">
             {% if user.is_superuser %}
                 <a hx-get="{% url 'update_service' service_id=service.id %}"

@@ -1,0 +1,25 @@
+{% load static %}
+<ul class="list-unstyled w-100 chat-list" id="chat-list-users">
+    {% for user in page_obj %}
+        {% if user != request.user %}
+            <li hx-get="{% url 'start_chat_from_admin' user.id %}"
+                hx-target="#chat-container"
+                hx-swap="innerHTML"
+                style="cursor: pointer;"
+                class="clearfix mb-2 d-flex align-items-center">
+                {% if user.avatar %}
+                    <img src="{{ user.get_avatar_url }}" alt="avatar" class="rounded-circle object-fit-cover" width="50" height="50">
+                {% elif user.is_tg_user %}
+                    <img src="{{ user.photo_url }}" alt="avatar" class="rounded-circle object-fit-cover" width="50" height="50">
+                {% else %}
+                    <img src="{% static 'mainUser/img/avatar-d.png' %}" alt="avatar" class="rounded-circle" width="50">
+                {% endif %}
+                <div class="about ms-2">
+                    <div class="name">{{ user.get_full_name }}</div>
+                </div>
+            </li>
+        {% endif %}
+    {% empty %}
+        <li class="clearfix mb-2 d-flex align-items-center">Нет пользователей</li>
+    {% endfor %}
+</ul>

@@ -1,0 +1,54 @@
+{% extends 'mainController/layout.html'%}
+{% load static %}
+{% block title %} Список чатов {% endblock %}
+{% block customCSS %}
+<link rel="stylesheet" href="{%static 'mainUser/css/profile.css'%}">
+{% endblock %}
+{% block body %}
+
+<div id="container-chat-admin" class="mx-auto text-light rounded" style="max-width: 1400px; width: 100%;">
+    <div class="container-fluid p-3 ">
+        <div class="row">
+            <!-- Левая колонка: список пользователей -->
+            <aside class="col-md-3 bg-dark text-light border-end border-secondary">
+                <div class="d-flex flex-column align-items-start">
+                    <!-- Переключатели -->
+                    <div class="d-flex justify-content-between w-100 mb-1 mt-2">
+
+                        <button hx-get="{% url 'paginate_clients' %}"
+                                hx-trigger="load, click, paginate-client from:body"
+                                hx-target="#user-chat-list"
+                                hx-swap="innerHTML"
+                                class="btn btn-outline-light w-50 me-1" id="clientsBtn">Клиенты
+                        </button>
+
+                        <button hx-get="{% url 'paginate_staff_chat' %}"
+                                hx-trigger="click, paginate-staff from:body"
+                                hx-target="#user-chat-list"
+                                hx-swap="innerHTML"
+                                class="btn btn-outline-light w-50 ms-1" id="staffBtn">Работники
+                        </button>
+
+                    </div>
+                    <!-- Список пользователей -->
+                    <div id="user-chat-list" class="w-100 chat-list"></div>
+                </div>
+            </aside>
+
+            <!-- Правая колонка: пустой контейнер под чат -->
+            <main class="col-md-9 bg-dark text-light" style="min-height: 85vh;">
+                <div id="chat-container">
+                    {% if load_from_push %}
+                        <div
+                            hx-trigger="load"
+                            hx-get="{% url 'start_chat_from_admin' other_user.id %}"
+                            hx-swap="outerHTML"
+                        ></div>
+                    {% endif %}
+                </div>
+            </main>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
