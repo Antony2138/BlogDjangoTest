@@ -296,8 +296,6 @@ function getAvailableSlots(selectedDate, staffId = null) {
             // Update the FullCalendar configuration
             // calendar.setOption('hiddenDays', nonWorkingDays);
         } else {
-            // Handle the case where there's an error or no data
-            // For now, we'll just log it, but you can handle it more gracefully if needed
             console.error('Failed to get non-working days:', nonWorkingDays);
         }
     });

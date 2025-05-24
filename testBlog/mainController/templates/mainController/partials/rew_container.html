@@ -88,7 +88,7 @@
                 if (!isDragging) return;
                 const x = e.touches[0].clientX;
                 const delta = startX - x;
-                container.scrollLeft = scrollStart + delta;
+                container.scrollLeft = scrollStart + delta * 3;
                 e.preventDefault();
             }, { passive: false });
 

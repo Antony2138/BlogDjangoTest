@@ -255,6 +255,10 @@ def get_staff_list(request):
 @require_user_authenticated
 @require_superuser
 def remove_staff_member(request, staff_user_id):
+    if request.user.is_superuser:
+        if staff_user_id == request.user.id:
+            messages.warning(request, "Обратитесь к администратору сайта")
+            return get_staff_list(request)
     if not request.headers.get('HX-Request') == 'true':
         return HttpResponseNotFound()
     if not check_permissions(staff_user_id, request.user):
@@ -451,9 +455,7 @@ def get_user_appointments(request, staff_id=None, response_type='html'):
         offered_service = staff_member.get_services_offered()
         extra_context['has_offered_service'] = True if offered_service else False
     else:
-        staff_member = get_object_or_404(StaffMember, user=request.user)
-        offered_service = staff_member.get_services_offered()
-        extra_context['has_offered_service'] = True if offered_service else False
+        extra_context['has_offered_service'] = False
     context = get_generic_context_with_extra(request=request, extra=extra_context)
     # if appointment is empty and user doesn't have a staff-member instance, put a message
     # it's not clean
@@ -521,6 +523,8 @@ def fetch_service_list_for_staff(request):
         try:
             staff_member = StaffMember.objects.get(user=request.user)
             services = list(staff_member.get_services_offered().values('id', 'name'))
+            if not services and request.user.is_superuser:
+                services = list(Service.objects.all().values('id', 'name'))
         except StaffMember.DoesNotExist:
             if not request.user.is_superuser:
                 return json_response(_("You're not a staff member. Can't perform this action !"), status=400,
