@@ -59,7 +59,7 @@
     position: absolute;
     width: 450px;
     z-index: 2;
-    background: linear-gradient(to right, rgba(14, 34, 56, 1) 0%, rgba(14, 34, 56, 0) 100%); /* Градиент от белого к прозрачному */
+    background: linear-gradient(to right, rgba(14, 34, 56, 1) 0%, rgba(14, 34, 56, 0) 100%);
 }
 
 .slider::after {
@@ -73,21 +73,20 @@
     top: 0;
 }
 
-/* Контейнер для слайдов */
+
 .slide-track {
-    display: flex; /* Выстраиваем слайды по горизонтали */
-    width: calc(450px * var(--carousel-length)); /* Ширина всех слайдов */
-    animation: scroll var(--animation-speed) linear infinite; /* Запуск анимации */
+    display: flex;
+    width: calc(450px * var(--carousel-length));
+    animation: scroll var(--animation-speed) linear infinite;
 }
 
-/* Стиль для каждого слайда */
 .slide {
     height: 600px;
     width: 450px;
-    flex-shrink: 0; /* Слайды не должны сжиматься */
+    flex-shrink: 0;
 }
 
-/* Анимация движения слайдов */
+
 @keyframes scroll {
     0% {
         transform: translateX(0);

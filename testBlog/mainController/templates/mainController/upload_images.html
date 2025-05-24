@@ -1,6 +1,4 @@
-{% extends 'mainController/layout.html'%}
 {% load static %}
-{% block body %}
 <style>
 .alert {
     transition: opacity 0.5s ease-in-out;
@@ -8,9 +6,9 @@
 </style>
 
 <div class="d-flex justify-content-center align-items-center">
-    <div class="card bg-white p-4 rounded-3 shadow-lg" style="max-width: 600px;">
+    <div class="card bg-dark p-4 rounded-3 shadow-lg">
         <div class="card-title">
-            <h2 class="text-center text-black mb-4 ">Загрузить изображения для карусели</h2>
+            <h2 class="text-center text-white mb-4 ">Загрузить изображения для карусели</h2>
             <div class="messages">
                 {% if messages %}
                     {% for message in messages %}
@@ -28,9 +26,9 @@
 
         </div>
 
-        <form method="post" enctype="multipart/form-data">
+        <form hx-post="{% url 'upload_images' %}" hx-target="#render-chunk" enctype="multipart/form-data">
             {% csrf_token %}
-            <div class="mb-3">
+            <div class="mb-3 text-white">
                 {{ form.as_p }}
             </div>
             <div class="text-center">
@@ -60,4 +58,3 @@
     });
 });
 </script>
-{% endblock %}

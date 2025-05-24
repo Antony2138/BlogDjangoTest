@@ -10,6 +10,7 @@ from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template import loader
 from django.urls import reverse
+from django.views.decorators.http import require_POST
 
 from .forms import (ClientProfileForm, ConfirmingCredentialsForm,
                     EnterCodeForm, EnterEmailForm, LoginForm, UserRegisterForm)
@@ -85,7 +86,7 @@ def check_telegram_auth(data: dict) -> bool:
 def telegram_auth(request):
     """ Обрабатывает вход через Telegram """
     data = request.GET.dict()
-    # Проверка срока действия (например, 10 минут)
+    # Проверка срока действия
     if int(data.get("auth_date", 0)) < time.time() - 600:
         return JsonResponse({"error": "Auth expired"}, status=400)
 
@@ -133,6 +134,7 @@ def show_confirming_credentials_modal(request):
     return render(request, "modal/confirming_credentials_modal.html", {"form": form})
 
 
+@require_POST
 def handle_user_registration(request):
     form = UserRegisterForm(request.POST)
     if form.is_valid():

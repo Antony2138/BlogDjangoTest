@@ -438,7 +438,7 @@ function fetchStaffMembers(isEditMode = false) {
 
 async function populateServices(selectedServiceId, isEditMode = false) {
     const services = await fetchServices(isEditMode);
-    if (!services) {
+    if (!services && !isUserSuperUser) {
         showErrorModal(noServiceOfferedTxt)
     }
     const selectElement = document.createElement('select');
@@ -453,8 +453,8 @@ async function populateServices(selectedServiceId, isEditMode = false) {
 
     services.forEach(service => {
         const option = document.createElement('option');
-        option.value = service.id;  // Accessing the id
-        option.textContent = service.name;  // Accessing the name
+        option.value = service.id;
+        option.textContent = service.name;
         if (service.id === selectedServiceId) {
             option.defaultSelected = true;
         }
@@ -778,8 +778,8 @@ function updateModalUIForEditMode(modal, isEditingAppointment) {
     toggleElementVisibility(submitButton, isEditingAppointment);
     toggleElementVisibility(deleteButton, !isEditingAppointment);
     toggleElementVisibility(closeButton, !isEditingAppointment);
-    toggleElementVisibility(endTimeLabel, !isEditingAppointment);  // Show end time in view mode
-    toggleElementVisibility(endTimeInput, !isEditingAppointment);  // Show end time in view mode
+    toggleElementVisibility(endTimeLabel, !isEditingAppointment);
+    toggleElementVisibility(endTimeInput, !isEditingAppointment);
     toggleElementVisibility(goButton, !isEditingAppointment);
 }
 
