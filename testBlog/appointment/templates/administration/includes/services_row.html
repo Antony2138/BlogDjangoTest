@@ -10,7 +10,7 @@
         </td>
     {% endif %}
     <td data-label="Название"
-        style="width: 50%; min-width: 200px; max-width: 400px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+        style="text-overflow: ellipsis;"
         hx-trigger="{% if user.is_superuser %}click{% endif %}"
         hx-get="{% if user.is_superuser %}{% url 'update_service' service_id=service.id %}{% endif %}"
         hx-target="#formModalContent"
@@ -20,13 +20,13 @@
     >
         {{ service.name }}
     </td>
-    <td data-label="Продолжительность" style="width: 20%; text-align: left;">
+    <td data-label="Продолжительность" style="">
         {{ service.get_duration }}
     </td>
-    <td data-label="Цена" style="width: 20%; text-align: left;">
+    <td data-label="Цена" style="">
         {{ service.get_price }}
     </td>
-    <td style="width: 10%;">
+    <td style="">
         <div class="d-flex align-items-center">
             {% if user.is_superuser %}
                 <a hx-get="{% url 'update_service' service_id=service.id %}"

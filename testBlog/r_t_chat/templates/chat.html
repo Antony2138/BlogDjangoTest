@@ -68,7 +68,11 @@
     <div class="card border-0" style="background: transparent;">
         <div class="card-header text-white text-center">
             <div class="d-flex align-items-center justify-content-center position-relative">
+                {% if request.user.is_superuser %}
                 <h1 class="text-center m-2">Чат с {{ other_user.get_full_name }}</h1>
+                {% else %}
+                <h1 class="text-center m-2">Чат с администратором</h1>
+                {% endif %}
                 <div id="online_status" class="me-2"></div>
             </div>
         </div>

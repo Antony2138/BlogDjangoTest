@@ -20,10 +20,10 @@
   --error: #ef4444;    /* Красный Red */
 }
 
-/* Анимация для выделения строк */
+
 @keyframes rowHighlight {
   0% {
-    background-color: rgba(99, 102, 241, 0.2); /* Полупрозрачный индиго */
+    background-color: rgba(99, 102, 241, 0.2);
     box-shadow: 0 0 0 1px var(--primary);
   }
   100% {
@@ -32,14 +32,14 @@
   }
 }
 
-/* Стили для скроллбара */
+
 .responsive-table-container::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 .responsive-table-container::-webkit-scrollbar-track {
-  background: rgba(226, 232, 240, 0.5); /* Светлый с прозрачностью */
+  background: rgba(226, 232, 240, 0.5);
   border-radius: 3px;
 }
 
@@ -52,7 +52,6 @@
   background: var(--primary-hover);
 }
 
-/* Firefox */
 .responsive-table-container {
   scrollbar-width: thin;
   scrollbar-color: var(--primary) rgba(226, 232, 240, 0.5);
@@ -99,7 +98,7 @@
     }
 
     table {
-        width: 600px; /* таблица становится прокручиваемой */
+        width: 600px;
     }
 
     thead th,
@@ -119,7 +118,6 @@
         width: 100%;
     }
 
-    /* Сообщения (алерты) тоже растянуть */
     .custom-alert {
         font-size: 0.9rem;
         width: 100%;

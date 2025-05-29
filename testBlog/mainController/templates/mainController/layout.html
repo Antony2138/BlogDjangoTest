@@ -69,19 +69,15 @@
                             </a>
                         </li>
                     {% endif %}
+                    {% if user.staffmember %}
+                    {% else %}
                     <li class="sidebar-item">
-                        {% if user.staffmember %}
-                            <a href="{% url 'user_profile' %}" class="sidebar-link">
-                                <i class="fa-solid fa-crown"></i>
-                                <span>Профиль</span>
-                            </a>
-                        {% else %}
-                            <a href="{% url 'profile' %}" class="sidebar-link">
-                                <i class="fa-solid fa-user"></i>
-                                <span>Профиль</span>
-                            </a>
-                        {% endif %}
+                        <a href="{% url 'profile' %}" class="sidebar-link">
+                            <i class="fa-solid fa-user"></i>
+                            <span>Профиль</span>
+                        </a>
                     </li>
+                {% endif %}
                     <li class="sidebar-item">
                         <form method="POST" action="{% url 'logout' %}">
                             {% csrf_token %}

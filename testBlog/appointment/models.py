@@ -64,7 +64,7 @@ class Service(models.Model):
 
     def get_price(self):
         # Check if the decimal part is 0
-        return f"{self.price} рублей"
+        return f"{self.price} руб."
 
     def get_image_url(self):
         if not self.image:
