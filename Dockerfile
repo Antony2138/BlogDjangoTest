@@ -8,7 +8,7 @@ COPY testBlog/ /app
 COPY ./requirements.txt /tmp/requirements.txt
 
 RUN apt-get update
-RUN apt-get install libpq-dev gcc -y
+RUN apt-get install libpq-dev gcc gettext -y
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 

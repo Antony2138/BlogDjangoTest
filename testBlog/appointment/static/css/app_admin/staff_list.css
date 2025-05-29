@@ -97,7 +97,6 @@
         border: 1px solid #6c757d;
         border-radius: 6px;
         background-color: #343a40;
-        padding: 10px;
     }
 
     .responsive-table-container td {
@@ -117,8 +116,6 @@
 
     .responsive-table-container td:last-child {
         display: flex;
-        gap: 6px;
-        flex-wrap: wrap;
     }
         .responsive-table-container table tbody tr {
         display: block;
