@@ -424,10 +424,8 @@ def delete_working_hours(request, working_hours_id):
     working_hours = get_object_or_404(WorkingHours, pk=working_hours_id)
     if not check_extensive_permissions(request.user.id, request.user, working_hours):
         return HttpResponseBadRequest()
-    staff_member = int(request.POST.get("staff_member"))
     working_hours.delete()
-    messages.success(request, "Рабочие часы успешно удалены!")
-    return get_working_hours_list_service(request, staff_member)
+    return HttpResponse(status=200)
 
 
 @require_user_authenticated
@@ -671,7 +669,7 @@ def search_users(request):
     ) | get_user_model().objects.filter(
         last_name__icontains=query
     )
-    only_users = users.filter(is_staff=False)
+    only_users = users.filter(is_staff=False, is_active=True)
     results = list(only_users.values('id', 'first_name', 'last_name'))
     return JsonResponse(results, safe=False)
 
