@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from .decorators import require_ajax
+from .decorators import require_ajax, require_user_authenticated
 from .forms import AppointmentRequestForm, SlotForm
 from .models import Appointment, CalendarSettings, DayOff, Service, StaffMember
 from .services import get_appointments_and_slots, get_available_slots_for_staff
@@ -207,6 +207,7 @@ def get_next_available_date_ajax(request, service_id):
         )
 
 
+@require_user_authenticated
 def appointment_request(request, service_id=None, staff_member_id=None):
     """This view function handles requests to book an appointment for a service.
 
@@ -256,6 +257,7 @@ def appointment_request(request, service_id=None, staff_member_id=None):
     return render(request, "appointment/appointments.html", context=context)
 
 
+@require_user_authenticated
 def appointment_request_submit(request):
     """This view function handles the submission of the appointment request form.
 
@@ -286,6 +288,7 @@ def appointment_request_submit(request):
     return render(request, "appointment/appointments.html", context=context)
 
 
+@require_user_authenticated
 def confirm_appt(request, appointment_request_id):
     return create_appointment(request, appointment_request_id)
 

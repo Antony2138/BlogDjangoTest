@@ -1,10 +1,6 @@
 # view_helpers.py
 # Path: appointment/view_helpers.py
 
-"""
-Author: Adams Pierre David
-Since: 2.0.0
-"""
 
 import uuid
 

@@ -204,19 +204,19 @@ function getCalendarConfig(events) {
 }
 
 function displayEventList(events, date) {
-    let eventListHtml = '<h3 style="font-size: 16px; font-weight: bold;">' + eventsOnTxt + ' ' + '</h3>';
+    let eventListHtml = '<h3 style="font-size: 16px; font-weight: bold; color: white;">' + eventsOnTxt + ' ' + '</h3>';
     eventListHtml += '<hr>';
 
     events.forEach(function (event) {
-        eventListHtml += `<div class="event-list-item-appt" data-event-id="${event.id}">${event.service_name}</div>`;
-        eventListHtml += `<div><i class="fa fa-clock-o" aria-hidden="true"></i> ${moment(event.start_time).format('h:mm a')} - ${moment(event.end_time).format('h:mm a')}</div>`;
+        eventListHtml += `<div class="event-list-item-appt text-white" data-event-id="${event.id}">${event.service_name}</div>`;
+        eventListHtml += `<div class="text-white"><i class="fa fa-clock-o" aria-hidden="true"></i> ${moment(event.start_time).format('h:mm a')} - ${moment(event.end_time).format('h:mm a')}</div>`;
         eventListHtml += '<hr>';
     });
 
     const date_obj = new Date(date.toISOString())
 
     if (events.length === 0) {
-        eventListHtml += `<div class="djangoAppt_no-events">` + noEventTxt + `</div>`;
+        eventListHtml += `<div class="djangoAppt_no-events text-white">` + noEventTxt + `</div>`;
     }
 
     eventListHtml += `<button class="btn btn-primary djangoAppt_btn-new-event" onclick="createNewAppointment('${date_obj}')">` + newEventTxt + `</button></div>`;

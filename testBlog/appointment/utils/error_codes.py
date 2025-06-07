@@ -2,10 +2,6 @@
 # Path: appointment/utils/error_codes.py
 
 
-"""
-Author: Adams Pierre David
-Since: 2.0.0
-"""
 
 from enum import Enum, auto
 

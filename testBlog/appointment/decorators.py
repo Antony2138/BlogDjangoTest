@@ -1,10 +1,6 @@
 # decorators.py
 # Path: appointment/decorators.py
 
-"""
-Author: Adams Pierre David
-Since: 2.0.0
-"""
 
 from functools import wraps
 

@@ -95,7 +95,7 @@ def get_or_create_chatroom_from_chat_admin(request, user_id):
     if not user_id:
         return HttpResponseBadRequest("No client_id provided.")
 
-    chat_admin_user = get_user_model().objects.filter(is_superuser=True).first()
+    chat_admin_user = get_user_model().objects.filter(is_superuser=True, is_staff=True).first()
     user = get_object_or_404(get_user_model(), id=user_id)
 
     if not request.user == chat_admin_user:

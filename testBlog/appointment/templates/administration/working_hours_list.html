@@ -47,13 +47,12 @@
                                 <i class="fa-solid fa-pen"></i>
                             </a>
                             {% endif %}
-                            {% trans "Вы действительно хотите удалить рабочие часы?" as w_modal_message %}
                             <a href="#"
                                hx-confirm="{% if request.user.id == staff_member.user.id %}Удалить рабочие часы?{% else %}Удалить рабочие часы этого работника?{% endif %}"
-                               hx-post="{% url 'delete_working_hours' working_hours_id=working_hour.id %}"
+                               hx-delete="{% url 'delete_working_hours' working_hours_id=working_hour.id %}"
                                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                               hx-target="#working-hours-list"
-                               hx-vals='{"staff_member": {{staff_member.id}} }'
+                               hx-target="closest tr"
+                               hx-swap="outerHTML"
                                class="btn btn-outline-danger btn-sm">
                                 <i class="fa-solid fa-trash"></i>
                             </a>
