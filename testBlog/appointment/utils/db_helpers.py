@@ -277,17 +277,13 @@ def create_and_save_appointment(ar, request):
     """Create and save a new appointment based on the provided appointment request and client data.
 
     :param ar: The appointment request associated with the new appointment.
-    :param client_data: The data of the client making the appointment.
-    :param appointment_data: Additional data for the appointment, including phone number, address, etc.
     :param request: The request object.
     :return: The newly created appointment.
     """
-
     user = get_object_or_404(get_user_model(), pk=request.user.id)
     appointment_request = get_object_or_404(AppointmentRequest, pk=ar)
     appointment = Appointment.objects.create(client=user, appointment_request=appointment_request)
     appointment.save()
-
     return appointment
 
 

@@ -64,7 +64,7 @@
 
 </style>
 
-<div class="container mt-5">
+<div class="container mt-1">
     <div class="card border-0" style="background: transparent;">
         <div class="card-header text-white text-center">
             <div class="d-flex align-items-center justify-content-center position-relative">
@@ -87,7 +87,9 @@
             <form id="chat_message_form" class="w-full"
                   hx-ext="ws"
                   ws-connect="/ws/chat/{{ chatroom_name }}/"
-                  ws-send="this">
+                  ws-send="this"
+                  onsubmit="setTimeout(() => this.reset(), 100)"
+            >
                 {% csrf_token %}
                 <div class="d-flex justify-content-center gap-3 w-full">
                     <div class="w-75">
@@ -103,11 +105,11 @@
 </div>
 <script>
     function scrollToBottom(time=0) {
-    setTimeout(function() {
-        const container = document.getElementById('chat_container');
-        container.scrollTop = container.scrollHeight;
-    }, time);
-}
+        setTimeout(function() {
+            const container = document.getElementById('chat_container');
+            container.scrollTop = container.scrollHeight;
+        }, time);
+    }
     scrollToBottom()
     document.getElementById("chat_message_form").addEventListener("htmx:wsAfterSend", function() {
         this.reset();

@@ -120,6 +120,7 @@ def create_appointment(request, appointment_request_id):
     return redirect_to_payment_or_thank_you_page(appointment)
 
 
+@require_user_authenticated
 def default_thank_you(request, appointment_id):
     """This view function handles the default thank you page.
 
@@ -225,6 +226,7 @@ def appointment_request(request, service_id=None, staff_member_id=None):
     if not request.user.is_authenticated:
         messages.error(request, _("To recording you must be registered"))
         return redirect("services")
+    print(request.user.id, "fkjjjj")
     if service_id:
         service = get_object_or_404(Service, pk=service_id)
         all_staff_members = StaffMember.objects.filter(
