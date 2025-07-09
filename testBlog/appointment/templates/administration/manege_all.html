@@ -18,6 +18,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/css/tempusdominus-bootstrap-4.min.css"
       integrity="sha512-3JRrEUwaCkFUBLK1N8HehwQgu8e23jTH4np5NHOmQOobuC4ROQxFwFgBLTnhcnQRMs84muMh0PnnwXlPq5MGjg=="
       crossorigin="anonymous" referrerpolicy="no-referrer"/>
+<link rel="stylesheet" type="text/css" href="{%static 'css/app_admin/analytics.css'%}"/>
 {% endblock %}
 {% block body %}
 
@@ -169,19 +170,23 @@
                                class="btn btn-outline-light">
                                 Список работников
                             </a>
-                            <a href="#"
-                               hx-get="{% url 'service_offered' %}"
-                               hx-target="#render-chunk"
-                               hx-trigger="load from:body"
-                               class="d-none">
-                                Предоставляемые услуги
-                            </a>
+<!--                            <a href="#"-->
+<!--                               hx-get="{% url 'service_offered' %}"-->
+<!--                               hx-target="#render-chunk"-->
+<!--                               hx-trigger="load from:body"-->
+<!--                               class="d-none">-->
+<!--                                Предоставляемые услуги-->
+<!--                            </a>-->
                             {% if request.user.is_superuser%}
                                 <a href="#"
                                    hx-get="{% url 'upload_images' %}"
                                    hx-target="#render-chunk"
                                    class="btn btn-outline-light">
                                     Карусель фото
+                                </a>
+                                <a href="{% url 'check_analytics' %}"
+                                   class="btn btn-outline-light">
+                                    Аналитика
                                 </a>
                             {% endif %}
                             {% include 'administration/includes/dropdown_staff.html' %}
@@ -219,6 +224,8 @@
                 </div>
             </aside>
             <main class="col-md-9" id="render-chunk">
+                {% block analytics %}
+                {% endblock %}
 <!--                {% include 'administration/partials/staff_profile.html' %}-->
             </main>
             {% include 'modal/avatar_user_modal.html' %}

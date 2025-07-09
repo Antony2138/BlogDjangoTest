@@ -26,6 +26,11 @@ class CustomUser(AbstractUser):
             return ""
         return self.avatar.url
 
+    def get_photo_url(self):
+        if not self.photo_url:
+            return ""
+        return self.photo_url
+
     def is_tg_user(self):
         if not self.telegram_id:
             return False

@@ -1,0 +1,530 @@
+{% extends 'administration/manege_all.html' %}
+{% load static %}
+{% block analytics %}
+    <div id="app">
+        <div class="tabs mb-3">
+            <button
+                    @click="switchTab('analytics')"
+                    :style="{ fontWeight: currentTab === 'analytics' ? 'bold' : 'normal' }"
+                    class="btn"
+                    :class="currentTab === 'analytics' ? 'btn-light' : 'btn-outline-light'"
+            >
+                Аналитика
+            </button>
+            <button
+                    @click="switchTab('reviews')"
+                    :style="{ fontWeight: currentTab === 'reviews' ? 'bold' : 'normal' }"
+                    class="btn"
+                    :class="currentTab === 'reviews' ? 'btn-light' : 'btn-outline-light'"
+            >
+                Отзывы
+            </button>
+        </div>
+
+
+        <!-- Раздел аналитики -->    <!-- Раздел аналитики -->    <!-- Раздел аналитики -->    <!-- Раздел аналитики -->
+        <!--    <div v-if="currentTab === 'analytics' && loading">-->
+        <!--        <h2>Аналитика салона</h2>-->
+        <!--        <p>Всего клиентов: [[ totalClients ]]</p>-->
+        <!--        <div class="d-flex flex-column gap-1">-->
+        <!--            <div v-for="client in clients" :key="client.id" class="client-card">-->
+        <!--                [[ client.first_name ]] [[ client.last_name ]]-->
+        <!--            </div>-->
+        <!--        </div>-->
+        <!--    </div>-->
+        <div v-if="currentTab === 'analytics' && loading">
+            <div v-if="!showHistory" class="analytics-summary mb-3">
+                <div class="summary-card bg-dark text-white p-2 rounded-3 d-flex flex-column gap-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0 text-white">Аналитика салона</h4>
+                        <input
+                                v-model="searchQuery"
+                                type="text"
+                                class="form-control form-control-sm w-50"
+                                placeholder="Поиск по клиентам..."
+                                @input="searchClients">
+                        <div>
+                            <button
+                                    @click="switchViewMode('grid')"
+                                    class="btn"
+                                    :class="viewMode === 'grid' ? 'btn-light' : 'btn-outline-light'">
+                                <i class="fa fa-th-large" aria-hidden="true"></i>
+                            </button>
+                            <button
+                                    @click="switchViewMode('table')"
+                                    class="btn"
+                                    :class="viewMode === 'table' ? 'btn-light' : 'btn-outline-light'">
+                                <i class="fa fa-bars" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div v-if="viewMode === 'grid' && !showHistory" class="clients-grid overflow-y-auto" style="height: 65vh">
+                <div v-for="client in clients" :key="client.id" class="client-card">
+                    <div class="client-header d-flex align-items-center mb-3">
+                        <div class="client-avatar me-2">
+                            <img v-if="client.avatar" :src="client.avatar" class="avatar-review">
+                            <img v-if="!client.avatar" src="{% static 'mainUser/img/avatar-d.png' %}"
+                                 class="avatar-review">
+                        </div>
+                        <div>
+                            <h6 class="mb-0">[[ client.first_name ]] [[ client.last_name ]]</h6>
+                            <small style="color: #aaa; font-size: 0.7rem">Клиент с [[ client.registration_date
+                                ]]</small>
+                        </div>
+                    </div>
+
+                    <div class="client-stats">
+                        <div class="stat-item">
+                            <span class="stat-value" style="font-size: 0.9rem">[[ client.last_visit ]]</span>
+                            <span class="stat-label">Последнее посещение</span>
+                        </div>
+                        <div class="stat-item hover-ele" @click="openClientHistory(client.id) ">
+                            <span class="stat-value">[[ client.total_visits ]]</span>
+                            <span class="stat-label">Всего посещений</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">[[ client.total_comments ]]</span>
+                            <span class="stat-label">Комментарии</span>
+                        </div>
+                    </div>
+
+                    <div class="client-actions mt-2">
+                        <button class="btn btn-sm btn-outline-primary me-2" @click="openClientHistory(client.id)">
+                            История
+                        </button>
+                        <button class="btn btn-sm btn-outline-success" @click="openChat(client.id)">Написать</button>
+                    </div>
+                </div>
+            </div>
+
+            <div v-if="viewMode === 'table' && !showHistory" class="table-responsive overflow-y-auto"
+                 style="height: 65vh">
+                <table class="table table-dark table-striped table-hover align-middle text-white">
+                    <thead>
+                    <tr>
+                        <th>Имя</th>
+                        <th>Фамилия</th>
+                        <th>Посещений</th>
+                        <th class="text-end">Действия</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="client in clients" :key="client.id">
+                        <td>[[ client.first_name ]]</td>
+                        <td>[[ client.last_name ]]</td>
+                        <td>[[ client.total_visits ]]</td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-primary me-1" @click="openClientHistory(client.id)">
+                                История
+                            </button>
+                            <button class="btn btn-sm btn-outline-success" @click="openChat(client.id)">Написать
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div v-if="showHistory && historyAppointments.length">
+                <div class="summary-card bg-dark text-white p-2 rounded-3 d-flex flex-column gap-2 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0 text-white">[[getClientById(currentClientHistory)]]</h4>
+                        <h4 class="text-white mb-0">История посещений</h4>
+                        <button class="btn btn-outline-danger btn-sm" @click="closeHistory"><i
+                                class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>
+
+                <table class="table table-dark table-striped table-hover text-white align-middle">
+                    <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Услуга</th>
+                        <th>Сотрудник</th>
+                        <th>Статус</th>
+                        <th>Цена</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="a in historyAppointments" :key="a.id">
+                        <td>[[ formatDate(a.date) ]]</td>
+                        <td>[[ a.service?.name || '-' ]]</td>
+                        <td>[[ a.staff_member || '-' ]]</td>
+                        <td>
+                            <span v-if="a.not_come" class="text-danger">Не пришёл</span>
+                            <span v-else class="text-success">Пришёл</span>
+                        </td>
+                        <td>
+                            <span v-if="a.not_come" class="text-secondary">--</span>
+                            <span v-else class="text-success">+ [[ a.service?.price || 0 ]]</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="text-end "><strong>Итого:</strong></td>
+                        <td><strong>[[ total_sum_from_client ]] руб.</strong></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div v-else-if="showHistory">
+                <div class="summary-card bg-dark text-white p-2 rounded-3 d-flex flex-column gap-2 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0 text-white">[[getClientById(currentClientHistory)]]</h4>
+                        <h4 class="text-white mb-0">Нет данных о посещениях</h4>
+                        <button class="btn btn-outline-danger btn-sm" @click="closeHistory"><i
+                                class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div v-else-if="currentTab === 'analytics'" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+        </div>
+        <!-- Раздел аналитики -->    <!-- Раздел аналитики -->    <!-- Раздел аналитики -->    <!-- Раздел аналитики -->
+
+        <!-- Раздел отзывов -->       <!-- Раздел отзывов -->       <!-- Раздел отзывов --><!-- Раздел отзывов -->
+        <div v-if="currentTab === 'reviews'">
+            <div class="reviews-header">
+                <div class="d-flex gap-2 align-items-center">
+                    <h4 class="mb-0 text-white">Отзывы клиентов</h4>
+                    <button @click="toggleEditMode()" class="btn btn-outline-light">
+                        [[ editMode ? 'Отменить' : 'Редактировать' ]]
+                    </button>
+                    <button v-if="editMode" @click="deleteSelectedReviews()" class="btn btn-danger btn-sm"
+                            :disabled="selectedReviews.length  === 0">
+                        Удалить выбранные - [[ selectedReviews.length ]]
+                    </button>
+                </div>
+                <button @click="loadReviews(rew_paginator.currentPage)" class="refresh-btn text-white"
+                        :disabled="paginationLoading">
+                    <i class="fas fa-sync-alt" :class="{ 'fa-spin': paginationLoading }"></i>
+                </button>
+            </div>
+
+            <div v-if="reviews.length === 0 && !paginationLoading" class="no-reviews">
+                Пока нет отзывов
+            </div>
+
+            <div class="review-list">
+                <div v-for="review in reviews" :key="review.id" class="review-card">
+                    <div v-if="editMode" class="me-2 d-flex align-items-center"
+                         onclick="this.querySelector('input[type=checkbox]').click()">
+                        <input class="form-check-input" type="checkbox" :id="'review-checkbox-' + review.id"
+                               @change="toggleReviewSelection(review.id)" :checked="isReviewSelected(review.id)"
+                               style="margin:auto; pointer-events: none">
+                    </div>
+                    <div class="review-header">
+                        <img v-if="review.user.avatar" :src="review.user.avatar" class="avatar-review">
+                        <img v-if="!review.user.avatar" src="{% static 'mainUser/img/avatar-d.png' %}"
+                             class="avatar-review">
+                        <div class="author-info">
+                            <p class="m-0">[[ review.user.name ]]</p>
+                            <div class="rating">
+                                <span class="stars" style="font-size: 0.9rem">[[ review.rating ]] ★</span>
+                                <span class="date" style="font-size: 0.9rem">[[ formatDate(review.created_at) ]]</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="review-body">
+                        <p class="review-text w-100 m-0" style="word-wrap: break-word; white-space: pre-line;">
+                            [[review.text ]]</p>
+                    </div>
+                </div>
+            </div>
+            <div v-if="reviews.length > 0" class="pagination-controls">
+                <button
+                        @click="loadReviews(rew_paginator.currentPage - 1)"
+                        :disabled="!rew_paginator.hasPrevious"
+                        class="btn btn-outline-light"
+                >
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <span v-if="rew_paginator.totalPages >= 5">
+                <span v-if="rew_paginator.currentPage >= 3">
+                    <button
+                            @click="loadReviews(rew_paginator.currentPage - 2)"
+                            class="btn btn-outline-light"
+                    > [[ rew_paginator.currentPage - 2 ]]
+                    </button>
+                </span>
+                <span v-if="rew_paginator.currentPage >= 2">
+                    <button
+                            @click="loadReviews(rew_paginator.currentPage - 1)"
+                            class="btn btn-outline-light"
+                    > [[ rew_paginator.currentPage - 1]]
+                    </button>
+                </span>
+
+                <button
+                        @click="loadReviews(rew_paginator.currentPage)"
+                        class="btn btn-outline-light active"
+                > [[ rew_paginator.currentPage ]]
+                </button>
+
+                <span v-if="rew_paginator.currentPage + 1 <= rew_paginator.totalPages">
+                    <button
+                            @click="loadReviews(rew_paginator.currentPage + 1)"
+                            class="btn btn-outline-light"
+                    > [[ rew_paginator.currentPage + 1]]
+                    </button>
+                </span>
+                <span v-if="rew_paginator.currentPage + 2 <= rew_paginator.totalPages">
+                    <button
+                            @click="loadReviews(rew_paginator.currentPage + 2)"
+                            class="btn btn-outline-light"
+                    > [[ rew_paginator.currentPage + 2]]
+                    </button>
+                </span>
+            </span>
+
+                <button
+                        @click="loadReviews(rew_paginator.currentPage + 1)"
+                        :disabled="!rew_paginator.hasNext || paginationLoading"
+                        class="btn btn-outline-light"
+                ><i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Раздел отзывов -->       <!-- Раздел отзывов -->       <!-- Раздел отзывов --><!-- Раздел отзывов -->
+
+
+        <div v-if="showChatModal" class="chat-modal-overlay">
+            <div class="chat-modal-container bg-dark">
+                <div class="chat-modal-header bg-dark">
+                    <button @click="closeChat" class="btn-close btn-close-white"></button>
+                </div>
+                <div class="chat-modal-body" v-html="chatHtmlContent"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block customJS %}
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const currentUserId = {% if staff_member_id %}{{ staff_member_id }}{% else %}
+        {{ request.user.id }}{% endif %};
+        const currentUserId2 = {{ staff|default:"false"|yesno:"true,false" }}
+
+        var app = new Vue({
+            delimiters: ['[[', ']]'],
+            el: '#app',
+            data: {
+                userId: currentUserId,
+                loading: false,
+                message: 'Hello Vue!',
+                currentTab: 'analytics',
+                viewMode: 'grid',
+                totalClients: 0,
+                clients: [],
+                totalReviews: 0,
+                reviews: [],
+                rew_paginator: [],
+                cln_paginator: [],
+                paginationLoading: false,
+                editMode: false,
+                selectedReviews: [],
+                currentChat: 0,
+                showChatModal: false,
+                chatHtmlContent: '',
+                currentClientHistory: null,
+                showHistory: false,
+                historyAppointments: [],
+                total_sum_from_client: 0,
+                searchQuery: '',
+                searchTimeOut: null,
+            },
+            methods: {
+                loadAnalytics(page = 1) {
+                    this.loading = false
+                    fetch(`{% url 'load_analytics' %}?page=${page}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            this.cln_paginator = data.cln_paginator;
+                            this.clients = data.clients;
+                            this.loading = true
+                        })
+                        .catch(() => {
+                            alert('Ошибка загрузки клиентов')
+                            this.loading = false
+                        });
+                },
+                searchClients() {
+                    if (this.searchQuery.trim() === ' ') {
+                        return
+                    }
+                    clearTimeout(this.searchTimeOut);
+                    this.searchTimeOut = setTimeout(() => {
+                        if (this.searchQuery.trim() !== '') {
+                            fetch(`{% url 'load_analytics' %}?q=${this.searchQuery}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    this.cln_paginator = data.cln_paginator;
+                                    this.clients = data.clients;
+                                })
+                                .catch(() => {
+                                    alert('Ошибка загрузки клиентов')
+                                });
+                        } else if (this.searchQuery === '') {
+                            this.loadAnalytics()
+                        }
+                    }, 700);
+                },
+                loadReviews(page = 1) {
+                    this.paginationLoading = true;
+                    fetch(`{% url 'load_reviews' %}?page=${page}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            this.totalReviews = data.total_reviews;
+                            this.reviews = data.reviews;
+                            this.rew_paginator = {
+                                hasNext: data.has_next,
+                                hasPrevious: data.has_previous,
+                                currentPage: data.current_page,
+                                totalPages: data.total_pages
+                            };
+                            this.paginationLoading = false;
+                        })
+                        .catch(() => {
+                            alert('Ошибка загрузки отзывов')
+                            this.paginationLoading = false;
+                        });
+                },
+                switchTab(tab) {
+                    this.currentTab = tab;
+                    if (tab === 'analytics' && this.clients.length === 0) {
+                        this.loadAnalytics();
+                    }
+                    if (tab === 'reviews' && this.reviews.length === 0) {
+                        this.loadReviews();
+                    }
+                },
+                switchViewMode(tab) {
+                    this.viewMode = tab;
+                },
+                formatDate(dateString) {
+                    const date = new Date(dateString);
+                    return date.toLocaleDateString('ru-RU', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                    });
+                },
+                toggleEditMode() {
+                    this.editMode = !this.editMode;
+                    if (!this.editMode) {
+                        this.selectedReviews = [];
+                    }
+                },
+                toggleReviewSelection(reviewId) {
+                    const index = this.selectedReviews.indexOf(reviewId);
+                    if (index === -1) {
+                        this.selectedReviews.push(reviewId);
+                    } else {
+                        this.selectedReviews.splice(index, 1);
+                    }
+                },
+                isReviewSelected(reviewId) {
+                    return this.selectedReviews.includes(reviewId);
+                },
+                deleteSelectedReviews() {
+                    if (this.selectedReviews.length === 0) return;
+
+                    if (!confirm(`Вы уверены, что хотите удалить выбранное?`)) {
+                        return;
+                    }
+
+                    this.paginationLoading = true;
+
+                    fetch('{% url "delete_reviews" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({
+                            review_ids: this.selectedReviews
+                        })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                this.loadReviews(this.rew_paginator.currentPage);
+                                this.editMode = false;
+                                this.selectedReviews = [];
+                            } else {
+                                alert('Ошибка при удалении отзывов');
+                            }
+                        })
+                        .catch(() => {
+                            alert('Ошибка при удалении отзывов');
+                        })
+                        .finally(() => {
+                            this.paginationLoading = false;
+                        });
+                },
+                async openChat(clientId) {
+                    this.showChatModal = true;
+                    this.currentChat = clientId;
+
+                    try {
+                        const response = await fetch(`/chat/start_chat_from_admin/${clientId}`);
+                        this.chatHtmlContent = await response.text();
+                        this.$nextTick(() => {
+                            const form = document.getElementById('chat_message_form');
+                            if (form && window.htmx) {
+                                htmx.process(form);
+                                form.addEventListener('htmx:wsError', (evt) => {
+                                    console.error('WebSocket error:', evt.detail.error);
+                                    alert('Ошибка подключения к чату');
+                                });
+                            }
+                        });
+                    } catch (error) {
+                        console.error('Ошибка загрузки чата:', error);
+                        this.chatHtmlContent = '<p>Не удалось загрузить чат</p>';
+                    }
+                },
+                closeChat() {
+                    this.showChatModal = false;
+                    this.currentChat = null;
+                },
+                getClientById(clientId) {
+                    const chat_client = this.clients.find(client => client.id === clientId);
+                    return chat_client ? `${chat_client.first_name} ${chat_client.last_name}` : '';
+                },
+                openClientHistory(clientId) {
+                    this.currentClientHistory = clientId
+                    this.showHistory = true
+                    fetch(`{% url 'load_client_history' %}?clientId=${clientId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            this.historyAppointments = data.history;
+                            this.total_sum_from_client = data.total_price;
+                        })
+                        .catch(() => {
+                            alert('Ошибка загрузки истории визитов');
+                            this.showHistory = false;
+                        });
+                },
+                closeHistory() {
+                    this.showHistory = false;
+                    this.currentClientHistory = null;
+                    this.historyAppointments = [];
+                }
+            },
+            mounted() {
+                this.loadAnalytics();
+            }
+        });
+    </script>
+
+{% endblock %}

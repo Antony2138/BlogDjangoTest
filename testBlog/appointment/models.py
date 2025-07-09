@@ -78,23 +78,10 @@ class Service(models.Model):
 class StaffMember(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     services_offered = models.ManyToManyField(Service)
-    slot_duration = models.PositiveIntegerField(
-        null=True,
-        blank=True,
-        help_text="(Количество слотов доступных для записи к данному работнику, день будет разбит на промежутки по"
-                  " установленному количеству минут)",
-    )
-    lead_time = models.TimeField(
-        null=True, blank=True, help_text="Время начала рабочего дня"
-    )
-    finish_time = models.TimeField(
-        null=True, blank=True, help_text="Время конца рабочего дня"
-    )
-    appointment_buffer_time = models.FloatField(
-        blank=True,
-        null=True,
-        help_text="Время между текущим моментом и первым доступным интервалом на текущий день (не влияет на завтра)",
-    )
+    slot_duration = models.PositiveIntegerField(null=True, blank=True,)
+    lead_time = models.TimeField(null=True, blank=True)
+    finish_time = models.TimeField(null=True, blank=True)
+    appointment_buffer_time = models.FloatField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.get_staff_member_name()}"
@@ -263,6 +250,19 @@ class ArchivedAppointmentRequest(models.Model):
     def get_id_request(self):
         return self.id_request
 
+    def get_ar_date(self):
+        return self.date
+
+    def get_start_time(self):
+        return datetime.datetime.combine(
+            self.date, self.start_time
+        )
+
+    def get_end_time(self):
+        return datetime.datetime.combine(
+            self.date, self.end_time
+        )
+
 
 class Appointment(models.Model):
     client = models.ForeignKey(
@@ -366,7 +366,7 @@ class ArchivedAppointment(models.Model):
         ArchivedAppointmentRequest, on_delete=models.CASCADE
     )
     id_request = models.CharField(max_length=100, blank=True, null=True)
-
+    not_come = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
