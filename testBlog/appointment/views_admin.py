@@ -1,17 +1,18 @@
 import json
 from datetime import date
 
+from django.apps import apps
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.paginator import Paginator
-from django.db.models import ProtectedError
+from django.db.models import Count, Max, ProtectedError, Q
 from django.http import (HttpResponse, HttpResponseBadRequest,
                          HttpResponseNotFound, JsonResponse)
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template import loader
 from django.utils.translation import gettext_lazy as _
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 
 from .decorators import (require_ajax, require_staff_or_superuser,
                          require_superuser, require_user_authenticated)
@@ -20,6 +21,7 @@ from .forms import (CalendarSettingsForm, PersonalInformationForm, ServiceForm,
                     StaffSlotDurationForm)
 from .models import (Appointment, ArchivedAppointment, DayOff, Service,
                      StaffMember, WorkingHours)
+from .serializers import ClientAnalyticsSerializer
 from .services import (arhiv_appointment, check_exists_calander_settings,
                        create_new_appt_from_calender_modal,
                        fetch_user_appointments, get_day_off_list_service,
@@ -35,6 +37,8 @@ from .utils.json_context import (convert_appointment_to_json,
                                  handle_unauthorized_response, json_response)
 from .utils.permissions import (check_extensive_permissions, check_permissions,
                                 has_permission_to_delete_appointment)
+
+Review = apps.get_model("mainController", "Review")
 
 
 @require_user_authenticated
@@ -168,8 +172,7 @@ def show_staff_profile(request, staff_user_id=None):
         context=context,
         request=request
     )
-    response = HttpResponse(content)
-    return response
+    return HttpResponse(content)
 
 
 @require_user_authenticated
@@ -489,10 +492,14 @@ def delete_appointment_ajax(request):
     if not has_permission_to_delete_appointment(request.user, appointment):
         message = _("You can only delete your own appointments.")
         return json_response(message, status=403, success=False, error_code=ErrorCode.NOT_AUTHORIZED)
-    arhiv_appointment(appointment)
+    if appointment.not_come:
+        arhiv_appointment(appointment)
+        massage = "Запись отправлена в архив"
+    else:
+        massage = "Запись удалена"
     appointment.appointment_request.delete()
     appointment.delete()
-    return json_response("Запись отправлена в архив")
+    return json_response(massage)
 
 
 @require_user_authenticated
@@ -834,3 +841,146 @@ def edit_staff_slot_duration(request, staff_id=None):
     else:
         return render(request, "administration/edit_staff_slot_duration.html", {"staff_member": staff_member
                                                                             })
+
+
+@require_staff_or_superuser
+def check_analytics(request):
+    return render(request, "administration/vue/analytics.html")
+
+
+@require_GET
+@require_user_authenticated
+@require_staff_or_superuser
+def load_analytics(request):
+    query = request.GET.get('q', '').strip()
+    parts = query.split()
+    if len(parts) >= 2:
+        q_objects = (
+            Q(first_name__icontains=parts[0]) & Q(last_name__icontains=parts[1]) |
+            Q(first_name__icontains=parts[1]) & Q(last_name__icontains=parts[0])
+        )
+    elif len(parts) == 1:
+        q_objects = (
+            Q(first_name__icontains=parts[0]) |
+            Q(last_name__icontains=parts[0])
+        )
+    else:
+        q_objects = (
+            Q(first_name__icontains='') |
+            Q(last_name__icontains='')
+        )
+    clients = get_user_model().objects.filter(
+        Q(is_staff=False) &
+        q_objects
+    ).annotate(
+        total_visits=Count("archivedappointment", distinct=True),
+        total_comments=Count("review", distinct=True),
+        last_visit=Max("archivedappointment__appointment_request__date")
+    )
+    page = request.GET.get("page", 1)
+    paginator = Paginator(clients, 10)
+    page_clients = paginator.get_page(page)
+    serializer = ClientAnalyticsSerializer(page_clients.object_list, many=True)
+    return JsonResponse({
+        "clients": serializer.data,
+        "cln_paginator": {
+            "current_page": page_clients.number,
+            "total_pages": paginator.num_pages,
+            "has_next": page_clients.has_next(),
+            "has_prev": page_clients.has_previous(),
+            "total_clients": len(page_clients.object_list),
+        }
+    })
+
+
+@require_user_authenticated
+@require_staff_or_superuser
+def load_reviews(request):
+    reviews = Review.objects.select_related('user').all().order_by('-created_at')
+    page_number = request.GET.get("page", 1)
+    paginator = Paginator(reviews, 10)
+    page_reviews = paginator.get_page(page_number)
+    serialized_reviews = [{
+            'id': review.id,
+            'user': {
+                'name': review.user.get_full_name(),
+                'tg_user': review.user.is_tg_user(),
+                'avatar': review.user.photo_url if review.user.is_tg_user() else review.user.get_avatar_url(),
+            },
+            'text': review.text,
+            'rating': review.rating,
+            'created_at': review.created_at,
+        }
+        for review in page_reviews.object_list
+    ]
+    return JsonResponse({
+        'reviews': serialized_reviews,
+        'total_reviews': paginator.count,
+        'has_next': page_reviews.has_next(),
+        'has_previous': page_reviews.has_previous(),
+        'current_page': page_reviews.number,
+        'total_pages': paginator.num_pages
+    })
+
+
+@require_user_authenticated
+@require_staff_or_superuser
+def delete_reviews(request):
+    try:
+        data = json.loads(request.body)
+        review_ids = data.get('review_ids', [])
+
+        Review.objects.filter(id__in=review_ids).delete()
+
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+@require_user_authenticated
+@require_staff_or_superuser
+def load_client_history(request):
+    id = request.GET.get("clientId", None)
+    if id:
+        try:
+            client = get_user_model().objects.get(pk=id)
+            appointments = ArchivedAppointment.objects.filter(
+                client=client
+            ).select_related(
+                'appointment_request__service',
+                'appointment_request__staff_member__user'
+            ).only(
+                'id', 'not_come', 'created_at',
+                'appointment_request__date',
+                'appointment_request__start_time',
+                'appointment_request__end_time',
+                'appointment_request__service__name',
+                'appointment_request__service__price',
+                'appointment_request__staff_member__user__first_name',
+                'appointment_request__staff_member__user__last_name',
+            ).order_by('-created_at')
+            history = []
+            total_price = 0
+            for appointment in appointments:
+                request_data = appointment.appointment_request
+                total_price += request_data.service.price if request_data.service.price and not appointment.not_come else 0
+                history.append({
+                    "id": appointment.id,
+                    "date": request_data.get_ar_date(),
+                    "start_time": request_data.get_start_time(),
+                    "end_time": request_data.get_end_time(),
+                    "service": {
+                        'name': request_data.service.name if request_data.service.name else None,
+                        'price': request_data.service.price if request_data.service.price else 0,
+                    },
+                    "staff_member": request_data.staff_member.user.get_full_name() if request_data.staff_member else None,
+                    "not_come": appointment.not_come,
+                    "created_at": appointment.created_at,
+                })
+            return JsonResponse({
+                "history": history,
+                "total_price": total_price,
+            })
+        except get_user_model().DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Client not found'}, status=404)
+    else:
+        return JsonResponse({'success': False, 'error': 'Client id is required'}, status=400)

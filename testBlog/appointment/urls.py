@@ -164,7 +164,12 @@ admin_urlpatterns = [
     path('get_working_hours_list/<int:staff_user_id>', views_admin.get_working_hours_list, name='get_working_hours_list'),
     path('edit_staff_slot_duration/<int:staff_id>', views_admin.edit_staff_slot_duration, name='edit_staff_slot_duration'),
 
-
+    # vue-analytics
+    path('check_analytics/', views_admin.check_analytics, name='check_analytics'),
+    path('load_analytics/', views_admin.load_analytics, name='load_analytics'),
+    path('load_reviews/', views_admin.load_reviews, name='load_reviews'),
+    path('delete-reviews/', views_admin.delete_reviews, name='delete_reviews'),
+    path('load_client_history', views_admin.load_client_history, name='load_client_history'),
 
 ]
 
